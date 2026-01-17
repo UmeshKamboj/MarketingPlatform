@@ -70,6 +70,8 @@ namespace MarketingPlatform.Infrastructure.Services
             var refreshToken = await _tokenService.GenerateRefreshTokenAsync();
             await _tokenService.SaveRefreshTokenAsync(user.Id, refreshToken);
 
+            var expiryMinutes = Convert.ToDouble(_configuration["JwtSettings:ExpiryMinutes"]);
+
             return new AuthResponseDto
             {
                 UserId = user.Id,
@@ -78,7 +80,7 @@ namespace MarketingPlatform.Infrastructure.Services
                 LastName = user.LastName,
                 Token = token,
                 RefreshToken = refreshToken,
-                TokenExpiration = DateTime.UtcNow.AddMinutes(60),
+                TokenExpiration = DateTime.UtcNow.AddMinutes(expiryMinutes),
                 Roles = new List<string> { "User" }
             };
         }
@@ -111,6 +113,8 @@ namespace MarketingPlatform.Infrastructure.Services
             var refreshToken = await _tokenService.GenerateRefreshTokenAsync();
             await _tokenService.SaveRefreshTokenAsync(user.Id, refreshToken);
 
+            var expiryMinutes = Convert.ToDouble(_configuration["JwtSettings:ExpiryMinutes"]);
+
             _logger.LogInformation($"User logged in: {user.Email}");
 
             return new AuthResponseDto
@@ -121,7 +125,7 @@ namespace MarketingPlatform.Infrastructure.Services
                 LastName = user.LastName,
                 Token = token,
                 RefreshToken = refreshToken,
-                TokenExpiration = DateTime.UtcNow.AddMinutes(60),
+                TokenExpiration = DateTime.UtcNow.AddMinutes(expiryMinutes),
                 Roles = roles.ToList()
             };
         }
@@ -155,6 +159,7 @@ namespace MarketingPlatform.Infrastructure.Services
             await _tokenService.SaveRefreshTokenAsync(user.Id, newRefreshToken);
 
             var roles = await _userManager.GetRolesAsync(user);
+            var expiryMinutes = Convert.ToDouble(_configuration["JwtSettings:ExpiryMinutes"]);
 
             return new AuthResponseDto
             {
@@ -164,7 +169,7 @@ namespace MarketingPlatform.Infrastructure.Services
                 LastName = user.LastName,
                 Token = newToken,
                 RefreshToken = newRefreshToken,
-                TokenExpiration = DateTime.UtcNow.AddMinutes(60),
+                TokenExpiration = DateTime.UtcNow.AddMinutes(expiryMinutes),
                 Roles = roles.ToList()
             };
         }
