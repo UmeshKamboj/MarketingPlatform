@@ -117,11 +117,66 @@ After running the API, verify the following:
   - 3 subscription plans: Free, Pro, Enterprise
   - 2 message providers: Twilio SMS, SendGrid Email
 
+## Testing Authentication
+
+### Register User
+```bash
+POST /api/auth/register
+{
+  "email": "test@example.com",
+  "password": "Test@12345",
+  "confirmPassword": "Test@12345",
+  "firstName": "Test",
+  "lastName": "User"
+}
+```
+
+### Login
+```bash
+POST /api/auth/login
+{
+  "email": "test@example.com",
+  "password": "Test@12345"
+}
+```
+
+### Get Current User (requires Bearer token)
+```bash
+GET /api/auth/me
+Authorization: Bearer {token}
+```
+
+### Refresh Token
+```bash
+POST /api/auth/refresh-token
+{
+  "token": "{expired_token}",
+  "refreshToken": "{refresh_token}"
+}
+```
+
+### Change Password (requires Bearer token)
+```bash
+POST /api/auth/change-password
+Authorization: Bearer {token}
+{
+  "currentPassword": "Test@12345",
+  "newPassword": "NewTest@12345",
+  "confirmNewPassword": "NewTest@12345"
+}
+```
+
+### Logout (requires Bearer token)
+```bash
+POST /api/auth/logout
+Authorization: Bearer {token}
+```
+
 ## Features (Planned)
 
 - ✅ Task 1.1: Solution structure and core projects
-- ✅ Task 1.2: Database foundation ← **Current**
-- ⏳ Task 1.3: Authentication & multi-tenancy
+- ✅ Task 1.2: Database foundation
+- ✅ Task 1.3: Authentication & Authorization Core ← **Current**
 - ⏳ Campaign management
 - ⏳ Contact & group management
 - ⏳ Template management
@@ -132,7 +187,7 @@ After running the API, verify the following:
 - ⏳ Super admin platform
 
 ## Project Status
-🚧 **In Development** - Task 1.2 Complete
+🚧 **In Development** - Task 1.3 Complete
 
 ## License
 MIT License
