@@ -1,0 +1,10 @@
+/* Custom styles for Marketing Platform */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.marketing-header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+}
