@@ -52,10 +52,16 @@ Shared utilities and helpers.
 2. **Update connection strings**
    - Update `appsettings.json` in both API and Web projects with your SQL Server connection string
 
-3. **Apply database migrations** (Task 1.2)
+3. **Apply database migrations**
    ```bash
    cd src/MarketingPlatform.Infrastructure
    dotnet ef database update --startup-project ../MarketingPlatform.API
+   ```
+   
+   Or run the API which will automatically migrate and seed the database:
+   ```bash
+   cd src/MarketingPlatform.API
+   dotnet run
    ```
 
 4. **Run the API**
@@ -85,10 +91,36 @@ Shared utilities and helpers.
 - **ApiSettings**: API base URL
 - **Stripe**: Publishable key
 
+## Database Setup
+
+The database is automatically migrated and seeded when you run the API. However, you can also manually manage migrations:
+
+### Create Migration
+```bash
+cd src/MarketingPlatform.Infrastructure
+dotnet ef migrations add MigrationName --startup-project ../MarketingPlatform.API
+```
+
+### Update Database
+```bash
+cd src/MarketingPlatform.Infrastructure
+dotnet ef database update --startup-project ../MarketingPlatform.API
+```
+
+### Verify Setup
+After running the API, verify the following:
+- Database `MarketingPlatformDb` is created
+- All tables are created successfully
+- Seed data is inserted:
+  - 3 roles: Admin, User, Manager
+  - Admin user: admin@marketingplatform.com / Admin@123456
+  - 3 subscription plans: Free, Pro, Enterprise
+  - 2 message providers: Twilio SMS, SendGrid Email
+
 ## Features (Planned)
 
-- ✅ Task 1.1: Solution structure and core projects ← **Current**
-- ⏳ Task 1.2: Database foundation
+- ✅ Task 1.1: Solution structure and core projects
+- ✅ Task 1.2: Database foundation ← **Current**
 - ⏳ Task 1.3: Authentication & multi-tenancy
 - ⏳ Campaign management
 - ⏳ Contact & group management
@@ -100,7 +132,7 @@ Shared utilities and helpers.
 - ⏳ Super admin platform
 
 ## Project Status
-🚧 **In Development** - Task 1.1 Complete
+🚧 **In Development** - Task 1.2 Complete
 
 ## License
 MIT License
