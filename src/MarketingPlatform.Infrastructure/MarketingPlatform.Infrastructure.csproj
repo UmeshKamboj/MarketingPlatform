@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MarketingPlatform.Application\MarketingPlatform.Application.csproj" />
     <ProjectReference Include="..\MarketingPlatform.Core\MarketingPlatform.Core.csproj" />
     <ProjectReference Include="..\MarketingPlatform.Shared\MarketingPlatform.Shared.csproj" />
   </ItemGroup>
