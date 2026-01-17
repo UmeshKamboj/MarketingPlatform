@@ -1,47 +1,109 @@
-# Marketing Platform
+# Marketing Platform - SMS, MMS & Email Marketing Solution
 
-A comprehensive marketing platform built with .NET 8.0 using Clean Architecture principles.
+## Overview
+A robust, enterprise-grade SMS, MMS & Email Marketing Platform built with ASP.NET Core 8.0, SQL Server, and Bootstrap 5.
 
-## Solution Structure
+## Technology Stack
+- **Framework**: ASP.NET Core 8.0
+- **Database**: SQL Server with Entity Framework Core
+- **Frontend**: Bootstrap 5, jQuery, Font Awesome
+- **Authentication**: ASP.NET Core Identity with JWT
+- **Background Jobs**: Hangfire
+- **Logging**: Serilog
+- **Payments**: Stripe
+- **API Documentation**: Swagger/OpenAPI
 
-- **MarketingPlatform.API** - RESTful API project
-- **MarketingPlatform.Web** - ASP.NET Core MVC web application
-- **MarketingPlatform.Core** - Domain entities and interfaces
-- **MarketingPlatform.Infrastructure** - Data access and external services
-- **MarketingPlatform.Application** - Business logic and application services
-- **MarketingPlatform.Shared** - Shared utilities and helpers
+## Projects
 
-## Prerequisites
+### MarketingPlatform.API
+RESTful API for all platform operations.
 
-- .NET 8.0 SDK
-- SQL Server (LocalDB or full instance)
-- Visual Studio 2022 or VS Code
+### MarketingPlatform.Web
+Web application (MVC) consuming the API.
+
+### MarketingPlatform.Core
+Domain entities, interfaces, enums, and constants.
+
+### MarketingPlatform.Infrastructure
+Data access, repositories, and external service integrations.
+
+### MarketingPlatform.Application
+Business logic, services, DTOs, and validators.
+
+### MarketingPlatform.Shared
+Shared utilities and helpers.
 
 ## Getting Started
 
-1. Clone the repository
-2. Update connection strings in appsettings.json
-3. Run database migrations (when available)
-4. Build and run the solution
+### Prerequisites
+- .NET 8.0 SDK
+- SQL Server (LocalDB, Express, or Full)
+- Visual Studio 2022 or VS Code
+- Node.js (optional, for frontend tooling)
 
-## Running the Projects
+### Setup Instructions
 
-### API Project
-```bash
-cd src/MarketingPlatform.API
-dotnet run
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/UmeshKamboj/MarketingPlatform.git
+   cd MarketingPlatform
+   ```
 
-### Web Project
-```bash
-cd src/MarketingPlatform.Web
-dotnet run
-```
+2. **Update connection strings**
+   - Update `appsettings.json` in both API and Web projects with your SQL Server connection string
 
-## Architecture
+3. **Apply database migrations** (Task 1.2)
+   ```bash
+   cd src/MarketingPlatform.Infrastructure
+   dotnet ef database update --startup-project ../MarketingPlatform.API
+   ```
 
-This solution follows Clean Architecture principles with clear separation of concerns:
-- Domain-centric design
-- Dependency inversion
-- Separation of business logic from infrastructure
-- Testable and maintainable codebase
+4. **Run the API**
+   ```bash
+   cd src/MarketingPlatform.API
+   dotnet run
+   ```
+   API will be available at: https://localhost:7001
+
+5. **Run the Web Application**
+   ```bash
+   cd src/MarketingPlatform.Web
+   dotnet run
+   ```
+   Web app will be available at: https://localhost:7002
+
+## Configuration
+
+### API Settings (appsettings.json)
+- **ConnectionStrings**: Database connection
+- **JwtSettings**: JWT authentication configuration
+- **Stripe**: Payment gateway keys
+- **Serilog**: Logging configuration
+
+### Web Settings (appsettings.json)
+- **ConnectionStrings**: Database connection
+- **ApiSettings**: API base URL
+- **Stripe**: Publishable key
+
+## Features (Planned)
+
+- ✅ Task 1.1: Solution structure and core projects ← **Current**
+- ⏳ Task 1.2: Database foundation
+- ⏳ Task 1.3: Authentication & multi-tenancy
+- ⏳ Campaign management
+- ⏳ Contact & group management
+- ⏳ Template management
+- ⏳ Keyword campaigns
+- ⏳ Automation & workflows
+- ⏳ Analytics & reporting
+- ⏳ Billing & subscriptions
+- ⏳ Super admin platform
+
+## Project Status
+🚧 **In Development** - Task 1.1 Complete
+
+## License
+MIT License
+
+## Contact
+For questions or support, contact: support@marketingplatform.com
