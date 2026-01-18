@@ -248,15 +248,17 @@ namespace MarketingPlatform.Application.Services
             if (!contacts.Any())
                 return false;
 
+            // Get all existing memberships in a single query to avoid N+1
+            var existingMembers = await _memberRepository.FindAsync(m => 
+                contactIds.Contains(m.ContactId) && m.ContactGroupId == groupId && !m.IsDeleted);
+            var existingContactIds = existingMembers.Select(m => m.ContactId).ToHashSet();
+
             int addedCount = 0;
 
             foreach (var contactId in contactIds)
             {
-                // Check for duplicate membership
-                var existingMember = await _memberRepository.FirstOrDefaultAsync(m => 
-                    m.ContactId == contactId && m.ContactGroupId == groupId && !m.IsDeleted);
-
-                if (existingMember != null)
+                // Check for duplicate membership using the pre-fetched set
+                if (existingContactIds.Contains(contactId))
                     continue; // Skip duplicates
 
                 // Add to group
