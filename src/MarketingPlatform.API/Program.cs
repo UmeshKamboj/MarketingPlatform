@@ -120,6 +120,9 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IExternalAuthProviderRepository, ExternalAuthProviderRepository>();
 builder.Services.AddScoped<IUserExternalLoginRepository, UserExternalLoginRepository>();
+builder.Services.AddScoped<ISuperAdminRepository, SuperAdminRepository>();
+builder.Services.AddScoped<IPrivilegedActionLogRepository, PrivilegedActionLogRepository>();
+builder.Services.AddScoped<IPlatformConfigurationRepository, PlatformConfigurationRepository>();
 
 // Application Services
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -139,6 +142,9 @@ builder.Services.AddScoped<IAudienceSegmentationService, AudienceSegmentationSer
 builder.Services.AddScoped<IKeywordService, KeywordService>();
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
+builder.Services.AddScoped<ISuperAdminService, SuperAdminService>();
+builder.Services.AddScoped<IPrivilegedActionLogService, PrivilegedActionLogService>();
+builder.Services.AddScoped<IPlatformConfigurationService, PlatformConfigurationService>();
 
 // Scheduling & Automation Services
 builder.Services.AddScoped<ICampaignSchedulerService, CampaignSchedulerService>();
