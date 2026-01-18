@@ -9,13 +9,16 @@ namespace MarketingPlatform.API.Controllers
     public class WebhooksController : ControllerBase
     {
         private readonly IMessageService _messageService;
+        private readonly IKeywordService _keywordService;
         private readonly ILogger<WebhooksController> _logger;
 
         public WebhooksController(
             IMessageService messageService,
+            IKeywordService keywordService,
             ILogger<WebhooksController> logger)
         {
             _messageService = messageService;
+            _keywordService = keywordService;
             _logger = logger;
         }
 
@@ -45,6 +48,28 @@ namespace MarketingPlatform.API.Controllers
             }
         }
 
+        [HttpPost("sms-inbound")]
+        public async Task<IActionResult> SMSInbound([FromBody] InboundSmsWebhookDto payload)
+        {
+            try
+            {
+                // TODO: Validate webhook signature from provider
+
+                _logger.LogInformation("Inbound SMS received from {PhoneNumber}: {Message}", 
+                    payload.From, payload.Body);
+
+                // Process keyword if present
+                await _keywordService.ProcessInboundKeywordAsync(payload.From, payload.Body);
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to process inbound SMS");
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
         [HttpPost("sms-delivery")]
         public async Task<IActionResult> SMSDeliveryUpdate([FromBody] dynamic payload)
         {
@@ -65,5 +90,14 @@ namespace MarketingPlatform.API.Controllers
             _logger.LogInformation("Email delivery webhook received");
             return Ok();
         }
+    }
+
+    // DTO for inbound SMS webhook (Twilio format)
+    public class InboundSmsWebhookDto
+    {
+        public string From { get; set; } = string.Empty;
+        public string To { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+        public string MessageSid { get; set; } = string.Empty;
     }
 }
