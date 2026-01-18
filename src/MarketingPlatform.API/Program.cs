@@ -88,10 +88,13 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IExternalAuthProviderRepository, ExternalAuthProviderRepository>();
+builder.Services.AddScoped<IUserExternalLoginRepository, UserExternalLoginRepository>();
 
 // Application Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOAuth2Service, OAuth2Service>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IContactService, ContactService>();
@@ -125,6 +128,18 @@ builder.Services.AddScoped<IReportExportService, ReportExportService>();
 builder.Services.AddScoped<IWebhookService, WebhookService>();
 builder.Services.AddScoped<ICRMIntegrationService, CRMIntegrationService>();
 
+// OAuth2 Providers (optional - only used if configured)
+builder.Services.AddScoped<IOAuth2Provider, MarketingPlatform.Infrastructure.Services.OAuth2Providers.AzureADAuthProvider>();
+builder.Services.AddScoped<IOAuth2Provider, MarketingPlatform.Infrastructure.Services.OAuth2Providers.GoogleAuthProvider>();
+builder.Services.AddScoped<IOAuth2Provider, MarketingPlatform.Infrastructure.Services.OAuth2Providers.OktaAuthProvider>();
+builder.Services.AddScoped<IOAuth2Provider, MarketingPlatform.Infrastructure.Services.OAuth2Providers.AwsCognitoAuthProvider>();
+
+// File Storage Providers
+builder.Services.AddScoped<IFileStorageProvider, MarketingPlatform.Infrastructure.Services.FileStorageProviders.LocalFileStorageProvider>();
+builder.Services.AddScoped<IFileStorageProvider, MarketingPlatform.Infrastructure.Services.FileStorageProviders.AzureBlobStorageProvider>();
+builder.Services.AddScoped<IFileStorageProvider, MarketingPlatform.Infrastructure.Services.FileStorageProviders.S3FileStorageProvider>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
 // Provider Services (Mock implementations)
 builder.Services.AddScoped<ISMSProvider, MockSMSProvider>();
 builder.Services.AddScoped<IMMSProvider, MockMMSProvider>();
@@ -134,6 +149,9 @@ builder.Services.AddScoped<IEmailProvider, MockEmailProvider>();
 // builder.Services.AddScoped<ISMSProvider, TwilioSMSProvider>();
 // builder.Services.AddScoped<IMMSProvider, TwilioMMSProvider>();
 // builder.Services.AddScoped<IEmailProvider, SendGridEmailProvider>();
+
+// Add HttpClientFactory for OAuth2 providers
+builder.Services.AddHttpClient();
 
 // Background Services
 builder.Services.AddHostedService<MessageQueueProcessor>();

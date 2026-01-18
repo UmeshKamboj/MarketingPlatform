@@ -56,6 +56,9 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<ApiRateLimit> ApiRateLimits => Set<ApiRateLimit>();
         public DbSet<RateLimitLog> RateLimitLogs => Set<RateLimitLog>();
         public DbSet<ProviderRateLimit> ProviderRateLimits => Set<ProviderRateLimit>();
+        public DbSet<ExternalAuthProvider> ExternalAuthProviders => Set<ExternalAuthProvider>();
+        public DbSet<UserExternalLogin> UserExternalLogins => Set<UserExternalLogin>();
+        public DbSet<FileStorageSettings> FileStorageSettings => Set<FileStorageSettings>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
