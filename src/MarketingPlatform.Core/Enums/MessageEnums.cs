@@ -10,6 +10,7 @@ namespace MarketingPlatform.Core.Enums
     public enum MessageStatus
     {
         Queued,
+        Sending,
         Sent,
         Delivered,
         Failed,
