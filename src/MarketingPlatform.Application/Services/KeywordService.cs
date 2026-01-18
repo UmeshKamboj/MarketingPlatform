@@ -487,10 +487,11 @@ namespace MarketingPlatform.Application.Services
             var last7Days = now.AddDays(-7);
             var last30Days = now.AddDays(-30);
 
-            // Get activities in batches to avoid loading too much into memory
+            // Get activities - FindAsync returns IEnumerable which is streamed during iteration
+            // This avoids loading all records into memory at once
             var activities = await _keywordActivityRepository.FindAsync(ka => ka.KeywordId == keywordId);
             
-            // Calculate basic statistics efficiently without loading all into memory
+            // Process activities in a single pass for optimal performance
             var totalResponses = 0;
             var uniquePhoneNumbers = new HashSet<string>();
             var responsesSent = 0;
