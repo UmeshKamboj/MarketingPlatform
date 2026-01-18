@@ -16,6 +16,7 @@ namespace MarketingPlatform.Application.Services
         private readonly IRepository<Campaign> _campaignRepository;
         private readonly IRepository<ContactGroup> _contactGroupRepository;
         private readonly IRepository<ContactGroupMember> _groupMemberRepository;
+        private readonly IRepository<Contact> _contactRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<KeywordService> _logger;
@@ -27,6 +28,7 @@ namespace MarketingPlatform.Application.Services
             IRepository<Campaign> campaignRepository,
             IRepository<ContactGroup> contactGroupRepository,
             IRepository<ContactGroupMember> groupMemberRepository,
+            IRepository<Contact> contactRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<KeywordService> logger,
@@ -37,6 +39,7 @@ namespace MarketingPlatform.Application.Services
             _campaignRepository = campaignRepository;
             _contactGroupRepository = contactGroupRepository;
             _groupMemberRepository = groupMemberRepository;
+            _contactRepository = contactRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
@@ -349,6 +352,19 @@ namespace MarketingPlatform.Application.Services
 
         public async Task<KeywordActivityDto> ProcessInboundKeywordAsync(string phoneNumber, string message)
         {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                _logger.LogWarning("ProcessInboundKeywordAsync called with null or empty phoneNumber");
+                throw new ArgumentException("Phone number is required", nameof(phoneNumber));
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                _logger.LogWarning("ProcessInboundKeywordAsync called with null or empty message");
+                throw new ArgumentException("Message is required", nameof(message));
+            }
+
             // Extract the first word as the keyword
             var keywordText = message.Trim().Split(' ')[0].ToUpperInvariant();
 
@@ -359,16 +375,17 @@ namespace MarketingPlatform.Application.Services
             if (keyword == null)
             {
                 _logger.LogInformation("No active keyword found for text: {KeywordText}", keywordText);
-                // Return activity without response
-                var unknownActivity = new KeywordActivity
+                // Return DTO directly for unknown keyword (not saved to database with KeywordId = 0)
+                return new KeywordActivityDto
                 {
-                    KeywordId = 0, // No matching keyword
+                    Id = 0,
+                    KeywordId = 0,
+                    KeywordText = keywordText,
                     PhoneNumber = phoneNumber,
                     IncomingMessage = message,
                     ResponseSent = null,
                     ReceivedAt = DateTime.UtcNow
                 };
-                return _mapper.Map<KeywordActivityDto>(unknownActivity);
             }
 
             // Log keyword activity
@@ -407,8 +424,7 @@ namespace MarketingPlatform.Application.Services
                 try
                 {
                     // Check if contact exists with this phone number
-                    var contactRepository = _unitOfWork.Repository<Contact>();
-                    var contact = await contactRepository.FirstOrDefaultAsync(c =>
+                    var contact = await _contactRepository.FirstOrDefaultAsync(c =>
                         c.PhoneNumber == phoneNumber && c.UserId == keyword.UserId && !c.IsDeleted);
 
                     if (contact != null)

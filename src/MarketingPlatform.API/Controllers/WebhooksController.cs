@@ -49,11 +49,14 @@ namespace MarketingPlatform.API.Controllers
         }
 
         [HttpPost("sms-inbound")]
+        // TODO: Add webhook signature validation for production use
+        // Example: Validate Twilio request signature using auth token
         public async Task<IActionResult> SMSInbound([FromBody] InboundSmsWebhookDto payload)
         {
             try
             {
                 // TODO: Validate webhook signature from provider
+                // For Twilio: Use X-Twilio-Signature header and validate against auth token
 
                 _logger.LogInformation("Inbound SMS received from {PhoneNumber}: {Message}", 
                     payload.From, payload.Body);

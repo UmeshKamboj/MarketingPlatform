@@ -163,6 +163,8 @@ namespace MarketingPlatform.API.Controllers
 
         [HttpPost("process-inbound")]
         [AllowAnonymous] // This endpoint should be called by SMS provider webhooks
+        // TODO: Add webhook signature validation for production use
+        // Example: Validate HMAC signature from Twilio/Plivo headers
         public async Task<ActionResult<ApiResponse<KeywordActivityDto>>> ProcessInboundKeyword([FromBody] InboundSmsDto dto)
         {
             try
