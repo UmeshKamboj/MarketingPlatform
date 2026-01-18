@@ -4,65 +4,210 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Marketing Platform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Marketing Platform</a>
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-megaphone-fill text-primary"></i> Marketing Platform
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door"></i> Home
+                            </a>
                         </li>
-                        <li class="nav-item" require-permission="ViewCampaigns">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Campaigns" asp-action="Index">Campaigns</a>
+                        
+                        <!-- User Dashboard -->
+                        <li class="nav-item dropdown" require-permission="ViewProfile">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Dashboard"><i class="bi bi-grid"></i> My Dashboard</a></li>
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Profile"><i class="bi bi-person"></i> My Profile</a></li>
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Settings"><i class="bi bi-gear"></i> My Settings</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item" require-permission="ViewContacts">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Contacts" asp-action="Index">Contacts</a>
+
+                        <!-- Campaigns -->
+                        <li class="nav-item dropdown" require-permission="ViewCampaigns">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-megaphone"></i> Campaigns
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Campaigns" asp-action="Index"><i class="bi bi-list-ul"></i> All Campaigns</a></li>
+                                <li><a class="dropdown-item" asp-controller="Campaigns" asp-action="Create"><i class="bi bi-plus-circle"></i> Create Campaign</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item" require-permission="ViewTemplates">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Templates" asp-action="Index">Templates</a>
+
+                        <!-- Contacts -->
+                        <li class="nav-item dropdown" require-permission="ViewContacts">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-people"></i> Contacts
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Contacts" asp-action="Index"><i class="bi bi-list-ul"></i> All Contacts</a></li>
+                                <li><a class="dropdown-item" asp-controller="Contacts" asp-action="Create"><i class="bi bi-person-plus"></i> Add Contact</a></li>
+                                <li><a class="dropdown-item" asp-controller="Contacts" asp-action="Groups"><i class="bi bi-collection"></i> Contact Groups</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item" require-permission="ViewAnalytics">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Analytics" asp-action="Index">Analytics</a>
+
+                        <!-- Templates -->
+                        <li class="nav-item dropdown" require-permission="ViewTemplates">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-file-earmark-text"></i> Templates
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Templates" asp-action="Index"><i class="bi bi-list-ul"></i> All Templates</a></li>
+                                <li><a class="dropdown-item" asp-controller="Templates" asp-action="Create"><i class="bi bi-plus-circle"></i> Create Template</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item" require-permission="ViewWorkflows">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Workflows" asp-action="Index">Workflows</a>
+
+                        <!-- Workflows -->
+                        <li class="nav-item dropdown" require-permission="ViewWorkflows">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-diagram-3"></i> Workflows
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Workflows" asp-action="Index"><i class="bi bi-list-ul"></i> All Workflows</a></li>
+                                <li><a class="dropdown-item" asp-controller="Workflows" asp-action="Create"><i class="bi bi-plus-circle"></i> Create Workflow</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item" require-permission="ViewUsers">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
+
+                        <!-- Analytics -->
+                        <li class="nav-item dropdown" require-permission="ViewAnalytics">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-graph-up-arrow"></i> Analytics
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Analytics" asp-action="Index"><i class="bi bi-speedometer"></i> Dashboard</a></li>
+                                <li><a class="dropdown-item" asp-controller="Analytics" asp-action="Campaigns"><i class="bi bi-bar-chart"></i> Campaign Performance</a></li>
+                                <li><a class="dropdown-item" asp-controller="Analytics" asp-action="Reports"><i class="bi bi-file-earmark-bar-graph"></i> Reports</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item" require-permission="ViewRoles">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Roles</a>
+
+                        <!-- Administration -->
+                        <li class="nav-item dropdown" require-permission="ViewUsers">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-shield-lock"></i> Administration
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Index"><i class="bi bi-people"></i> Manage Users</a></li>
+                                <li><a class="dropdown-item" asp-controller="Roles" asp-action="Index"><i class="bi bi-key"></i> Roles & Permissions</a></li>
+                                <li><a class="dropdown-item" asp-controller="Pricing" asp-action="Index"><i class="bi bi-currency-dollar"></i> Pricing Plans</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="Settings" asp-action="Index"><i class="bi bi-gear"></i> Settings</a></li>
+                                <li><a class="dropdown-item" asp-controller="Settings" asp-action="Integrations"><i class="bi bi-plug"></i> Integrations</a></li>
+                                <li><a class="dropdown-item" asp-controller="Settings" asp-action="Compliance"><i class="bi bi-shield-check"></i> Compliance</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item" require-permission="ViewSettings">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Settings" asp-action="Index">Settings</a>
+
+                        <!-- Super Admin -->
+                        <li class="nav-item dropdown" require-permission="ManageSuperAdmins">
+                            <a class="nav-link dropdown-toggle text-danger" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-lightning-fill"></i> Super Admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="SuperAdmin" asp-action="Dashboard"><i class="bi bi-speedometer"></i> Admin Dashboard</a></li>
+                                <li><a class="dropdown-item" asp-controller="SuperAdmin" asp-action="Users"><i class="bi bi-people-fill"></i> System Users</a></li>
+                                <li><a class="dropdown-item" asp-controller="SuperAdmin" asp-action="PlatformConfig"><i class="bi bi-sliders"></i> Platform Config</a></li>
+                                <li><a class="dropdown-item" asp-controller="SuperAdmin" asp-action="AuditLogs"><i class="bi bi-journal-text"></i> Audit Logs</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="LandingPageConfig" asp-action="Index"><i class="bi bi-layout-text-window"></i> Landing Page Config</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <!-- Right side menu -->
+                    <ul class="navbar-nav ms-auto">
+                        <!-- Authenticated User Menu -->
+                        <li class="nav-item dropdown d-none" id="user-menu">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i> <span id="user-name">User</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Profile"><i class="bi bi-person"></i> Profile</a></li>
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Settings"><i class="bi bi-gear"></i> Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="Logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                        
+                        <!-- Guest Menu -->
+                        <li class="nav-item" id="login-link">
+                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item" id="register-link">
+                            <a class="nav-link btn btn-primary text-white ms-2" asp-controller="Auth" asp-action="Register">
+                                <i class="bi bi-person-plus"></i> Sign Up
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - Marketing Platform - <a asp-area="" asp-controller="Home" asp-action="Index">Privacy</a>
+    <footer class="border-top footer text-muted bg-light mt-5">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5 class="fw-bold">Marketing Platform</h5>
+                    <p class="small">SMS, MMS & Email Marketing Solution</p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="fw-bold">Product</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#features" class="text-decoration-none text-muted">Features</a></li>
+                        <li><a href="#pricing" class="text-decoration-none text-muted">Pricing</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="fw-bold">Company</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="text-decoration-none text-muted">About Us</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Contact</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="fw-bold">Legal</h6>
+                    <ul class="list-unstyled small">
+                        <li><a asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-muted">Privacy Policy</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center small">
+                &copy; 2024 Marketing Platform - All rights reserved
+            </div>
         </div>
     </footer>
 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/custom.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
