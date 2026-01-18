@@ -1,5 +1,3 @@
-using MarketingPlatform.Core.Entities;
-
 namespace MarketingPlatform.Core.Entities
 {
     /// <summary>
