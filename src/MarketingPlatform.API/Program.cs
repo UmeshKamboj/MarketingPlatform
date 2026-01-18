@@ -120,6 +120,10 @@ builder.Services.AddScoped<IMessageRoutingService, MessageRoutingService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<IReportExportService, ReportExportService>();
 
+// Integration Services
+builder.Services.AddScoped<IWebhookService, WebhookService>();
+builder.Services.AddScoped<ICRMIntegrationService, CRMIntegrationService>();
+
 // Provider Services (Mock implementations)
 builder.Services.AddScoped<ISMSProvider, MockSMSProvider>();
 builder.Services.AddScoped<IMMSProvider, MockMMSProvider>();
