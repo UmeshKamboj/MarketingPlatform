@@ -12,15 +12,18 @@ namespace MarketingPlatform.API.Controllers
     {
         private readonly IOAuth2Service _oauth2Service;
         private readonly IExternalAuthProviderRepository _providerRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<OAuth2Controller> _logger;
 
         public OAuth2Controller(
             IOAuth2Service oauth2Service,
             IExternalAuthProviderRepository providerRepository,
+            IUnitOfWork unitOfWork,
             ILogger<OAuth2Controller> logger)
         {
             _oauth2Service = oauth2Service;
             _providerRepository = providerRepository;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
@@ -180,7 +183,7 @@ namespace MarketingPlatform.API.Controllers
                 };
 
                 await _providerRepository.AddAsync(provider);
-                await _providerRepository.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
 
                 return Ok(new { message = "Provider created successfully", providerId = provider.Id });
             }
@@ -221,8 +224,8 @@ namespace MarketingPlatform.API.Controllers
                 
                 provider.UpdatedAt = DateTime.UtcNow;
 
-                await _providerRepository.UpdateAsync(provider);
-                await _providerRepository.SaveChangesAsync();
+                _providerRepository.Update(provider);
+                await _unitOfWork.SaveChangesAsync();
 
                 return Ok(new { message = "Provider updated successfully" });
             }
@@ -290,8 +293,8 @@ namespace MarketingPlatform.API.Controllers
                     return NotFound(new { message = "Provider not found" });
                 }
 
-                await _providerRepository.DeleteAsync(provider);
-                await _providerRepository.SaveChangesAsync();
+                _providerRepository.Remove(provider);
+                await _unitOfWork.SaveChangesAsync();
 
                 return Ok(new { message = "Provider deleted successfully" });
             }
