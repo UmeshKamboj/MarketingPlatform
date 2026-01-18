@@ -75,6 +75,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IContactGroupService, ContactGroupService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

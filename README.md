@@ -221,14 +221,177 @@ POST /api/users/{userId}/activate
 Authorization: Bearer {admin_token}
 ```
 
+## Testing Contact Management
+
+### Create Contact
+```bash
+POST /api/contacts
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "phoneNumber": "+1234567890",
+  "email": "john@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "country": "USA"
+}
+```
+
+### Get Contacts (paginated)
+```bash
+GET /api/contacts?pageNumber=1&pageSize=20&searchTerm=john
+Authorization: Bearer {token}
+```
+
+### Get Single Contact
+```bash
+GET /api/contacts/{id}
+Authorization: Bearer {token}
+```
+
+### Update Contact
+```bash
+PUT /api/contacts/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "phoneNumber": "+1234567890",
+  "email": "john.updated@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "isActive": true
+}
+```
+
+### Delete Contact
+```bash
+DELETE /api/contacts/{id}
+Authorization: Bearer {token}
+```
+
+### Import Contacts from CSV
+```bash
+POST /api/contacts/import/csv?groupId=1
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+file: contacts.csv
+```
+
+CSV Format:
+```csv
+PhoneNumber,Email,FirstName,LastName,Country,City,PostalCode
++1234567890,john@example.com,John,Doe,USA,New York,10001
++9876543210,jane@example.com,Jane,Smith,USA,Los Angeles,90001
+```
+
+### Import Contacts from Excel
+```bash
+POST /api/contacts/import/excel
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+file: contacts.xlsx
+```
+
+Excel Format: Same columns as CSV (PhoneNumber, Email, FirstName, LastName, Country, City, PostalCode)
+
+### Export Contacts to CSV (all)
+```bash
+POST /api/contacts/export/csv
+Authorization: Bearer {token}
+Content-Type: application/json
+Body: null
+```
+
+### Export Contacts to CSV (selected)
+```bash
+POST /api/contacts/export/csv
+Authorization: Bearer {token}
+Content-Type: application/json
+Body: [1, 2, 3, 4, 5]
+```
+
+### Export Contacts to Excel
+```bash
+POST /api/contacts/export/excel
+Authorization: Bearer {token}
+Content-Type: application/json
+Body: null
+```
+
+### Search Contacts
+```bash
+GET /api/contacts/search?searchTerm=john
+Authorization: Bearer {token}
+```
+
+### Create Contact Group
+```bash
+POST /api/contactgroups
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "name": "VIP Customers",
+  "description": "High value customers",
+  "isStatic": true
+}
+```
+
+### Get Contact Groups (paginated)
+```bash
+GET /api/contactgroups?pageNumber=1&pageSize=20
+Authorization: Bearer {token}
+```
+
+### Get Single Contact Group
+```bash
+GET /api/contactgroups/{id}
+Authorization: Bearer {token}
+```
+
+### Update Contact Group
+```bash
+PUT /api/contactgroups/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "name": "VIP Customers Updated",
+  "description": "Updated description",
+  "isStatic": true
+}
+```
+
+### Delete Contact Group
+```bash
+DELETE /api/contactgroups/{id}
+Authorization: Bearer {token}
+```
+
+### Add Contact to Group
+```bash
+POST /api/contactgroups/{groupId}/contacts/{contactId}
+Authorization: Bearer {token}
+```
+
+### Remove Contact from Group
+```bash
+DELETE /api/contactgroups/{groupId}/contacts/{contactId}
+Authorization: Bearer {token}
+```
+
+### Get Group Contacts
+```bash
+GET /api/contactgroups/{id}/contacts?pageNumber=1&pageSize=20
+Authorization: Bearer {token}
+```
+
 ## Features (Planned)
 
 - ✅ Task 1.1: Solution structure and core projects
 - ✅ Task 1.2: Database foundation
 - ✅ Task 1.3: Authentication & Authorization Core
-- ✅ Task 2.1: API Foundation - Repository Pattern & Core Services ← **Current**
+- ✅ Task 2.1: API Foundation - Repository Pattern & Core Services
+- ✅ Task 2.2: Contact Management - Full CRUD with Import/Export ← **Current**
 - ⏳ Campaign management
-- ⏳ Contact & group management
 - ⏳ Template management
 - ⏳ Keyword campaigns
 - ⏳ Automation & workflows
@@ -237,7 +400,7 @@ Authorization: Bearer {admin_token}
 - ⏳ Super admin platform
 
 ## Project Status
-🚧 **In Development** - Task 2.1 Complete
+🚧 **In Development** - Task 2.2 Complete
 
 ## License
 MIT License
