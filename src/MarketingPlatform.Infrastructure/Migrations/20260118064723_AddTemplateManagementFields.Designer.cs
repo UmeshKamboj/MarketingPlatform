@@ -4,6 +4,7 @@ using MarketingPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260118064723_AddTemplateManagementFields")]
+    partial class AddTemplateManagementFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -376,9 +379,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<int>("CampaignId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Channel")
-                        .HasColumnType("int");
-
                     b.Property<int>("ContactId")
                         .HasColumnType("int");
 
@@ -395,20 +395,8 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("ExternalMessageId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FailedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("HTMLContent")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<int>("MaxRetries")
-                        .HasColumnType("int");
 
                     b.Property<string>("MediaUrls")
                         .HasColumnType("nvarchar(max)");
@@ -420,24 +408,11 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Recipient")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RetryCount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ScheduledAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("SentAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<string>("Subject")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");

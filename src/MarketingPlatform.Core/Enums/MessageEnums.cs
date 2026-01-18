@@ -16,4 +16,13 @@ namespace MarketingPlatform.Core.Enums
         Failed,
         Bounced
     }
+
+    public enum TemplateCategory
+    {
+        Promotional,
+        Transactional,
+        Reminder,
+        Alert,
+        Custom
+    }
 }
