@@ -8,3 +8,156 @@ body {
     color: white;
     padding: 20px;
 }
+
+/* Campaign Creation Wizard Styles */
+.step-indicator {
+    position: relative;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.step-indicator .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #6c757d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.step-indicator .step-label {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.step-indicator.active .step-number {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+.step-indicator.active .step-label {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.step-indicator.completed .step-number {
+    background-color: #28a745;
+    color: white;
+}
+
+.step-indicator.completed .step-label {
+    color: #28a745;
+}
+
+/* Campaign Cards */
+.campaign-card {
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+.campaign-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Form Enhancements */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Channel Badge Styles */
+.channel-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.channel-sms {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.channel-mms {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.channel-email {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.channel-multi {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+/* Status Badge Styles */
+.status-draft {
+    background-color: #6c757d;
+    color: white;
+}
+
+.status-scheduled {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.status-running {
+    background-color: #007bff;
+    color: white;
+}
+
+.status-completed {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-failed {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-paused {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+/* Bootstrap Icons fallback - using text instead if icons not loaded */
+.bi::before {
+    display: inline-block;
+    margin-right: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .step-indicator {
+        padding: 5px;
+    }
+    
+    .step-indicator .step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .step-indicator .step-label {
+        font-size: 11px;
+    }
+}

@@ -1,0 +1,100 @@
+@{
+    ViewData["Title"] = "Campaigns";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Campaigns</h2>
+        <a href="@Url.Action("Create", "Campaigns")" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Campaign
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#all">All</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#draft">Draft</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#scheduled">Scheduled</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#running">Running</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#completed">Completed</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div id="campaigns-list">
+                <div class="text-center py-5">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+        
+        // Load campaigns on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCampaigns();
+        });
+
+        async function loadCampaigns(status = null) {
+            const listContainer = document.getElementById('campaigns-list');
+            
+            try {
+                let url = `${apiBaseUrl}/campaigns`;
+                if (status) {
+                    url = `${apiBaseUrl}/campaigns/status/${status}`;
+                }
+                
+                // This is a placeholder - in production, you'd need authentication
+                // const response = await fetch(url, {
+                //     headers: { 'Authorization': 'Bearer ' + getToken() }
+                // });
+                
+                // For now, show a message
+                listContainer.innerHTML = `
+                    <div class="alert alert-info">
+                        <h5>Campaign List</h5>
+                        <p>Connect to the API at <code>${apiBaseUrl}/campaigns</code> to view campaigns.</p>
+                        <p class="mb-0">Authentication required. Please implement login functionality to view campaigns.</p>
+                    </div>
+                `;
+            } catch (error) {
+                listContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        Error loading campaigns: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Tab click handlers
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function(e) {
+                const target = e.target.getAttribute('href');
+                const statusMap = {
+                    '#all': null,
+                    '#draft': 0,
+                    '#scheduled': 1,
+                    '#running': 2,
+                    '#completed': 4
+                };
+                loadCampaigns(statusMap[target]);
+            });
+        });
+    </script>
+}
