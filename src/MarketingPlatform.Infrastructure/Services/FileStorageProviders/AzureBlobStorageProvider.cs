@@ -100,7 +100,8 @@ namespace MarketingPlatform.Infrastructure.Services.FileStorageProviders
             var containerClient = _blobServiceClient!.GetBlobContainerClient(_containerName);
             var blobClient = containerClient.GetBlobClient(fileKey);
 
-            return await blobClient.ExistsAsync();
+            var response = await blobClient.ExistsAsync();
+            return response.Value;
         }
 
         public async Task<string> GetUrlAsync(string fileKey, int expiryMinutes = 60)
@@ -152,7 +153,7 @@ namespace MarketingPlatform.Infrastructure.Services.FileStorageProviders
         {
             if (_blobServiceClient == null || string.IsNullOrEmpty(_containerName))
             {
-                throw new InvalidOperationException("Azure Blob Storage is not configured. Please configure ConnectionString and ContainerName in appsettings.json");
+                throw new InvalidOperationException("Azure Blob Storage is not configured. Please configure FileStorage:Azure:ConnectionString and FileStorage:Azure:ContainerName in appsettings.json");
             }
         }
     }

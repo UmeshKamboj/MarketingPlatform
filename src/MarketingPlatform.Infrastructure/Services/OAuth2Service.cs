@@ -58,7 +58,7 @@ namespace MarketingPlatform.Infrastructure.Services
             {
                 _logger.LogError("OAuth2 error from {Provider}: {Error} - {ErrorDescription}", 
                     providerName, callback.Error, callback.ErrorDescription);
-                throw new Exception($"OAuth2 error: {callback.Error}");
+                throw new InvalidOperationException($"OAuth2 error: {callback.Error}");
             }
 
             var provider = await GetProviderConfigAsync(providerName);
@@ -114,7 +114,7 @@ namespace MarketingPlatform.Infrastructure.Services
                     if (!result.Succeeded)
                     {
                         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                        throw new Exception($"Failed to create user: {errors}");
+                        throw new InvalidOperationException($"Failed to create user: {errors}");
                     }
 
                     // Assign default role
@@ -191,7 +191,7 @@ namespace MarketingPlatform.Infrastructure.Services
             var existing = await _externalLoginRepository.GetByProviderAsync(providerName, providerUserId);
             if (existing != null)
             {
-                throw new Exception("This external account is already linked to another user");
+                throw new InvalidOperationException("This external account is already linked to another user");
             }
 
             var externalLogin = new UserExternalLogin
@@ -227,7 +227,7 @@ namespace MarketingPlatform.Infrastructure.Services
 
             if (externalLogin == null || string.IsNullOrEmpty(externalLogin.RefreshToken))
             {
-                throw new Exception("External login not found or refresh token not available");
+                throw new InvalidOperationException("External login not found or refresh token not available");
             }
 
             if (!_providers.TryGetValue(providerName, out var oauthProvider))

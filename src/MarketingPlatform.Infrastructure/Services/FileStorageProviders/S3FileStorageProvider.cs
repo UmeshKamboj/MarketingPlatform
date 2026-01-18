@@ -165,7 +165,7 @@ namespace MarketingPlatform.Infrastructure.Services.FileStorageProviders
         {
             if (_s3Client == null || string.IsNullOrEmpty(_bucketName))
             {
-                throw new InvalidOperationException("S3 File Storage is not configured. Please configure AccessKey, SecretKey, Region, and BucketName in appsettings.json");
+                throw new InvalidOperationException("S3 File Storage is not configured. Please configure FileStorage:S3:AccessKey, FileStorage:S3:SecretKey, FileStorage:S3:Region, and FileStorage:S3:BucketName in appsettings.json");
             }
         }
     }

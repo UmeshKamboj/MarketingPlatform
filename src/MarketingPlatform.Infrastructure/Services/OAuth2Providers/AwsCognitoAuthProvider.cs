@@ -1,7 +1,5 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Amazon.CognitoIdentityProvider;
-using Amazon.CognitoIdentityProvider.Model;
 using Microsoft.Extensions.Logging;
 using MarketingPlatform.Application.DTOs.Auth;
 using MarketingPlatform.Application.Interfaces;
