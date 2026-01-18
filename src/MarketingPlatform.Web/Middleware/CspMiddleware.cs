@@ -70,6 +70,7 @@ namespace MarketingPlatform.Web.Middleware
         /// Builds a CSP header for development environment.
         /// More permissive to allow hot reload, browser-link, and WebSocket connections.
         /// Uses specific port ranges for common development tools to maintain security.
+        /// Includes trusted external resources for development testing.
         /// </summary>
         /// <param name="nonce">The nonce to include in the CSP</param>
         /// <returns>CSP header value</returns>
@@ -77,11 +78,12 @@ namespace MarketingPlatform.Web.Middleware
         {
             // Common development ports: 5000-5999 (Kestrel), 7000-7999 (HTTPS), 44300-44399 (IIS Express HTTPS), 60000-65535 (dynamic)
             return $"default-src 'self'; " +
-                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-eval'; " +
-                   $"style-src 'self' 'nonce-{nonce}'; " +
-                   $"connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:*; " +
+                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
+                   $"style-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net; " +
+                   $"connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:* https://api.stripe.com; " +
                    $"img-src 'self' data: https:; " +
-                   $"font-src 'self'; " +
+                   $"font-src 'self' https://cdn.jsdelivr.net; " +
+                   $"frame-src https://www.google.com/recaptcha/ https://js.stripe.com; " +
                    $"object-src 'none'; " +
                    $"base-uri 'self';";
         }
@@ -89,17 +91,19 @@ namespace MarketingPlatform.Web.Middleware
         /// <summary>
         /// Builds a strict CSP header for production environment.
         /// Uses nonces for inline scripts/styles without allowing unsafe-inline or unsafe-eval.
+        /// Allows trusted external resources (CDNs, payment processors, security services).
         /// </summary>
         /// <param name="nonce">The nonce to include in the CSP</param>
         /// <returns>CSP header value</returns>
         private static string BuildProductionCsp(string nonce)
         {
             return $"default-src 'self'; " +
-                   $"script-src 'self' 'nonce-{nonce}'; " +
-                   $"style-src 'self' 'nonce-{nonce}'; " +
-                   $"connect-src 'self'; " +
+                   $"script-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
+                   $"style-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net; " +
+                   $"connect-src 'self' https://api.stripe.com; " +
                    $"img-src 'self' data: https:; " +
-                   $"font-src 'self'; " +
+                   $"font-src 'self' https://cdn.jsdelivr.net; " +
+                   $"frame-src https://www.google.com/recaptcha/ https://js.stripe.com; " +
                    $"object-src 'none'; " +
                    $"base-uri 'self'; " +
                    $"form-action 'self'; " +
