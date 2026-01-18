@@ -59,6 +59,7 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<ExternalAuthProvider> ExternalAuthProviders => Set<ExternalAuthProvider>();
         public DbSet<UserExternalLogin> UserExternalLogins => Set<UserExternalLogin>();
         public DbSet<FileStorageSettings> FileStorageSettings => Set<FileStorageSettings>();
+        public DbSet<EncryptionAuditLog> EncryptionAuditLogs => Set<EncryptionAuditLog>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
