@@ -103,6 +103,7 @@ namespace MarketingPlatform.Application.Services
             // Create audit entry
             await CreateAuditEntryAsync(rule.Id, ComplianceAuditAction.Created, userId, null, 
                 JsonConvert.SerializeObject(rule), "Rule created", null);
+            await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Compliance rule created: {Name} by user {UserId}", rule.Name, userId);
 
@@ -133,12 +134,13 @@ namespace MarketingPlatform.Application.Services
             rule.UpdatedAt = DateTime.UtcNow;
 
             _complianceRuleRepository.Update(rule);
-            await _unitOfWork.SaveChangesAsync();
-
+            
             // Create audit entry
             var newState = JsonConvert.SerializeObject(rule);
             await CreateAuditEntryAsync(id, ComplianceAuditAction.Updated, userId, previousState, 
                 newState, dto.Reason, ipAddress);
+            
+            await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Compliance rule updated: {Name} by user {UserId}", rule.Name, userId);
 
@@ -160,11 +162,12 @@ namespace MarketingPlatform.Application.Services
             rule.ModifiedBy = userId;
 
             _complianceRuleRepository.Update(rule);
-            await _unitOfWork.SaveChangesAsync();
-
+            
             // Create audit entry
             await CreateAuditEntryAsync(id, ComplianceAuditAction.Deleted, userId, previousState, 
                 null, reason ?? "Rule deleted", ipAddress);
+            
+            await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Compliance rule deleted: {Name} by user {UserId}", rule.Name, userId);
 
@@ -186,12 +189,13 @@ namespace MarketingPlatform.Application.Services
             rule.UpdatedAt = DateTime.UtcNow;
 
             _complianceRuleRepository.Update(rule);
-            await _unitOfWork.SaveChangesAsync();
-
+            
             // Create audit entry
             var newState = JsonConvert.SerializeObject(rule);
             await CreateAuditEntryAsync(id, ComplianceAuditAction.Activated, userId, previousState, 
                 newState, "Rule activated", ipAddress);
+            
+            await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Compliance rule activated: {Name} by user {UserId}", rule.Name, userId);
 
@@ -213,12 +217,13 @@ namespace MarketingPlatform.Application.Services
             rule.UpdatedAt = DateTime.UtcNow;
 
             _complianceRuleRepository.Update(rule);
-            await _unitOfWork.SaveChangesAsync();
-
+            
             // Create audit entry
             var newState = JsonConvert.SerializeObject(rule);
             await CreateAuditEntryAsync(id, ComplianceAuditAction.Deactivated, userId, previousState, 
                 newState, reason ?? "Rule deactivated", ipAddress);
+            
+            await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Compliance rule deactivated: {Name} by user {UserId}", rule.Name, userId);
 
@@ -281,7 +286,7 @@ namespace MarketingPlatform.Application.Services
             };
 
             await _auditRepository.AddAsync(audit);
-            await _unitOfWork.SaveChangesAsync();
+            // Note: SaveChanges is called by the calling method to ensure transactional consistency
         }
     }
 }

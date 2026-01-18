@@ -166,9 +166,9 @@ namespace MarketingPlatform.Application.Services
                 return setting.DataType switch
                 {
                     SettingDataType.String => (T)(object)setting.Value,
-                    SettingDataType.Integer => (T)(object)int.Parse(setting.Value),
-                    SettingDataType.Boolean => (T)(object)bool.Parse(setting.Value),
-                    SettingDataType.Decimal => (T)(object)decimal.Parse(setting.Value),
+                    SettingDataType.Integer => int.TryParse(setting.Value, out var intValue) ? (T)(object)intValue : defaultValue,
+                    SettingDataType.Boolean => bool.TryParse(setting.Value, out var boolValue) ? (T)(object)boolValue : defaultValue,
+                    SettingDataType.Decimal => decimal.TryParse(setting.Value, out var decimalValue) ? (T)(object)decimalValue : defaultValue,
                     SettingDataType.Json => JsonConvert.DeserializeObject<T>(setting.Value) ?? defaultValue,
                     _ => defaultValue
                 };

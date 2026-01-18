@@ -25,6 +25,31 @@ namespace MarketingPlatform.API.Controllers
         }
 
         /// <summary>
+        /// Get client IP address handling proxy scenarios
+        /// </summary>
+        private string? GetClientIpAddress()
+        {
+            // Check for X-Forwarded-For header (load balancers, proxies)
+            if (Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))
+            {
+                var ips = forwardedFor.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries);
+                if (ips.Length > 0)
+                {
+                    return ips[0].Trim(); // First IP is the original client
+                }
+            }
+
+            // Check for X-Real-IP header (nginx, other proxies)
+            if (Request.Headers.TryGetValue("X-Real-IP", out var realIp))
+            {
+                return realIp.ToString();
+            }
+
+            // Fallback to direct connection IP
+            return HttpContext.Connection.RemoteIpAddress?.ToString();
+        }
+
+        /// <summary>
         /// Get all compliance rules with pagination
         /// </summary>
         [HttpGet]
@@ -178,7 +203,7 @@ namespace MarketingPlatform.API.Controllers
                 if (string.IsNullOrEmpty(userId))
                     return Unauthorized();
 
-                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var ipAddress = GetClientIpAddress();
 
                 var result = await _complianceRuleService.UpdateComplianceRuleAsync(id, dto, userId, ipAddress);
                 if (!result)
@@ -206,7 +231,7 @@ namespace MarketingPlatform.API.Controllers
                 if (string.IsNullOrEmpty(userId))
                     return Unauthorized();
 
-                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var ipAddress = GetClientIpAddress();
 
                 var result = await _complianceRuleService.ActivateComplianceRuleAsync(id, userId, ipAddress);
                 if (!result)
@@ -234,7 +259,7 @@ namespace MarketingPlatform.API.Controllers
                 if (string.IsNullOrEmpty(userId))
                     return Unauthorized();
 
-                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var ipAddress = GetClientIpAddress();
 
                 var result = await _complianceRuleService.DeactivateComplianceRuleAsync(id, userId, reason, ipAddress);
                 if (!result)
@@ -262,7 +287,7 @@ namespace MarketingPlatform.API.Controllers
                 if (string.IsNullOrEmpty(userId))
                     return Unauthorized();
 
-                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                var ipAddress = GetClientIpAddress();
 
                 var result = await _complianceRuleService.DeleteComplianceRuleAsync(id, userId, reason, ipAddress);
                 if (!result)
