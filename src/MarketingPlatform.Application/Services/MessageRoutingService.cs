@@ -410,5 +410,138 @@ namespace MarketingPlatform.Application.Services
 
             return FallbackReason.PrimaryFailed;
         }
+
+        // Routing Configuration Management Methods
+        public async Task<List<ChannelRoutingConfig>> GetAllConfigsAsync()
+        {
+            return await _routingConfigRepository.GetQueryable()
+                .OrderBy(c => c.Channel)
+                .ThenByDescending(c => c.Priority)
+                .ToListAsync();
+        }
+
+        public async Task<ChannelRoutingConfig?> GetConfigByIdAsync(int id)
+        {
+            return await _routingConfigRepository.GetByIdAsync(id);
+        }
+
+        public async Task<ChannelRoutingConfig?> GetConfigByChannelAsync(ChannelType channel)
+        {
+            return await _routingConfigRepository.GetQueryable()
+                .Where(c => c.Channel == channel && c.IsActive)
+                .OrderByDescending(c => c.Priority)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<ChannelRoutingConfig> CreateConfigAsync(ChannelRoutingConfig config)
+        {
+            config.CreatedAt = DateTime.UtcNow;
+            await _routingConfigRepository.AddAsync(config);
+            await _unitOfWork.SaveChangesAsync();
+            return config;
+        }
+
+        public async Task<ChannelRoutingConfig?> UpdateConfigAsync(int id, ChannelRoutingConfig updatedConfig)
+        {
+            var config = await _routingConfigRepository.GetByIdAsync(id);
+            
+            if (config == null)
+                return null;
+
+            // Update properties
+            config.PrimaryProvider = updatedConfig.PrimaryProvider;
+            config.FallbackProvider = updatedConfig.FallbackProvider;
+            config.RoutingStrategy = updatedConfig.RoutingStrategy;
+            config.EnableFallback = updatedConfig.EnableFallback;
+            config.MaxRetries = updatedConfig.MaxRetries;
+            config.RetryStrategy = updatedConfig.RetryStrategy;
+            config.InitialRetryDelaySeconds = updatedConfig.InitialRetryDelaySeconds;
+            config.MaxRetryDelaySeconds = updatedConfig.MaxRetryDelaySeconds;
+            config.CostThreshold = updatedConfig.CostThreshold;
+            config.IsActive = updatedConfig.IsActive;
+            config.Priority = updatedConfig.Priority;
+            config.AdditionalSettings = updatedConfig.AdditionalSettings;
+            config.UpdatedAt = DateTime.UtcNow;
+
+            _routingConfigRepository.Update(config);
+            await _unitOfWork.SaveChangesAsync();
+
+            return config;
+        }
+
+        public async Task<bool> DeleteConfigAsync(int id)
+        {
+            var config = await _routingConfigRepository.GetByIdAsync(id);
+            
+            if (config == null)
+                return false;
+
+            _routingConfigRepository.Remove(config);
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        // Delivery Attempt Management Methods
+        public async Task<List<MessageDeliveryAttempt>> GetDeliveryAttemptsAsync(int messageId)
+        {
+            return await _deliveryAttemptRepository.GetQueryable()
+                .Where(a => a.CampaignMessageId == messageId)
+                .OrderBy(a => a.AttemptNumber)
+                .ToListAsync();
+        }
+
+        public async Task<object> GetChannelStatsAsync(ChannelType channel, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            startDate ??= DateTime.UtcNow.AddDays(-30);
+            endDate ??= DateTime.UtcNow;
+
+            var attempts = await _deliveryAttemptRepository.GetQueryable()
+                .Where(a => a.Channel == channel && 
+                           a.AttemptedAt >= startDate && 
+                           a.AttemptedAt <= endDate)
+                .ToListAsync();
+
+            return new
+            {
+                Channel = channel.ToString(),
+                TotalAttempts = attempts.Count,
+                SuccessfulAttempts = attempts.Count(a => a.Success),
+                FailedAttempts = attempts.Count(a => !a.Success),
+                SuccessRate = attempts.Any() ? (decimal)attempts.Count(a => a.Success) / attempts.Count * 100 : 0,
+                AverageResponseTimeMs = attempts.Any() ? attempts.Average(a => a.ResponseTimeMs) : 0,
+                TotalCost = attempts.Where(a => a.CostAmount.HasValue).Sum(a => a.CostAmount.Value),
+                FallbackCount = attempts.Count(a => a.FallbackReason.HasValue),
+                Period = new { StartDate = startDate, EndDate = endDate }
+            };
+        }
+
+        public async Task<object> GetOverallStatsAsync(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            startDate ??= DateTime.UtcNow.AddDays(-30);
+            endDate ??= DateTime.UtcNow;
+
+            var attempts = await _deliveryAttemptRepository.GetQueryable()
+                .Where(a => a.AttemptedAt >= startDate && a.AttemptedAt <= endDate)
+                .ToListAsync();
+
+            return new
+            {
+                TotalAttempts = attempts.Count,
+                SuccessfulAttempts = attempts.Count(a => a.Success),
+                FailedAttempts = attempts.Count(a => !a.Success),
+                SuccessRate = attempts.Any() ? (decimal)attempts.Count(a => a.Success) / attempts.Count * 100 : 0,
+                AverageResponseTimeMs = attempts.Any() ? attempts.Average(a => a.ResponseTimeMs) : 0,
+                TotalCost = attempts.Where(a => a.CostAmount.HasValue).Sum(a => a.CostAmount.Value),
+                FallbackCount = attempts.Count(a => a.FallbackReason.HasValue),
+                ByChannel = attempts.GroupBy(a => a.Channel).Select(g => new
+                {
+                    Channel = g.Key.ToString(),
+                    TotalAttempts = g.Count(),
+                    SuccessfulAttempts = g.Count(a => a.Success),
+                    SuccessRate = (decimal)g.Count(a => a.Success) / g.Count() * 100
+                }),
+                Period = new { StartDate = startDate, EndDate = endDate }
+            };
+        }
     }
 }

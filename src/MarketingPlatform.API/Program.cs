@@ -225,8 +225,26 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Marketing Platform API",
         Version = "v1",
-        Description = "RESTful API for Marketing Platform - SMS, MMS & Email Marketing Solution"
+        Description = "RESTful API for Marketing Platform - Comprehensive SMS, MMS & Email Marketing Solution with advanced features including contact management, campaign automation, analytics, and integrations.",
+        Contact = new OpenApiContact
+        {
+            Name = "Marketing Platform Support",
+            Email = "support@marketingplatform.com"
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT License",
+            Url = new Uri("https://opensource.org/licenses/MIT")
+        }
     });
+
+    // Include XML comments for better API documentation
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
 
     // Add JWT Authentication to Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -252,6 +270,9 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
+
+    // Enable annotations for better documentation
+    options.EnableAnnotations();
 });
 
 var app = builder.Build();
