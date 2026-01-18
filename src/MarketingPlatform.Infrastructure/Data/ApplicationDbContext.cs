@@ -45,6 +45,8 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<ComplianceSettings> ComplianceSettings => Set<ComplianceSettings>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<FrequencyControl> FrequencyControls => Set<FrequencyControl>();
+        public DbSet<MessageDeliveryAttempt> MessageDeliveryAttempts => Set<MessageDeliveryAttempt>();
+        public DbSet<ChannelRoutingConfig> ChannelRoutingConfigs => Set<ChannelRoutingConfig>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
