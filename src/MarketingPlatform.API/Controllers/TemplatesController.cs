@@ -314,5 +314,23 @@ namespace MarketingPlatform.API.Controllers
                 return BadRequest(ApiResponse<TemplateUsageStatsDto>.ErrorResponse("Failed to get template stats", new List<string> { ex.Message }));
             }
         }
+
+        /// <summary>
+        /// Calculate character count for content
+        /// </summary>
+        [HttpPost("calculate-character-count")]
+        public async Task<ActionResult<ApiResponse<CharacterCountDto>>> CalculateCharacterCount([FromBody] CalculateCharacterCountRequestDto request)
+        {
+            try
+            {
+                var result = await _templateService.CalculateCharacterCountAsync(request.Content, request.Channel, request.IsSubject);
+                return Ok(ApiResponse<CharacterCountDto>.SuccessResponse(result));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calculating character count");
+                return BadRequest(ApiResponse<CharacterCountDto>.ErrorResponse("Failed to calculate character count", new List<string> { ex.Message }));
+            }
+        }
     }
 }
