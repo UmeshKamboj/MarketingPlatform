@@ -97,6 +97,7 @@ builder.Services.AddScoped<IRateLimitService, RateLimitService>();
 
 // Message Service
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IMessageRoutingService, MessageRoutingService>();
 
 // Provider Services (Mock implementations)
 builder.Services.AddScoped<ISMSProvider, MockSMSProvider>();

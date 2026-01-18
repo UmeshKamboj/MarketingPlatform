@@ -4,6 +4,7 @@ using MarketingPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260118172455_AddMessageRoutingAndDeliveryTracking")]
+    partial class AddMessageRoutingAndDeliveryTracking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -497,7 +500,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("CampaignSchedules");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceAuditLog", b =>
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelRoutingConfig", b =>
                 {
                     b.Property<int>("Id")
@@ -506,14 +508,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("ActionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ActionType")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CampaignId")
-                        .HasColumnType("int");
                     b.Property<string>("AdditionalSettings")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
@@ -521,45 +515,12 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<int>("Channel")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ContactId")
-                        .HasColumnType("int");
                     b.Property<decimal?>("CostThreshold")
                         .HasColumnType("decimal(18,6)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserAgent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CampaignId");
-
-                    b.HasIndex("ContactId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ComplianceAuditLogs");
                     b.Property<bool>("EnableFallback")
                         .HasColumnType("bit");
 
@@ -622,38 +583,14 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<string>("CompanyName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ConsentRetentionDays")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("EnableAuditLogging")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("EnableConsentTracking")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("EnableQuietHours")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("EnforceSuppressionList")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("OptInConfirmationMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OptInKeywords")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OptOutConfirmationMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OptOutKeywords")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PrivacyPolicyUrl")
                         .HasColumnType("nvarchar(max)");
@@ -664,20 +601,8 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<TimeSpan?>("QuietHoursStart")
                         .HasColumnType("time");
 
-                    b.Property<string>("QuietHoursTimeZone")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("RequireDoubleOptIn")
                         .HasColumnType("bit");
-
-                    b.Property<bool>("RequireDoubleOptInEmail")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("RequireDoubleOptInSms")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("TermsOfServiceUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -701,9 +626,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("Channel")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("ConsentDate")
                         .HasColumnType("datetime2");
 
@@ -725,14 +647,8 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("Source")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("UserAgent")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -767,12 +683,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<bool>("EmailOptIn")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("EmailOptInDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("FirstName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -787,12 +697,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("MmsOptIn")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("MmsOptInDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -801,12 +705,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<string>("PostalCode")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("SmsOptIn")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("SmsOptInDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -827,57 +725,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Contacts");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ContactConsent", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Channel")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ConsentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ContactId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RevokedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Source")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserAgent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ContactId");
-
-                    b.ToTable("ContactConsents");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ContactEngagement", b =>
@@ -2334,29 +2181,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("Campaign");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceAuditLog", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.Campaign", "Campaign")
-                        .WithMany()
-                        .HasForeignKey("CampaignId");
-
-                    b.HasOne("MarketingPlatform.Core.Entities.Contact", "Contact")
-                        .WithMany()
-                        .HasForeignKey("ContactId");
-
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("Contact");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceSettings", b =>
                 {
                     b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "User")
@@ -2388,17 +2212,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ContactConsent", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.Contact", "Contact")
-                        .WithMany("ContactConsents")
-                        .HasForeignKey("ContactId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Contact");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ContactEngagement", b =>
@@ -2778,8 +2591,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("CampaignMessages");
 
                     b.Navigation("ConsentHistories");
-
-                    b.Navigation("ContactConsents");
 
                     b.Navigation("Engagement");
 

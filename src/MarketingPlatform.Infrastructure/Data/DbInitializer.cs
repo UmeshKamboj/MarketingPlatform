@@ -124,6 +124,62 @@ namespace MarketingPlatform.Infrastructure.Data
                 context.MessageProviders.AddRange(providers);
                 await context.SaveChangesAsync();
             }
+
+            // Seed Channel Routing Configurations
+            if (!context.ChannelRoutingConfigs.Any())
+            {
+                var routingConfigs = new List<ChannelRoutingConfig>
+                {
+                    new ChannelRoutingConfig
+                    {
+                        Channel = ChannelType.SMS,
+                        PrimaryProvider = "MockSMSProvider",
+                        FallbackProvider = "BackupSMSProvider",
+                        RoutingStrategy = RoutingStrategy.Primary,
+                        EnableFallback = true,
+                        MaxRetries = 3,
+                        RetryStrategy = RetryStrategy.Exponential,
+                        InitialRetryDelaySeconds = 60,
+                        MaxRetryDelaySeconds = 3600,
+                        IsActive = true,
+                        Priority = 1,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new ChannelRoutingConfig
+                    {
+                        Channel = ChannelType.MMS,
+                        PrimaryProvider = "MockMMSProvider",
+                        FallbackProvider = "BackupMMSProvider",
+                        RoutingStrategy = RoutingStrategy.Primary,
+                        EnableFallback = true,
+                        MaxRetries = 3,
+                        RetryStrategy = RetryStrategy.Exponential,
+                        InitialRetryDelaySeconds = 60,
+                        MaxRetryDelaySeconds = 3600,
+                        IsActive = true,
+                        Priority = 1,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new ChannelRoutingConfig
+                    {
+                        Channel = ChannelType.Email,
+                        PrimaryProvider = "MockEmailProvider",
+                        FallbackProvider = "BackupEmailProvider",
+                        RoutingStrategy = RoutingStrategy.Primary,
+                        EnableFallback = true,
+                        MaxRetries = 3,
+                        RetryStrategy = RetryStrategy.Exponential,
+                        InitialRetryDelaySeconds = 120,
+                        MaxRetryDelaySeconds = 7200,
+                        IsActive = true,
+                        Priority = 1,
+                        CreatedAt = DateTime.UtcNow
+                    }
+                };
+
+                context.ChannelRoutingConfigs.AddRange(routingConfigs);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
