@@ -79,6 +79,22 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IContactGroupService, ContactGroupService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 
+// Message Service
+builder.Services.AddScoped<IMessageService, MessageService>();
+
+// Provider Services (Mock implementations)
+builder.Services.AddScoped<ISMSProvider, MockSMSProvider>();
+builder.Services.AddScoped<IMMSProvider, MockMMSProvider>();
+builder.Services.AddScoped<IEmailProvider, MockEmailProvider>();
+
+// TODO: Replace with real providers in production:
+// builder.Services.AddScoped<ISMSProvider, TwilioSMSProvider>();
+// builder.Services.AddScoped<IMMSProvider, TwilioMMSProvider>();
+// builder.Services.AddScoped<IEmailProvider, SendGridEmailProvider>();
+
+// Background Services
+builder.Services.AddHostedService<MessageQueueProcessor>();
+
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
