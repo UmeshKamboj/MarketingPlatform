@@ -6,6 +6,6 @@ namespace MarketingPlatform.Application.DTOs.ContactGroup
         public string? Description { get; set; }
         public bool IsStatic { get; set; } = true;
         public bool IsDynamic { get; set; } = false;
-        public string? RuleCriteria { get; set; }
+        public GroupRuleCriteriaDto? RuleCriteria { get; set; }
     }
 }
