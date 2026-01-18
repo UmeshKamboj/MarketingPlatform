@@ -286,13 +286,12 @@ namespace MarketingPlatform.Infrastructure.Data
                     {
                         Name = "Starter",
                         Description = "Perfect for small businesses getting started",
+                        Type = PricingModelType.Flat,
                         BasePrice = 29.00m,
-                        Currency = "USD",
-                        BillingPeriod = "month",
+                        BillingPeriod = BillingPeriod.Monthly,
                         IsActive = true,
-                        DisplayOrder = 1,
-                        Features = "[\"1,000 SMS messages/month\",\"500 emails/month\",\"Basic analytics\",\"Email support\",\"1 user\"]",
-                        IsPopular = false,
+                        Priority = 1,
+                        Configuration = "{\"features\":[\"1,000 SMS messages/month\",\"500 emails/month\",\"Basic analytics\",\"Email support\",\"1 user\"]}",
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -300,13 +299,12 @@ namespace MarketingPlatform.Infrastructure.Data
                     {
                         Name = "Professional",
                         Description = "For growing businesses with larger audiences",
+                        Type = PricingModelType.Flat,
                         BasePrice = 99.00m,
-                        Currency = "USD",
-                        BillingPeriod = "month",
+                        BillingPeriod = BillingPeriod.Monthly,
                         IsActive = true,
-                        DisplayOrder = 2,
-                        Features = "[\"10,000 SMS messages/month\",\"5,000 emails/month\",\"Advanced analytics\",\"Priority support\",\"5 users\",\"Custom templates\",\"Automation workflows\"]",
-                        IsPopular = true,
+                        Priority = 2,
+                        Configuration = "{\"features\":[\"10,000 SMS messages/month\",\"5,000 emails/month\",\"Advanced analytics\",\"Priority support\",\"5 users\",\"Custom templates\",\"Automation workflows\"],\"isPopular\":true}",
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -314,13 +312,12 @@ namespace MarketingPlatform.Infrastructure.Data
                     {
                         Name = "Enterprise",
                         Description = "For large organizations with custom needs",
+                        Type = PricingModelType.Flat,
                         BasePrice = 299.00m,
-                        Currency = "USD",
-                        BillingPeriod = "month",
+                        BillingPeriod = BillingPeriod.Monthly,
                         IsActive = true,
-                        DisplayOrder = 3,
-                        Features = "[\"Unlimited SMS messages\",\"Unlimited emails\",\"Advanced analytics & reporting\",\"24/7 phone support\",\"Unlimited users\",\"Custom branding\",\"API access\",\"Dedicated account manager\"]",
-                        IsPopular = false,
+                        Priority = 3,
+                        Configuration = "{\"features\":[\"Unlimited SMS messages\",\"Unlimited emails\",\"Advanced analytics & reporting\",\"24/7 phone support\",\"Unlimited users\",\"Custom branding\",\"API access\",\"Dedicated account manager\"]}",
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     }
@@ -342,8 +339,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "banner",
                         Category = "LandingPage",
                         Description = "Hero section type: 'banner' or 'slider'",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -353,8 +349,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "Transform Your Marketing with SMS, MMS & Email",
                         Category = "LandingPage",
                         Description = "Hero section main title",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -364,8 +359,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "A powerful, enterprise-grade marketing platform to reach your customers where they are. Send targeted campaigns, track performance, and grow your business.",
                         Category = "LandingPage",
                         Description = "Hero section subtitle/description",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -375,8 +369,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "/images/hero-banner.jpg",
                         Category = "LandingPage",
                         Description = "Hero banner image URL",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -386,8 +379,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "Get Started Free",
                         Category = "LandingPage",
                         Description = "Primary call-to-action button text",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -397,8 +389,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "/Auth/Register",
                         Category = "LandingPage",
                         Description = "Primary call-to-action button link",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -410,8 +401,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "[{\"title\":\"Transform Your Marketing\",\"subtitle\":\"Reach customers on SMS, MMS & Email\",\"image\":\"/images/slide1.jpg\",\"ctaText\":\"Get Started\",\"ctaLink\":\"/Auth/Register\"},{\"title\":\"Advanced Analytics\",\"subtitle\":\"Track and optimize your campaigns\",\"image\":\"/images/slide2.jpg\",\"ctaText\":\"Learn More\",\"ctaLink\":\"#features\"},{\"title\":\"Automate Your Workflow\",\"subtitle\":\"Save time with powerful automation\",\"image\":\"/images/slide3.jpg\",\"ctaText\":\"See How\",\"ctaLink\":\"#features\"}]",
                         Category = "LandingPage",
                         Description = "Slider slides configuration (JSON array)",
-                        DataType = "json",
-                        IsPublic = true,
+                        DataType = SettingDataType.Json,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -421,8 +411,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "true",
                         Category = "LandingPage",
                         Description = "Enable slider auto-play",
-                        DataType = "boolean",
-                        IsPublic = true,
+                        DataType = SettingDataType.Boolean,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -432,8 +421,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "5000",
                         Category = "LandingPage",
                         Description = "Slider auto-play interval in milliseconds",
-                        DataType = "number",
-                        IsPublic = true,
+                        DataType = SettingDataType.Integer,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -445,8 +433,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "#ffffff",
                         Category = "LandingPage",
                         Description = "Navigation menu background color",
-                        DataType = "color",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -456,8 +443,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "#212529",
                         Category = "LandingPage",
                         Description = "Navigation menu text color",
-                        DataType = "color",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -467,8 +453,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "#667eea",
                         Category = "LandingPage",
                         Description = "Navigation menu hover color",
-                        DataType = "color",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -478,8 +463,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "16",
                         Category = "LandingPage",
                         Description = "Navigation menu font size (in pixels)",
-                        DataType = "number",
-                        IsPublic = true,
+                        DataType = SettingDataType.Integer,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -489,8 +473,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "top",
                         Category = "LandingPage",
                         Description = "Navigation menu position: 'top' or 'fixed'",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -500,8 +483,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "[{\"text\":\"Home\",\"link\":\"#home\",\"order\":1},{\"text\":\"Features\",\"link\":\"#features\",\"order\":2},{\"text\":\"Pricing\",\"link\":\"#pricing\",\"order\":3},{\"text\":\"Contact\",\"link\":\"#contact\",\"order\":4},{\"text\":\"Login\",\"link\":\"/Auth/Login\",\"order\":5,\"class\":\"btn-outline-primary\"}]",
                         Category = "LandingPage",
                         Description = "Navigation menu items (JSON array)",
-                        DataType = "json",
-                        IsPublic = true,
+                        DataType = SettingDataType.Json,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -513,8 +495,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "#667eea",
                         Category = "LandingPage",
                         Description = "Primary theme color",
-                        DataType = "color",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -524,8 +505,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "#764ba2",
                         Category = "LandingPage",
                         Description = "Secondary theme color",
-                        DataType = "color",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -535,8 +515,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "#f093fb",
                         Category = "LandingPage",
                         Description = "Accent theme color",
-                        DataType = "color",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -548,8 +527,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "Marketing Platform",
                         Category = "LandingPage",
                         Description = "Company name displayed on landing page",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -559,8 +537,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "/images/logo.png",
                         Category = "LandingPage",
                         Description = "Company logo URL",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -570,8 +547,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "SMS, MMS & Email Marketing Platform",
                         Category = "LandingPage",
                         Description = "Company tagline",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -583,8 +559,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "10M+",
                         Category = "LandingPage",
                         Description = "Messages sent statistic",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -594,8 +569,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "98%",
                         Category = "LandingPage",
                         Description = "Delivery rate statistic",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -605,8 +579,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "5K+",
                         Category = "LandingPage",
                         Description = "Active users statistic",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -616,8 +589,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "24/7",
                         Category = "LandingPage",
                         Description = "Support availability statistic",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -629,8 +601,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "© 2024 Marketing Platform. All rights reserved.",
                         Category = "LandingPage",
                         Description = "Footer copyright text",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -640,8 +611,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "[{\"platform\":\"facebook\",\"url\":\"https://facebook.com/marketingplatform\",\"icon\":\"bi-facebook\"},{\"platform\":\"twitter\",\"url\":\"https://twitter.com/marketingplatform\",\"icon\":\"bi-twitter\"},{\"platform\":\"linkedin\",\"url\":\"https://linkedin.com/company/marketingplatform\",\"icon\":\"bi-linkedin\"},{\"platform\":\"instagram\",\"url\":\"https://instagram.com/marketingplatform\",\"icon\":\"bi-instagram\"}]",
                         Category = "LandingPage",
                         Description = "Footer social media links (JSON array)",
-                        DataType = "json",
-                        IsPublic = true,
+                        DataType = SettingDataType.Json,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -653,8 +623,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "Marketing Platform - SMS, MMS & Email Marketing",
                         Category = "LandingPage",
                         Description = "Page title for SEO",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -664,8 +633,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "Transform your marketing with our enterprise-grade SMS, MMS & Email platform. Powerful automation, advanced analytics, and seamless integration.",
                         Category = "LandingPage",
                         Description = "Meta description for SEO",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
@@ -675,8 +643,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Value = "SMS marketing, email marketing, MMS marketing, marketing automation, campaign management",
                         Category = "LandingPage",
                         Description = "Meta keywords for SEO",
-                        DataType = "string",
-                        IsPublic = true,
+                        DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     }
