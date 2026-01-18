@@ -202,6 +202,8 @@
 
 @section Scripts {
     <script>
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+
         // Load pricing plans on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadPricingPlans();
@@ -211,15 +213,31 @@
             const container = document.getElementById('pricing-plans');
             
             try {
-                // For now, use mock data until API is integrated
-                // In production, fetch from: const response = await fetch('/api/pricing/models');
-                const mockPlans = getMockPricingPlans();
-                renderPricingPlans(mockPlans);
+                // Fetch plans from API that are marked to show on landing page
+                const response = await fetch(`${apiBaseUrl}/subscriptionplans/landing`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load pricing plans');
+                }
+
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    renderPricingPlans(result.data);
+                } else {
+                    container.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-info text-center">
+                                <i class="bi bi-info-circle"></i> No pricing plans available at this time.
+                            </div>
+                        </div>
+                    `;
+                }
             } catch (error) {
                 console.error('Error loading pricing plans:', error);
                 container.innerHTML = `
                     <div class="col-12">
-                        <div class="alert alert-warning">
+                        <div class="alert alert-warning text-center">
                             <i class="bi bi-exclamation-triangle"></i> Unable to load pricing plans at this time.
                         </div>
                     </div>
@@ -227,82 +245,24 @@
             }
         }
 
-        function getMockPricingPlans() {
-            return [
-                {
-                    id: 1,
-                    name: 'Starter',
-                    description: 'Perfect for small businesses getting started',
-                    basePrice: 29,
-                    billingPeriod: 'month',
-                    features: [
-                        '1,000 SMS messages/month',
-                        '500 emails/month',
-                        'Basic analytics',
-                        'Email support',
-                        '1 user'
-                    ],
-                    isPopular: false,
-                    isActive: true
-                },
-                {
-                    id: 2,
-                    name: 'Professional',
-                    description: 'For growing businesses with larger audiences',
-                    basePrice: 99,
-                    billingPeriod: 'month',
-                    features: [
-                        '10,000 SMS messages/month',
-                        '5,000 emails/month',
-                        'Advanced analytics',
-                        'Priority support',
-                        '5 users',
-                        'Custom templates',
-                        'Automation workflows'
-                    ],
-                    isPopular: true,
-                    isActive: true
-                },
-                {
-                    id: 3,
-                    name: 'Enterprise',
-                    description: 'For large organizations with custom needs',
-                    basePrice: 299,
-                    billingPeriod: 'month',
-                    features: [
-                        'Unlimited SMS messages',
-                        'Unlimited emails',
-                        'Advanced analytics & reporting',
-                        '24/7 phone support',
-                        'Unlimited users',
-                        'Custom branding',
-                        'API access',
-                        'Dedicated account manager'
-                    ],
-                    isPopular: false,
-                    isActive: true
-                }
-            ];
-        }
-
         function renderPricingPlans(plans) {
             const container = document.getElementById('pricing-plans');
             
-            if (!plans || plans.length === 0) {
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-info text-center">
-                            <i class="bi bi-info-circle"></i> No pricing plans available at this time.
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
             let html = '';
             plans.forEach((plan, index) => {
-                const popularBadge = plan.isPopular ? '<div class="position-absolute top-0 start-50 translate-middle"><span class="badge bg-warning text-dark">Most Popular</span></div>' : '';
-                const cardClass = plan.isPopular ? 'border-primary shadow-lg' : 'border-0 shadow-sm';
+                // Parse features from JSON string if needed
+                let features = [];
+                try {
+                    features = plan.features ? (typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features) : [];
+                } catch (e) {
+                    console.error('Error parsing features for plan:', plan.name, e);
+                    features = [];
+                }
+
+                // Determine if plan is popular (middle plan typically)
+                const isPopular = index === Math.floor(plans.length / 2);
+                const popularBadge = isPopular ? '<div class="position-absolute top-0 start-50 translate-middle"><span class="badge bg-warning text-dark">Most Popular</span></div>' : '';
+                const cardClass = isPopular ? 'border-primary shadow-lg' : 'border-0 shadow-sm';
                 
                 html += `
                     <div class="col-lg-4 col-md-6">
@@ -310,21 +270,22 @@
                             ${popularBadge}
                             <div class="card-body p-4">
                                 <h3 class="card-title text-center mb-3">${escapeHtml(plan.name)}</h3>
-                                <p class="text-muted text-center mb-4">${escapeHtml(plan.description)}</p>
+                                <p class="text-muted text-center mb-4">${escapeHtml(plan.description || '')}</p>
                                 <div class="text-center mb-4">
-                                    <span class="display-4 fw-bold">$${plan.basePrice}</span>
-                                    <span class="text-muted">/${plan.billingPeriod}</span>
+                                    <span class="display-4 fw-bold">$${plan.priceMonthly ? plan.priceMonthly.toFixed(2) : '0.00'}</span>
+                                    <span class="text-muted">/month</span>
                                 </div>
                                 <ul class="list-unstyled mb-4">
-                                    ${plan.features.map(feature => `
+                                    ${features.map(feature => `
                                         <li class="mb-2">
                                             <i class="bi bi-check-circle-fill text-success me-2"></i>
                                             ${escapeHtml(feature)}
                                         </li>
                                     `).join('')}
+                                    ${features.length === 0 ? '<li class="text-muted">No features listed</li>' : ''}
                                 </ul>
                                 <div class="text-center">
-                                    <a href="/Auth/Register?plan=${plan.id}" class="btn ${plan.isPopular ? 'btn-primary' : 'btn-outline-primary'} w-100">
+                                    <a href="/Auth/Register?plan=${plan.id}" class="btn ${isPopular ? 'btn-primary' : 'btn-outline-primary'} w-100">
                                         Choose ${escapeHtml(plan.name)}
                                     </a>
                                 </div>

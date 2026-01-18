@@ -54,6 +54,22 @@ namespace MarketingPlatform.API.Controllers
             }
         }
 
+        [HttpGet("landing")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ApiResponse<List<SubscriptionPlanDto>>>> GetLandingPagePlans()
+        {
+            try
+            {
+                var plans = await _subscriptionPlanService.GetLandingPagePlansAsync();
+                return Ok(ApiResponse<List<SubscriptionPlanDto>>.SuccessResponse(plans));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting landing page subscription plans");
+                return BadRequest(ApiResponse<List<SubscriptionPlanDto>>.ErrorResponse("Failed to retrieve landing page plans", new List<string> { ex.Message }));
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<SubscriptionPlanDto>>> GetById(int id)
         {

@@ -54,6 +54,14 @@ namespace MarketingPlatform.Application.Services
             return plans.OrderBy(p => p.PriceMonthly).Select(MapToPlanDto).ToList();
         }
 
+        public async Task<List<SubscriptionPlanDto>> GetLandingPagePlansAsync()
+        {
+            var plans = await _planRepository.FindAsync(p => 
+                p.IsActive && p.IsVisible && p.ShowOnLanding && !p.IsDeleted);
+
+            return plans.OrderBy(p => p.PriceMonthly).Select(MapToPlanDto).ToList();
+        }
+
         public async Task<SubscriptionPlanDto> CreatePlanAsync(CreateSubscriptionPlanDto dto)
         {
             var plan = _mapper.Map<SubscriptionPlan>(dto);

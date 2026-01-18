@@ -156,6 +156,8 @@ namespace MarketingPlatform.Infrastructure.Data
                         ContactLimit = 500,
                         Features = "[\"Basic campaign management\", \"Basic analytics\", \"Email support\"]",
                         IsActive = true,
+                        IsVisible = true,
+                        ShowOnLanding = true,
                         CreatedAt = DateTime.UtcNow
                     },
                     new SubscriptionPlan
@@ -170,6 +172,8 @@ namespace MarketingPlatform.Infrastructure.Data
                         ContactLimit = 10000,
                         Features = "[\"Advanced campaign management\", \"Workflows & automation\", \"Advanced analytics\", \"Priority support\", \"Custom templates\"]",
                         IsActive = true,
+                        IsVisible = true,
+                        ShowOnLanding = true,
                         CreatedAt = DateTime.UtcNow
                     },
                     new SubscriptionPlan
@@ -184,6 +188,8 @@ namespace MarketingPlatform.Infrastructure.Data
                         ContactLimit = 100000,
                         Features = "[\"Unlimited campaigns\", \"Advanced workflows\", \"Premium analytics\", \"24/7 support\", \"Dedicated account manager\", \"API access\", \"White-label options\"]",
                         IsActive = true,
+                        IsVisible = true,
+                        ShowOnLanding = true,
                         CreatedAt = DateTime.UtcNow
                     }
                 };
