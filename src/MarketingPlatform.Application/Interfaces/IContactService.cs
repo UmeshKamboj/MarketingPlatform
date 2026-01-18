@@ -17,5 +17,10 @@ namespace MarketingPlatform.Application.Interfaces
         Task<byte[]> ExportContactsToCsvAsync(string userId, List<int>? contactIds = null);
         Task<byte[]> ExportContactsToExcelAsync(string userId, List<int>? contactIds = null);
         Task<List<ContactDto>> SearchContactsAsync(string userId, string searchTerm);
+        
+        // Duplicate detection & handling
+        Task<DuplicateCheckResultDto> CheckForDuplicatesAsync(string userId, CheckDuplicateDto dto, int? excludeContactId = null);
+        Task<DuplicateReportDto> GetDuplicateReportAsync(string userId);
+        Task<ResolveDuplicateResultDto> ResolveDuplicatesAsync(string userId, ResolveDuplicateDto dto);
     }
 }

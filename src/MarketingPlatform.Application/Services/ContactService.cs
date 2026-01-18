@@ -135,6 +135,19 @@ namespace MarketingPlatform.Application.Services
 
         public async Task<ContactDto> CreateContactAsync(string userId, CreateContactDto dto)
         {
+            // Check for duplicates
+            var duplicateCheck = await CheckForDuplicatesAsync(userId, new CheckDuplicateDto 
+            { 
+                PhoneNumber = dto.PhoneNumber, 
+                Email = dto.Email 
+            });
+
+            if (duplicateCheck.HasDuplicates)
+            {
+                var duplicateInfo = string.Join(", ", duplicateCheck.Duplicates.Select(d => d.DuplicateReason));
+                throw new InvalidOperationException($"Duplicate contact found. Matching fields: {duplicateInfo}. Use duplicate resolution to handle this.");
+            }
+
             var contact = _mapper.Map<Contact>(dto);
             contact.UserId = userId;
             contact.CustomAttributes = SerializeCustomAttributes(dto.CustomAttributes);
@@ -154,6 +167,23 @@ namespace MarketingPlatform.Application.Services
 
             if (contact == null)
                 return false;
+
+            // Check for duplicates if email or phone is being changed
+            if ((dto.Email != null && dto.Email != contact.Email) || 
+                (dto.PhoneNumber != null && dto.PhoneNumber != contact.PhoneNumber))
+            {
+                var duplicateCheck = await CheckForDuplicatesAsync(userId, new CheckDuplicateDto 
+                { 
+                    PhoneNumber = dto.PhoneNumber ?? contact.PhoneNumber, 
+                    Email = dto.Email ?? contact.Email 
+                }, excludeContactId: contactId);
+
+                if (duplicateCheck.HasDuplicates)
+                {
+                    var duplicateInfo = string.Join(", ", duplicateCheck.Duplicates.Select(d => d.DuplicateReason));
+                    throw new InvalidOperationException($"Duplicate contact found. Matching fields: {duplicateInfo}. Use duplicate resolution to handle this.");
+                }
+            }
 
             contact.PhoneNumber = dto.PhoneNumber ?? contact.PhoneNumber;
             contact.Email = dto.Email ?? contact.Email;
@@ -229,16 +259,26 @@ namespace MarketingPlatform.Application.Services
                 {
                     try
                     {
-                        // Check for duplicate
-                        var isDuplicate = await _contactRepository.AnyAsync(c =>
-                            c.UserId == userId &&
-                            !c.IsDeleted &&
-                            ((c.Email != null && record.Email != null && c.Email == record.Email) ||
-                             (c.PhoneNumber == record.PhoneNumber && !string.IsNullOrEmpty(record.PhoneNumber))));
+                        // Check for duplicate with detailed information
+                        var duplicateCheck = await CheckForDuplicatesAsync(userId, new CheckDuplicateDto
+                        {
+                            PhoneNumber = record.PhoneNumber,
+                            Email = record.Email
+                        });
 
-                        if (isDuplicate)
+                        if (duplicateCheck.HasDuplicates)
                         {
                             result.DuplicateCount++;
+                            var firstDuplicate = duplicateCheck.Duplicates.First();
+                            result.DuplicateDetails.Add(new DuplicateImportContactDto
+                            {
+                                PhoneNumber = record.PhoneNumber,
+                                Email = record.Email,
+                                FirstName = record.FirstName,
+                                LastName = record.LastName,
+                                DuplicateReason = firstDuplicate.DuplicateReason,
+                                ExistingContactId = firstDuplicate.ContactId
+                            });
                             continue;
                         }
 
@@ -326,16 +366,26 @@ namespace MarketingPlatform.Application.Services
                         var city = worksheet.Cells[row, 6].Value?.ToString();
                         var postalCode = worksheet.Cells[row, 7].Value?.ToString();
 
-                        // Check for duplicate
-                        var isDuplicate = await _contactRepository.AnyAsync(c =>
-                            c.UserId == userId &&
-                            !c.IsDeleted &&
-                            ((c.Email != null && email != null && c.Email == email) ||
-                             (c.PhoneNumber == phoneNumber && !string.IsNullOrEmpty(phoneNumber))));
+                        // Check for duplicate with detailed information
+                        var duplicateCheck = await CheckForDuplicatesAsync(userId, new CheckDuplicateDto
+                        {
+                            PhoneNumber = phoneNumber,
+                            Email = email
+                        });
 
-                        if (isDuplicate)
+                        if (duplicateCheck.HasDuplicates)
                         {
                             result.DuplicateCount++;
+                            var firstDuplicate = duplicateCheck.Duplicates.First();
+                            result.DuplicateDetails.Add(new DuplicateImportContactDto
+                            {
+                                PhoneNumber = phoneNumber,
+                                Email = email,
+                                FirstName = firstName,
+                                LastName = lastName,
+                                DuplicateReason = firstDuplicate.DuplicateReason,
+                                ExistingContactId = firstDuplicate.ContactId
+                            });
                             continue;
                         }
 
@@ -531,6 +581,262 @@ namespace MarketingPlatform.Application.Services
             {
                 return null;
             }
+        }
+
+        public async Task<DuplicateCheckResultDto> CheckForDuplicatesAsync(string userId, CheckDuplicateDto dto, int? excludeContactId = null)
+        {
+            var result = new DuplicateCheckResultDto();
+            var duplicates = new List<DuplicateContactDto>();
+
+            // Check for email duplicates
+            if (!string.IsNullOrEmpty(dto.Email))
+            {
+                var emailDuplicates = await _contactRepository.FindAsync(c =>
+                    c.UserId == userId &&
+                    !c.IsDeleted &&
+                    c.Email != null &&
+                    c.Email.ToLower() == dto.Email.ToLower() &&
+                    (!excludeContactId.HasValue || c.Id != excludeContactId.Value));
+
+                foreach (var contact in emailDuplicates)
+                {
+                    var existing = duplicates.FirstOrDefault(d => d.ContactId == contact.Id);
+                    if (existing != null)
+                    {
+                        existing.DuplicateReason = "Both";
+                    }
+                    else
+                    {
+                        duplicates.Add(new DuplicateContactDto
+                        {
+                            ContactId = contact.Id,
+                            PhoneNumber = contact.PhoneNumber,
+                            Email = contact.Email,
+                            FirstName = contact.FirstName,
+                            LastName = contact.LastName,
+                            CreatedAt = contact.CreatedAt,
+                            DuplicateReason = "Email"
+                        });
+                    }
+                }
+            }
+
+            // Check for phone number duplicates
+            if (!string.IsNullOrEmpty(dto.PhoneNumber))
+            {
+                var phoneDuplicates = await _contactRepository.FindAsync(c =>
+                    c.UserId == userId &&
+                    !c.IsDeleted &&
+                    c.PhoneNumber.ToLower() == dto.PhoneNumber.ToLower() &&
+                    (!excludeContactId.HasValue || c.Id != excludeContactId.Value));
+
+                foreach (var contact in phoneDuplicates)
+                {
+                    var existing = duplicates.FirstOrDefault(d => d.ContactId == contact.Id);
+                    if (existing != null)
+                    {
+                        existing.DuplicateReason = "Both";
+                    }
+                    else
+                    {
+                        duplicates.Add(new DuplicateContactDto
+                        {
+                            ContactId = contact.Id,
+                            PhoneNumber = contact.PhoneNumber,
+                            Email = contact.Email,
+                            FirstName = contact.FirstName,
+                            LastName = contact.LastName,
+                            CreatedAt = contact.CreatedAt,
+                            DuplicateReason = "PhoneNumber"
+                        });
+                    }
+                }
+            }
+
+            result.Duplicates = duplicates;
+            result.HasDuplicates = duplicates.Any();
+            return result;
+        }
+
+        public async Task<DuplicateReportDto> GetDuplicateReportAsync(string userId)
+        {
+            var report = new DuplicateReportDto();
+            var groups = new Dictionary<string, DuplicateGroupDto>();
+
+            var allContacts = await _contactRepository.FindAsync(c => c.UserId == userId && !c.IsDeleted);
+            var contactsList = allContacts.ToList();
+
+            // Group by email
+            var emailGroups = contactsList
+                .Where(c => !string.IsNullOrEmpty(c.Email))
+                .GroupBy(c => c.Email!.ToLower())
+                .Where(g => g.Count() > 1);
+
+            foreach (var group in emailGroups)
+            {
+                var key = $"email:{group.Key}";
+                if (!groups.ContainsKey(key))
+                {
+                    groups[key] = new DuplicateGroupDto
+                    {
+                        DuplicateKey = group.Key,
+                        DuplicateType = "Email",
+                        Count = group.Count(),
+                        Contacts = group.Select(c => new DuplicateContactDto
+                        {
+                            ContactId = c.Id,
+                            PhoneNumber = c.PhoneNumber,
+                            Email = c.Email,
+                            FirstName = c.FirstName,
+                            LastName = c.LastName,
+                            CreatedAt = c.CreatedAt,
+                            DuplicateReason = "Email"
+                        }).ToList()
+                    };
+                }
+            }
+
+            // Group by phone number
+            var phoneGroups = contactsList
+                .Where(c => !string.IsNullOrEmpty(c.PhoneNumber))
+                .GroupBy(c => c.PhoneNumber.ToLower())
+                .Where(g => g.Count() > 1);
+
+            foreach (var group in phoneGroups)
+            {
+                var key = $"phone:{group.Key}";
+                if (!groups.ContainsKey(key))
+                {
+                    groups[key] = new DuplicateGroupDto
+                    {
+                        DuplicateKey = group.Key,
+                        DuplicateType = "PhoneNumber",
+                        Count = group.Count(),
+                        Contacts = group.Select(c => new DuplicateContactDto
+                        {
+                            ContactId = c.Id,
+                            PhoneNumber = c.PhoneNumber,
+                            Email = c.Email,
+                            FirstName = c.FirstName,
+                            LastName = c.LastName,
+                            CreatedAt = c.CreatedAt,
+                            DuplicateReason = "PhoneNumber"
+                        }).ToList()
+                    };
+                }
+            }
+
+            report.DuplicateGroups = groups.Values.ToList();
+            report.TotalDuplicates = report.DuplicateGroups.Sum(g => g.Count);
+            return report;
+        }
+
+        public async Task<ResolveDuplicateResultDto> ResolveDuplicatesAsync(string userId, ResolveDuplicateDto dto)
+        {
+            var result = new ResolveDuplicateResultDto();
+
+            try
+            {
+                // Validate primary contact
+                var primaryContact = await _contactRepository.FirstOrDefaultAsync(c =>
+                    c.Id == dto.PrimaryContactId && c.UserId == userId && !c.IsDeleted);
+
+                if (primaryContact == null)
+                {
+                    result.Success = false;
+                    result.Message = "Primary contact not found";
+                    return result;
+                }
+
+                // Get duplicate contacts
+                var duplicateContacts = await _contactRepository.FindAsync(c =>
+                    dto.DuplicateContactIds.Contains(c.Id) && c.UserId == userId && !c.IsDeleted);
+
+                if (!duplicateContacts.Any())
+                {
+                    result.Success = false;
+                    result.Message = "No duplicate contacts found";
+                    return result;
+                }
+
+                switch (dto.Action)
+                {
+                    case ResolutionAction.KeepPrimary:
+                        // Just delete the duplicates
+                        foreach (var contact in duplicateContacts)
+                        {
+                            contact.IsDeleted = true;
+                            contact.UpdatedAt = DateTime.UtcNow;
+                        }
+                        _contactRepository.UpdateRange(duplicateContacts);
+                        result.ContactsAffected = duplicateContacts.Count();
+                        result.Message = $"Deleted {duplicateContacts.Count()} duplicate contact(s)";
+                        break;
+
+                    case ResolutionAction.MergeIntoPrimary:
+                        // Merge data into primary (fill in missing fields)
+                        foreach (var contact in duplicateContacts)
+                        {
+                            if (string.IsNullOrEmpty(primaryContact.Email) && !string.IsNullOrEmpty(contact.Email))
+                                primaryContact.Email = contact.Email;
+                            if (string.IsNullOrEmpty(primaryContact.PhoneNumber) && !string.IsNullOrEmpty(contact.PhoneNumber))
+                                primaryContact.PhoneNumber = contact.PhoneNumber;
+                            if (string.IsNullOrEmpty(primaryContact.FirstName) && !string.IsNullOrEmpty(contact.FirstName))
+                                primaryContact.FirstName = contact.FirstName;
+                            if (string.IsNullOrEmpty(primaryContact.LastName) && !string.IsNullOrEmpty(contact.LastName))
+                                primaryContact.LastName = contact.LastName;
+                            if (string.IsNullOrEmpty(primaryContact.Country) && !string.IsNullOrEmpty(contact.Country))
+                                primaryContact.Country = contact.Country;
+                            if (string.IsNullOrEmpty(primaryContact.City) && !string.IsNullOrEmpty(contact.City))
+                                primaryContact.City = contact.City;
+                            if (string.IsNullOrEmpty(primaryContact.PostalCode) && !string.IsNullOrEmpty(contact.PostalCode))
+                                primaryContact.PostalCode = contact.PostalCode;
+
+                            // Merge custom attributes
+                            if (!string.IsNullOrEmpty(contact.CustomAttributes))
+                            {
+                                var primaryAttrs = DeserializeCustomAttributes(primaryContact.CustomAttributes) ?? new Dictionary<string, string>();
+                                var contactAttrs = DeserializeCustomAttributes(contact.CustomAttributes) ?? new Dictionary<string, string>();
+
+                                foreach (var attr in contactAttrs)
+                                {
+                                    if (!primaryAttrs.ContainsKey(attr.Key))
+                                        primaryAttrs[attr.Key] = attr.Value;
+                                }
+
+                                primaryContact.CustomAttributes = SerializeCustomAttributes(primaryAttrs);
+                            }
+
+                            // Mark duplicate as deleted
+                            contact.IsDeleted = true;
+                            contact.UpdatedAt = DateTime.UtcNow;
+                        }
+
+                        primaryContact.UpdatedAt = DateTime.UtcNow;
+                        _contactRepository.Update(primaryContact);
+                        _contactRepository.UpdateRange(duplicateContacts);
+                        result.ContactsAffected = duplicateContacts.Count() + 1;
+                        result.Message = $"Merged {duplicateContacts.Count()} contact(s) into primary contact";
+                        break;
+
+                    case ResolutionAction.KeepAll:
+                        // Do nothing, just acknowledge
+                        result.ContactsAffected = 0;
+                        result.Message = "All contacts kept as-is";
+                        break;
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = $"Error resolving duplicates: {ex.Message}";
+                _logger.LogError(ex, "Error resolving duplicate contacts");
+            }
+
+            return result;
         }
     }
 }
