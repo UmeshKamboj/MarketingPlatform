@@ -357,18 +357,23 @@ namespace MarketingPlatform.Application.Services
             }
 
             // Render content
+            var renderedSubject = !string.IsNullOrWhiteSpace(template.Subject)
+                ? RenderContent(template.Subject, variables)
+                : null;
+            var renderedBody = RenderContent(template.MessageBody, variables);
+            
             var preview = new TemplatePreviewDto
             {
-                Subject = !string.IsNullOrWhiteSpace(template.Subject)
-                    ? RenderContent(template.Subject, variables)
-                    : null,
-                MessageBody = RenderContent(template.MessageBody, variables),
+                Subject = renderedSubject,
+                MessageBody = renderedBody,
                 HTMLContent = !string.IsNullOrWhiteSpace(template.HTMLContent)
                     ? RenderContent(template.HTMLContent, variables)
                     : null,
                 MediaUrls = !string.IsNullOrWhiteSpace(template.DefaultMediaUrls)
                     ? JsonConvert.DeserializeObject<List<string>>(template.DefaultMediaUrls)
-                    : null
+                    : null,
+                SubjectCharacterCount = renderedSubject != null ? CalculateCharacterCount(renderedSubject, ChannelType.Email, true) : null,
+                MessageBodyCharacterCount = CalculateCharacterCount(renderedBody, template.Channel, false)
             };
 
             // Find missing variables
@@ -436,6 +441,11 @@ namespace MarketingPlatform.Application.Services
                 LastUsedAt = template.LastUsedAt,
                 SuccessRate = successRate
             };
+        }
+
+        public Task<CharacterCountDto> CalculateCharacterCountAsync(string content, ChannelType channel, bool isSubject)
+        {
+            return Task.FromResult(CalculateCharacterCount(content, channel, isSubject));
         }
 
         // Private helper methods
@@ -511,6 +521,82 @@ namespace MarketingPlatform.Application.Services
                 { "Email", contact.Email ?? "" },
                 { "Phone", contact.PhoneNumber ?? "" },
                 { "PhoneNumber", contact.PhoneNumber ?? "" }
+            };
+        }
+
+        private CharacterCountDto CalculateCharacterCount(string content, ChannelType channel, bool isSubject)
+        {
+            if (string.IsNullOrEmpty(content))
+            {
+                return new CharacterCountDto
+                {
+                    CharacterCount = 0,
+                    ContainsUnicode = false,
+                    SmsSegments = channel == ChannelType.SMS || channel == ChannelType.MMS ? 0 : null,
+                    RecommendedMaxLength = GetRecommendedMaxLength(channel, isSubject, false),
+                    ExceedsRecommendedLength = false
+                };
+            }
+
+            var charCount = content.Length;
+            var containsUnicode = ContainsUnicodeCharacters(content);
+
+            int? smsSegments = null;
+            int? recommendedMax = GetRecommendedMaxLength(channel, isSubject, containsUnicode);
+
+            // Calculate SMS segments for SMS/MMS channels
+            if (channel == ChannelType.SMS || channel == ChannelType.MMS)
+            {
+                // Standard GSM-7 encoding: 160 chars per segment (concatenated: 153 chars per segment)
+                // Unicode UCS-2 encoding: 70 chars per segment (concatenated: 67 chars per segment)
+                if (containsUnicode)
+                {
+                    smsSegments = charCount <= 70 ? 1 : (int)Math.Ceiling((double)charCount / 67);
+                }
+                else
+                {
+                    smsSegments = charCount <= 160 ? 1 : (int)Math.Ceiling((double)charCount / 153);
+                }
+            }
+
+            return new CharacterCountDto
+            {
+                CharacterCount = charCount,
+                ContainsUnicode = containsUnicode,
+                SmsSegments = smsSegments,
+                RecommendedMaxLength = recommendedMax,
+                ExceedsRecommendedLength = recommendedMax.HasValue && charCount > recommendedMax.Value
+            };
+        }
+
+        private bool ContainsUnicodeCharacters(string text)
+        {
+            // Check if string contains characters outside the GSM-7 character set
+            // GSM-7 includes basic ASCII and some extended characters
+            foreach (char c in text)
+            {
+                // Characters above ASCII 127 or certain special chars indicate Unicode
+                if (c > 127 || c == '€' || c == '[' || c == ']' || c == '{' || c == '}' || c == '\\' || c == '^' || c == '~' || c == '|')
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private int? GetRecommendedMaxLength(ChannelType channel, bool isSubject, bool isUnicode)
+        {
+            if (isSubject && channel == ChannelType.Email)
+            {
+                return 60; // Email subject line recommended max
+            }
+
+            return channel switch
+            {
+                ChannelType.SMS => isUnicode ? 70 : 160,
+                ChannelType.MMS => isUnicode ? 70 : 160,
+                ChannelType.Email => null, // No strict limit for email body
+                _ => null
             };
         }
     }

@@ -7,6 +7,7 @@ using MarketingPlatform.Application.DTOs.Template;
 using MarketingPlatform.Application.DTOs.Message;
 using MarketingPlatform.Application.DTOs.SuppressionList;
 using MarketingPlatform.Application.DTOs.ContactTag;
+using MarketingPlatform.Application.DTOs.URL;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Models;
 
@@ -66,6 +67,11 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<ContactTag, ContactTagDto>()
                 .ForMember(dest => dest.ContactCount, opt => opt.Ignore()); // Handled manually in service
             CreateMap<CreateContactTagDto, ContactTag>();
+
+            // URL Shortener mappings
+            CreateMap<URLShortener, UrlShortenerDto>();
+            CreateMap<CreateShortenedUrlDto, URLShortener>();
+            CreateMap<URLClick, UrlClickDto>();
         }
     }
 }
