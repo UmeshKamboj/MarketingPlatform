@@ -161,7 +161,9 @@ namespace MarketingPlatform.Application.Services
                 }
 
                 // Delete from file storage
-                var fileKey = imageUrl.Split('/').Last();
+                // Extract filename from URL - handles both simple paths and URLs with query strings
+                var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
+                var fileKey = uri.IsAbsoluteUri ? Path.GetFileName(uri.LocalPath) : Path.GetFileName(imageUrl);
                 await _fileStorageService.DeleteFileAsync(fileKey);
 
                 return true;
