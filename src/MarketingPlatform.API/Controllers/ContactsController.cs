@@ -213,5 +213,65 @@ namespace MarketingPlatform.API.Controllers
                 return BadRequest(ApiResponse<List<ContactDto>>.ErrorResponse(ex.Message));
             }
         }
+
+        [HttpPost("check-duplicates")]
+        public async Task<ActionResult<ApiResponse<DuplicateCheckResultDto>>> CheckDuplicates([FromBody] CheckDuplicateDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var result = await _contactService.CheckForDuplicatesAsync(userId, dto);
+                return Ok(ApiResponse<DuplicateCheckResultDto>.SuccessResponse(result));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking for duplicates");
+                return BadRequest(ApiResponse<DuplicateCheckResultDto>.ErrorResponse(ex.Message));
+            }
+        }
+
+        [HttpGet("duplicates/report")]
+        public async Task<ActionResult<ApiResponse<DuplicateReportDto>>> GetDuplicatesReport()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var report = await _contactService.GetDuplicateReportAsync(userId);
+                return Ok(ApiResponse<DuplicateReportDto>.SuccessResponse(report));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating duplicate report");
+                return BadRequest(ApiResponse<DuplicateReportDto>.ErrorResponse(ex.Message));
+            }
+        }
+
+        [HttpPost("duplicates/resolve")]
+        public async Task<ActionResult<ApiResponse<ResolveDuplicateResultDto>>> ResolveDuplicates([FromBody] ResolveDuplicateDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var result = await _contactService.ResolveDuplicatesAsync(userId, dto);
+                if (!result.Success)
+                    return BadRequest(ApiResponse<ResolveDuplicateResultDto>.ErrorResponse(result.Message));
+
+                return Ok(ApiResponse<ResolveDuplicateResultDto>.SuccessResponse(result, result.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resolving duplicates");
+                return BadRequest(ApiResponse<ResolveDuplicateResultDto>.ErrorResponse(ex.Message));
+            }
+        }
     }
 }
