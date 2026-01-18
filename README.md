@@ -384,6 +384,260 @@ GET /api/contactgroups/{id}/contacts?pageNumber=1&pageSize=20
 Authorization: Bearer {token}
 ```
 
+## Testing Contact Tags Management
+
+### Create Tag
+```bash
+POST /api/contacttags
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "name": "VIP",
+  "color": "#FF5733"
+}
+```
+
+### Get All Tags
+```bash
+GET /api/contacttags?pageNumber=1&pageSize=20&searchTerm=VIP
+Authorization: Bearer {token}
+```
+
+### Get Single Tag
+```bash
+GET /api/contacttags/{id}
+Authorization: Bearer {token}
+```
+
+### Update Tag
+```bash
+PUT /api/contacttags/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "name": "Premium VIP",
+  "color": "#FFD700"
+}
+```
+
+### Delete Tag
+```bash
+DELETE /api/contacttags/{id}
+Authorization: Bearer {token}
+```
+
+### Assign Tag to Contact
+```bash
+POST /api/contacttags/contacts/{contactId}/tags/{tagId}
+Authorization: Bearer {token}
+```
+
+### Remove Tag from Contact
+```bash
+DELETE /api/contacttags/contacts/{contactId}/tags/{tagId}
+Authorization: Bearer {token}
+```
+
+### Get Contact Tags
+```bash
+GET /api/contacttags/contacts/{contactId}
+Authorization: Bearer {token}
+```
+
+## Testing Suppression/Exclusion Lists
+
+### Create Suppression Entry
+```bash
+POST /api/suppressionlists
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "phoneOrEmail": "+1234567890",
+  "type": 0,
+  "reason": "User requested opt-out"
+}
+```
+
+Suppression Types:
+- 0 = OptOut
+- 1 = Bounce
+- 2 = Complaint
+- 3 = Manual
+
+### Get All Suppression Entries
+```bash
+GET /api/suppressionlists?pageNumber=1&pageSize=20&searchTerm=john
+Authorization: Bearer {token}
+```
+
+### Get Single Suppression Entry
+```bash
+GET /api/suppressionlists/{id}
+Authorization: Bearer {token}
+```
+
+### Delete Suppression Entry
+```bash
+DELETE /api/suppressionlists/{id}
+Authorization: Bearer {token}
+```
+
+### Bulk Create Suppression Entries
+```bash
+POST /api/suppressionlists/bulk
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "phoneOrEmails": ["+1234567890", "user@example.com", "+9876543210"],
+  "type": 0,
+  "reason": "Bulk opt-out from campaign"
+}
+```
+
+### Check If Contact Is Suppressed
+```bash
+GET /api/suppressionlists/check/{phoneOrEmail}
+Authorization: Bearer {token}
+```
+
+Example:
+```bash
+GET /api/suppressionlists/check/+1234567890
+GET /api/suppressionlists/check/user@example.com
+```
+
+## Testing Audience Segmentation
+
+### Evaluate Segment (Get Matching Contacts)
+```bash
+POST /api/audience/evaluate
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "rules": [
+    {
+      "field": "Country",
+      "operator": "Equals",
+      "value": "USA"
+    },
+    {
+      "field": "City",
+      "operator": "In",
+      "value": "New York,Los Angeles,Chicago"
+    }
+  ],
+  "logicalOperator": "AND"
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "totalContacts": 150,
+    "contactIds": [1, 5, 8, 12, 15, ...]
+  }
+}
+```
+
+### Calculate Audience Size
+```bash
+POST /api/audience/calculate-size
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "rules": [
+    {
+      "field": "Tag",
+      "operator": "In",
+      "value": "1,2,3"
+    }
+  ],
+  "logicalOperator": "OR"
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": 250,
+  "message": "Audience size calculated successfully"
+}
+```
+
+### Refresh Dynamic Group
+```bash
+POST /api/audience/groups/{groupId}/refresh
+Authorization: Bearer {token}
+```
+
+### Segment Rule Examples
+
+**Filter by Country:**
+```json
+{
+  "field": "Country",
+  "operator": "Equals",
+  "value": "USA"
+}
+```
+
+**Filter by Tag:**
+```json
+{
+  "field": "Tag",
+  "operator": "In",
+  "value": "1,2,3"
+}
+```
+
+**Filter by Custom Attribute:**
+```json
+{
+  "field": "CustomAttribute.MembershipLevel",
+  "operator": "Equals",
+  "value": "Gold"
+}
+```
+
+**Filter by Email Domain:**
+```json
+{
+  "field": "Email",
+  "operator": "EndsWith",
+  "value": "@gmail.com"
+}
+```
+
+**Available Operators:**
+- Equals
+- NotEquals
+- Contains
+- NotContains
+- StartsWith
+- EndsWith
+- In (comma-separated values)
+- NotIn (comma-separated values)
+
+**Available Fields:**
+- Email
+- PhoneNumber
+- FirstName
+- LastName
+- Country
+- City
+- PostalCode
+- Tag (for tag-based filtering)
+- CustomAttribute.{KeyName} (for custom attribute filtering)
+
+### Get Group Contacts
+```bash
+GET /api/contactgroups/{id}/contacts?pageNumber=1&pageSize=20
+Authorization: Bearer {token}
+```
+
 ## Testing Template Management
 
 ### Create SMS Template
@@ -864,7 +1118,12 @@ Response:
 - ✅ Task 2.1: API Foundation - Repository Pattern & Core Services
 - ✅ Task 2.2: Contact Management - Full CRUD with Import/Export
 - ✅ Task 2.3: Campaign Management - Core Campaign CRUD & Scheduling
-- ✅ Task 2.5: Template Management - Reusable Message Templates with Variables ← **Current**
+- ✅ Task 2.4: Contact, Group & Audience Management Enhancements:
+  - ✅ Suppression/Exclusion list management
+  - ✅ Contact tag management
+  - ✅ Audience segmentation engine
+  - ✅ Dynamic group rule processing
+- ✅ Task 2.5: Template Management - Reusable Message Templates with Variables
 - ⏳ Keyword campaigns
 - ⏳ Automation & workflows
 - ⏳ Analytics & reporting
@@ -872,7 +1131,7 @@ Response:
 - ⏳ Super admin platform
 
 ## Project Status
-🚧 **In Development** - Task 2.5 Complete
+🚧 **In Development** - Task 2.4 & 2.5 Complete
 
 ## License
 MIT License
