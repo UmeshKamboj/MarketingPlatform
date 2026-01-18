@@ -8,6 +8,7 @@ namespace MarketingPlatform.Core.Entities
         public ScheduleType ScheduleType { get; set; }
         public DateTime? ScheduledDateTime { get; set; }
         public string? RecurrencePattern { get; set; } // JSON
+        public bool TimeZoneAware { get; set; }
         public string? TimeZone { get; set; }
 
         // Navigation properties
