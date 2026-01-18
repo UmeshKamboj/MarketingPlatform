@@ -1,0 +1,293 @@
+@{
+    ViewData["Title"] = "Message Details";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-envelope-open"></i> Message Details</h2>
+        <a href="@Url.Action("Index", "Messages")" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Messages
+        </a>
+    </div>
+
+    <div id="loading" class="text-center py-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div id="messageDetails" style="display: none;">
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 id="statRecipients" class="text-primary">-</h3>
+                        <p class="text-muted mb-0">Recipients</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 id="statDelivered" class="text-success">-</h3>
+                        <p class="text-muted mb-0">Delivered</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 id="statOpened" class="text-info">-</h3>
+                        <p class="text-muted mb-0">Opened</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 id="statClicked" class="text-warning">-</h3>
+                        <p class="text-muted mb-0">Clicked</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Message Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="text-muted small">Subject</label>
+                                <p id="messageSubject" class="fw-bold">-</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="text-muted small">Channel</label>
+                                <p id="messageChannel">-</p>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="text-muted small">Status</label>
+                                <p id="messageStatus">-</p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="text-muted small">Campaign</label>
+                                <p id="messageCampaign">-</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small">Sent At</label>
+                                <p id="messageSentAt">-</p>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <label class="text-muted small">Message Content</label>
+                            <div class="border rounded p-3 bg-light" id="messageContent">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Delivery Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm" id="deliveryTable">
+                                <thead>
+                                    <tr>
+                                        <th>Recipient</th>
+                                        <th>Status</th>
+                                        <th>Delivered At</th>
+                                        <th>Opened At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav>
+                            <ul class="pagination pagination-sm justify-content-center mb-0">
+                                <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Performance Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" onclick="resendMessage()">
+                                <i class="bi bi-arrow-repeat"></i> Resend to Failed
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="duplicateMessage()">
+                                <i class="bi bi-files"></i> Duplicate Message
+                            </button>
+                            <button class="btn btn-outline-info" onclick="exportReport()">
+                                <i class="bi bi-download"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+        const messageId = window.location.pathname.split('/').pop();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMessageDetails();
+        });
+
+        async function loadMessageDetails() {
+            try {
+                const mockMessage = {
+                    id: messageId,
+                    subject: 'Flash Sale Alert',
+                    channel: 'SMS',
+                    status: 'Sent',
+                    campaignName: 'Flash Deals',
+                    sentAt: '2024-03-20 09:15:00',
+                    content: 'FLASH SALE! Get 50% off today only. Shop now: https://example.com/sale',
+                    stats: {
+                        recipients: 5230,
+                        delivered: 5227,
+                        opened: 4156,
+                        clicked: 1456,
+                        bounced: 3,
+                        failed: 0
+                    },
+                    deliveryDetails: [
+                        { recipient: '+1234567890', status: 'Delivered', deliveredAt: '2024-03-20 09:15:23', openedAt: '2024-03-20 09:16:45' },
+                        { recipient: '+1234567891', status: 'Delivered', deliveredAt: '2024-03-20 09:15:24', openedAt: '2024-03-20 09:18:12' },
+                        { recipient: '+1234567892', status: 'Delivered', deliveredAt: '2024-03-20 09:15:25', openedAt: null },
+                        { recipient: '+1234567893', status: 'Failed', deliveredAt: null, openedAt: null },
+                        { recipient: '+1234567894', status: 'Delivered', deliveredAt: '2024-03-20 09:15:27', openedAt: '2024-03-20 09:20:34' }
+                    ]
+                };
+                
+                populateDetails(mockMessage);
+                renderDeliveryTable(mockMessage.deliveryDetails);
+                createPerformanceChart(mockMessage.stats);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('messageDetails').style.display = 'block';
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        function populateDetails(message) {
+            document.getElementById('statRecipients').textContent = message.stats.recipients.toLocaleString();
+            document.getElementById('statDelivered').textContent = message.stats.delivered.toLocaleString();
+            document.getElementById('statOpened').textContent = message.stats.opened ? message.stats.opened.toLocaleString() : 'N/A';
+            document.getElementById('statClicked').textContent = message.stats.clicked.toLocaleString();
+            
+            document.getElementById('messageSubject').textContent = message.subject;
+            
+            const channelColors = { SMS: 'success', MMS: 'info', Email: 'primary' };
+            document.getElementById('messageChannel').innerHTML = 
+                `<span class="badge bg-${channelColors[message.channel]}">${message.channel}</span>`;
+            
+            const statusColors = { Sent: 'success', Pending: 'warning', Failed: 'danger' };
+            document.getElementById('messageStatus').innerHTML = 
+                `<span class="badge bg-${statusColors[message.status]}">${message.status}</span>`;
+            
+            document.getElementById('messageCampaign').textContent = message.campaignName;
+            document.getElementById('messageSentAt').textContent = message.sentAt;
+            document.getElementById('messageContent').textContent = message.content;
+        }
+
+        function renderDeliveryTable(details) {
+            const tbody = document.querySelector('#deliveryTable tbody');
+            let html = '';
+            
+            details.forEach(detail => {
+                const statusColors = { Delivered: 'success', Failed: 'danger', Pending: 'warning' };
+                html += `
+                    <tr>
+                        <td>${detail.recipient}</td>
+                        <td><span class="badge bg-${statusColors[detail.status]}">${detail.status}</span></td>
+                        <td><small>${detail.deliveredAt || 'N/A'}</small></td>
+                        <td><small>${detail.openedAt || 'N/A'}</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewRecipient('${detail.recipient}')">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        function createPerformanceChart(stats) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Delivered', 'Opened', 'Clicked', 'Failed'],
+                    datasets: [{
+                        data: [stats.delivered, stats.opened || 0, stats.clicked, stats.failed],
+                        backgroundColor: ['#198754', '#0dcaf0', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function viewRecipient(phone) {
+            alert(`View details for ${phone} (Demo)`);
+        }
+
+        function resendMessage() {
+            if (confirm('Resend this message to failed recipients?')) {
+                alert('Message resent! (Demo)');
+            }
+        }
+
+        function duplicateMessage() {
+            if (confirm('Create a copy of this message?')) {
+                window.location.href = '/Messages/Compose';
+            }
+        }
+
+        function exportReport() {
+            alert('Exporting report... (Demo)');
+        }
+    </script>
+}
