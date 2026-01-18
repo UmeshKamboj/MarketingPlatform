@@ -16,5 +16,6 @@ namespace MarketingPlatform.Application.Interfaces
         Task<PaginatedResult<KeywordActivityDto>> GetKeywordActivitiesAsync(int keywordId, string userId, PagedRequest request);
         Task<KeywordActivityDto> ProcessInboundKeywordAsync(string phoneNumber, string message);
         Task<int> GetKeywordActivityCountAsync(int keywordId);
+        Task<KeywordAnalyticsDto?> GetKeywordAnalyticsAsync(int keywordId, string userId);
     }
 }

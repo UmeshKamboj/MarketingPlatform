@@ -469,6 +469,150 @@ namespace MarketingPlatform.Application.Services
             return await _keywordActivityRepository.CountAsync(ka => ka.KeywordId == keywordId);
         }
 
+        public async Task<KeywordAnalyticsDto?> GetKeywordAnalyticsAsync(int keywordId, string userId)
+        {
+            // First verify the keyword belongs to the user
+            var keyword = await _keywordRepository.FirstOrDefaultAsync(k =>
+                k.Id == keywordId && k.UserId == userId && !k.IsDeleted);
+
+            if (keyword == null)
+            {
+                _logger.LogWarning("Keyword {KeywordId} not found for user {UserId}", keywordId, userId);
+                return null;
+            }
+
+            // Calculate time-based metrics cutoffs
+            var now = DateTime.UtcNow;
+            var last24Hours = now.AddHours(-24);
+            var last7Days = now.AddDays(-7);
+            var last30Days = now.AddDays(-30);
+
+            // Get activities - FindAsync returns IEnumerable which is streamed during iteration
+            // This avoids loading all records into memory at once
+            var activities = await _keywordActivityRepository.FindAsync(ka => ka.KeywordId == keywordId);
+            
+            // Process activities in a single pass for optimal performance
+            var totalResponses = 0;
+            var uniquePhoneNumbers = new HashSet<string>();
+            var responsesSent = 0;
+            var activitiesLast24Hours = 0;
+            var activitiesLast7Days = 0;
+            var activitiesLast30Days = 0;
+            DateTime? firstUsedAt = null;
+            DateTime? lastUsedAt = null;
+
+            foreach (var activity in activities)
+            {
+                totalResponses++;
+                uniquePhoneNumbers.Add(activity.PhoneNumber);
+                
+                if (!string.IsNullOrWhiteSpace(activity.ResponseSent))
+                    responsesSent++;
+                
+                if (activity.ReceivedAt >= last24Hours)
+                    activitiesLast24Hours++;
+                if (activity.ReceivedAt >= last7Days)
+                    activitiesLast7Days++;
+                if (activity.ReceivedAt >= last30Days)
+                    activitiesLast30Days++;
+                
+                if (firstUsedAt == null || activity.ReceivedAt < firstUsedAt)
+                    firstUsedAt = activity.ReceivedAt;
+                if (lastUsedAt == null || activity.ReceivedAt > lastUsedAt)
+                    lastUsedAt = activity.ReceivedAt;
+            }
+
+            var uniqueContacts = uniquePhoneNumbers.Count;
+            var repeatUsageCount = totalResponses - uniqueContacts;
+            var responsesFailed = totalResponses - responsesSent;
+            var responseSuccessRate = totalResponses > 0 
+                ? Math.Round((decimal)responsesSent / totalResponses * 100, 2) 
+                : 0;
+
+            // Opt-in statistics - only calculate if opt-in group is configured
+            int totalOptIns = 0;
+            int successfulOptIns = 0;
+            int failedOptIns = 0;
+
+            if (keyword.OptInGroupId.HasValue && uniquePhoneNumbers.Count > 0)
+            {
+                // Get contacts matching the phone numbers efficiently
+                var phoneNumbersList = uniquePhoneNumbers.ToList();
+                var batchSize = 100; // Process in batches to avoid large IN clauses
+                var allContactIds = new List<int>();
+
+                for (int i = 0; i < phoneNumbersList.Count; i += batchSize)
+                {
+                    var batch = phoneNumbersList.Skip(i).Take(batchSize).ToList();
+                    var batchContacts = await _contactRepository.FindAsync(c => 
+                        batch.Contains(c.PhoneNumber) && 
+                        c.UserId == userId && 
+                        !c.IsDeleted);
+                    
+                    allContactIds.AddRange(batchContacts.Select(c => c.Id));
+                }
+
+                totalOptIns = allContactIds.Count;
+
+                if (totalOptIns > 0)
+                {
+                    // Check group membership in batches
+                    successfulOptIns = 0;
+                    for (int i = 0; i < allContactIds.Count; i += batchSize)
+                    {
+                        var batch = allContactIds.Skip(i).Take(batchSize).ToList();
+                        var batchMembers = await _groupMemberRepository.FindAsync(gm =>
+                            gm.ContactGroupId == keyword.OptInGroupId.Value &&
+                            batch.Contains(gm.ContactId) &&
+                            !gm.IsDeleted);
+                        
+                        successfulOptIns += batchMembers.Count();
+                    }
+                    
+                    failedOptIns = totalOptIns - successfulOptIns;
+                }
+            }
+
+            var optInConversionRate = totalResponses > 0 
+                ? Math.Round((decimal)successfulOptIns / totalResponses * 100, 2) 
+                : 0;
+
+            // Campaign statistics
+            var campaignRelatedActivities = keyword.LinkedCampaignId.HasValue ? totalResponses : 0;
+            string? linkedCampaignName = null;
+
+            if (keyword.LinkedCampaignId.HasValue)
+            {
+                var campaign = await _campaignRepository.FirstOrDefaultAsync(c =>
+                    c.Id == keyword.LinkedCampaignId.Value && !c.IsDeleted);
+                linkedCampaignName = campaign?.Name;
+            }
+
+            return new KeywordAnalyticsDto
+            {
+                KeywordId = keyword.Id,
+                KeywordText = keyword.KeywordText,
+                TotalResponses = totalResponses,
+                UniqueContacts = uniqueContacts,
+                RepeatUsageCount = repeatUsageCount,
+                TotalOptIns = totalOptIns,
+                SuccessfulOptIns = successfulOptIns,
+                FailedOptIns = failedOptIns,
+                OptInConversionRate = optInConversionRate,
+                ResponsesSent = responsesSent,
+                ResponsesFailed = responsesFailed,
+                ResponseSuccessRate = responseSuccessRate,
+                LinkedCampaignId = keyword.LinkedCampaignId,
+                LinkedCampaignName = linkedCampaignName,
+                CampaignRelatedActivities = campaignRelatedActivities,
+                FirstUsedAt = firstUsedAt,
+                LastUsedAt = lastUsedAt,
+                ActivitiesLast24Hours = activitiesLast24Hours,
+                ActivitiesLast7Days = activitiesLast7Days,
+                ActivitiesLast30Days = activitiesLast30Days
+            };
+        }
+
         private async Task<KeywordDto> MapToKeywordDtoAsync(Keyword keyword)
         {
             var dto = _mapper.Map<KeywordDto>(keyword);

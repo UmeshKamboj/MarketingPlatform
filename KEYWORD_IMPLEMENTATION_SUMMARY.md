@@ -3,10 +3,11 @@
 ## Overview
 This document summarizes the complete SMS Keyword Creation, Campaign, and Management System implementation for the MarketingPlatform.
 
-## Implementation Status: ✅ COMPLETE
+## Implementation Status: ✅ COMPLETE (Enhanced with Analytics)
 
 ### Date Completed: January 18, 2026
-### Branch: `copilot/add-sms-keyword-management`
+### Branch: `copilot/add-keyword-auto-response`
+### Previous Branch: `copilot/add-sms-keyword-management`
 
 ## What Was Already Present
 
@@ -25,11 +26,12 @@ The repository had the following foundation in place:
 ### 1. Data Transfer Objects (DTOs)
 **Location**: `src/MarketingPlatform.Application/DTOs/Keyword/`
 
-Created 4 DTO classes:
+Created 5 DTO classes:
 - **KeywordDto**: Read model with all fields including computed properties (ActivityCount, LinkedCampaignName, OptInGroupName)
 - **CreateKeywordDto**: Creation model with required fields only
 - **UpdateKeywordDto**: Update model with status field
 - **KeywordActivityDto**: Activity tracking model
+- **KeywordAnalyticsDto**: Comprehensive analytics and engagement metrics (NEW)
 
 ### 2. Service Layer
 **Location**: `src/MarketingPlatform.Application/Services/KeywordService.cs`
@@ -46,6 +48,7 @@ Implemented complete service with:
 - ✅ GetKeywordActivitiesAsync - Paginated activity history
 - ✅ ProcessInboundKeywordAsync - Webhook processing with auto-response
 - ✅ GetKeywordActivityCountAsync - Activity count
+- ✅ GetKeywordAnalyticsAsync - Comprehensive analytics and engagement metrics (NEW)
 
 **Key Business Logic**:
 - Keyword text normalization (uppercase, trim)
@@ -60,7 +63,7 @@ Implemented complete service with:
 **Location**: `src/MarketingPlatform.API/Controllers/`
 
 #### KeywordsController (New)
-Full REST API with 10 endpoints:
+Full REST API with 11 endpoints:
 - GET /api/keywords - List with pagination
 - GET /api/keywords/{id} - Get single keyword
 - GET /api/keywords/status/{status} - Filter by status
@@ -69,6 +72,7 @@ Full REST API with 10 endpoints:
 - PUT /api/keywords/{id} - Update keyword
 - DELETE /api/keywords/{id} - Delete keyword
 - GET /api/keywords/{id}/activities - Activity history
+- GET /api/keywords/{id}/analytics - Comprehensive analytics (NEW)
 - POST /api/keywords/process-inbound - Process inbound SMS
 
 #### WebhooksController (Updated)
@@ -136,6 +140,16 @@ Created comprehensive documentation:
 - ✅ Record responses sent
 - ✅ View activity history with pagination
 - ✅ Activity count per keyword
+
+### Analytics & Engagement Metrics (NEW)
+- ✅ Comprehensive analytics endpoint
+- ✅ Opt-in conversion tracking (successful vs failed)
+- ✅ Response success rate monitoring
+- ✅ Unique contact engagement tracking
+- ✅ Repeat usage analysis
+- ✅ Time-based activity metrics (24h, 7d, 30d)
+- ✅ Campaign-related activity analytics
+- ✅ First and last usage timestamps
 
 ### Inbound SMS Processing
 - ✅ Webhook endpoint for SMS providers
@@ -276,20 +290,22 @@ The existing schema supports all features:
 - PUT /api/keywords/{id}
 - DELETE /api/keywords/{id}
 - GET /api/keywords/{id}/activities
+- GET /api/keywords/{id}/analytics (NEW)
 
 ## File Changes Summary
 
-### New Files (11)
-- Controllers/KeywordsController.cs (187 lines)
-- Services/KeywordService.cs (480 lines)
-- Interfaces/IKeywordService.cs (20 lines)
+### New Files (12)
+- Controllers/KeywordsController.cs (205 lines)
+- Services/KeywordService.cs (585 lines)
+- Interfaces/IKeywordService.cs (21 lines)
 - DTOs/Keyword/KeywordDto.cs (23 lines)
 - DTOs/Keyword/CreateKeywordDto.cs (13 lines)
 - DTOs/Keyword/UpdateKeywordDto.cs (15 lines)
 - DTOs/Keyword/KeywordActivityDto.cs (14 lines)
+- DTOs/Keyword/KeywordAnalyticsDto.cs (40 lines) (NEW)
 - Validators/CreateKeywordValidator.cs (27 lines)
 - Validators/UpdateKeywordValidator.cs (32 lines)
-- SMS_KEYWORD_API_DOCUMENTATION.md (600 lines)
+- SMS_KEYWORD_API_DOCUMENTATION.md (680 lines)
 - KEYWORD_IMPLEMENTATION_SUMMARY.md (this file)
 
 ### Modified Files (4)
@@ -328,12 +344,14 @@ Documented in SMS_KEYWORD_API_DOCUMENTATION.md:
 10. ✅ Filter keywords by status
 11. ✅ Process inbound SMS via webhook
 12. ✅ View keyword activity history
+13. ✅ Get keyword analytics and engagement metrics (NEW)
 
 ### Integration Testing
 1. ✅ Verify SMS provider sends auto-response
 2. ✅ Verify contact is added to opt-in group
 3. ✅ Verify campaign link works
 4. ✅ Verify activity is logged correctly
+5. ✅ Verify analytics calculations are accurate (NEW)
 
 ## Conclusion
 
@@ -342,6 +360,9 @@ The SMS Keyword Management System is **COMPLETE** and ready for use. All require
 ✅ **Keyword Creation** - Full CRUD with validation
 ✅ **Keyword Campaign** - Campaign linking and integration
 ✅ **Management System** - Complete management API
+✅ **Auto-Response** - Automated reply messages
+✅ **Opt-In Workflows** - Automatic contact group addition
+✅ **Analytics & Engagement** - Comprehensive metrics (opt-ins, responses, conversions)
 ✅ **Follows Existing Structure** - Repository pattern, service layer, DTOs
 ✅ **API Endpoints** - REST API with authentication
 ✅ **Token Encryption** - JWT authentication throughout
