@@ -33,4 +33,10 @@ namespace MarketingPlatform.Core.Enums
         Failed,
         Refunded
     }
+
+    public enum PaymentProvider
+    {
+        Stripe,
+        PayPal
+    }
 }

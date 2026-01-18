@@ -164,6 +164,14 @@ builder.Services.AddScoped<IMessageRoutingService, MessageRoutingService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<IReportExportService, ReportExportService>();
 
+// Subscription & Billing Services
+builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
+builder.Services.AddScoped<IStripeService, StripeService>();
+builder.Services.AddScoped<IPayPalService, PayPalService>();
+builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IUsageTrackingService, UsageTrackingService>();
+builder.Services.AddScoped<ISuperAdminAnalyticsService, SuperAdminAnalyticsService>();
+
 // Integration Services
 builder.Services.AddScoped<IWebhookService, WebhookService>();
 builder.Services.AddScoped<ICRMIntegrationService, CRMIntegrationService>();

@@ -13,6 +13,8 @@ using MarketingPlatform.Application.DTOs.Compliance;
 using MarketingPlatform.Application.DTOs.Role;
 using MarketingPlatform.Application.DTOs.SuperAdmin;
 using MarketingPlatform.Application.DTOs.Configuration;
+using MarketingPlatform.Application.DTOs.Subscription;
+using MarketingPlatform.Application.DTOs.Billing;
 using MarketingPlatform.Application.DTOs.Pricing;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Models;
@@ -160,6 +162,18 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<UpdateComplianceRuleDto, ComplianceRule>();
 
             CreateMap<ComplianceRuleAudit, ComplianceRuleAuditDto>();
+
+            // SubscriptionPlan mappings
+            CreateMap<SubscriptionPlan, SubscriptionPlanDto>()
+                .ForMember(dest => dest.Features, opt => opt.Ignore()); // Handled manually in service
+            CreateMap<CreateSubscriptionPlanDto, SubscriptionPlan>()
+                .ForMember(dest => dest.Features, opt => opt.Ignore()); // Handled manually in service
+
+            // Billing mappings
+            CreateMap<UserSubscription, UserSubscriptionDto>()
+                .ForMember(dest => dest.PlanName, opt => opt.MapFrom(src => src.SubscriptionPlan.Name));
+            CreateMap<Invoice, InvoiceDto>();
+            CreateMap<BillingHistory, BillingHistoryDto>();
 
             // Pricing Model mappings
             CreateMap<PricingModel, PricingModelDto>();

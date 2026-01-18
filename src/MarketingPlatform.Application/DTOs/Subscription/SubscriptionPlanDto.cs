@@ -1,7 +1,8 @@
-namespace MarketingPlatform.Core.Entities
+namespace MarketingPlatform.Application.DTOs.Subscription
 {
-    public class SubscriptionPlan : BaseEntity
+    public class SubscriptionPlanDto
     {
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public decimal PriceMonthly { get; set; }
@@ -10,22 +11,15 @@ namespace MarketingPlatform.Core.Entities
         public int MMSLimit { get; set; }
         public int EmailLimit { get; set; }
         public int ContactLimit { get; set; }
-        public string? Features { get; set; } // JSON
-        
-        // Stripe Integration
+        public Dictionary<string, object>? Features { get; set; }
         public string? StripeProductId { get; set; }
         public string? StripePriceIdMonthly { get; set; }
         public string? StripePriceIdYearly { get; set; }
-        
-        // PayPal Integration
         public string? PayPalProductId { get; set; }
         public string? PayPalPlanIdMonthly { get; set; }
         public string? PayPalPlanIdYearly { get; set; }
-        
-        public bool IsActive { get; set; } = true;
-        public bool IsVisible { get; set; } = true;
-
-        // Navigation properties
-        public virtual ICollection<UserSubscription> UserSubscriptions { get; set; } = new List<UserSubscription>();
+        public bool IsActive { get; set; }
+        public bool IsVisible { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }
