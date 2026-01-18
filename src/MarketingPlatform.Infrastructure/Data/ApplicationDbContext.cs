@@ -43,6 +43,7 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<MessageProvider> MessageProviders => Set<MessageProvider>();
         public DbSet<ProviderLog> ProviderLogs => Set<ProviderLog>();
         public DbSet<ComplianceSettings> ComplianceSettings => Set<ComplianceSettings>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
