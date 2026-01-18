@@ -212,6 +212,34 @@ For questions or issues:
 - Documentation: See README.md and other documentation files
 - API Documentation: Available at `/swagger` endpoint
 
+## Landing Page Configuration
+
+The landing page is fully configurable through the Platform Settings. All configuration is seeded automatically on first run:
+
+### Available Sections
+
+1. **Hero Section** - Main banner/slider with CTA buttons
+2. **Features Section** - 6 key features with icons and descriptions
+3. **Statistics Section** - Key metrics (messages sent, delivery rate, users, support)
+4. **Pricing Section** - Subscription plans with monthly/yearly toggle
+5. **Testimonials Section** - Customer reviews and ratings
+6. **CTA Section** - Final call-to-action before footer
+7. **Footer** - Copyright, social links, and contact information
+
+### Customization Options
+
+All landing page settings can be customized through the Super Admin panel:
+- **Theme Colors:** Primary, secondary, and accent colors
+- **Hero Content:** Title, subtitle, images, and CTA buttons
+- **Menu Navigation:** Customize menu items, colors, and position
+- **Statistics:** Update displayed metrics
+- **Features:** Modify features list with icons and descriptions
+- **Testimonials:** Add/edit customer testimonials
+- **SEO:** Title, description, and keywords
+- **Contact Info:** Email, phone, and address
+
+Access configuration at: `/SuperAdmin/PlatformConfig` (SuperAdmin role required)
+
 ## Changelog
 
 - **2026-01-18:** Initial seed data with 5 user accounts and 3 subscription plans

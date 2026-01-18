@@ -112,10 +112,22 @@ After running the API, verify the following:
 - Database `MarketingPlatformDb` is created
 - All tables are created successfully
 - Seed data is inserted:
-  - 3 roles: Admin, User, Manager
-  - Admin user: admin@marketingplatform.com / Admin@123456
-  - 3 subscription plans: Free, Pro, Enterprise
+  - 5 roles: SuperAdmin, Admin, Manager, Analyst, Viewer, User
+  - 5 test user accounts (see LOGIN_CREDENTIALS.md for details)
+  - 3 subscription plans: Free ($0), Pro ($49.99), Enterprise ($199.99)
+  - All subscription plans visible on landing page
   - 2 message providers: Twilio SMS, SendGrid Email
+
+### Default Login Credentials
+
+For detailed login credentials for all test accounts, see [LOGIN_CREDENTIALS.md](LOGIN_CREDENTIALS.md).
+
+**Quick Access:**
+- **Super Admin:** admin@marketingplatform.com / Admin@123456
+- **Manager:** manager@marketingplatform.com / Manager@123456
+- **Regular User:** user@marketingplatform.com / User@123456
+
+⚠️ **Important:** Change these default credentials in production!
 
 ## Testing Authentication
 

@@ -702,6 +702,186 @@ namespace MarketingPlatform.Infrastructure.Data
                         DataType = SettingDataType.String,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
+                    },
+
+                    // Features Section
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Features.SectionTitle",
+                        Value = "Powerful Features for Modern Marketing",
+                        Category = "LandingPage",
+                        Description = "Features section title",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Features.SectionSubtitle",
+                        Value = "Everything you need to create, manage, and optimize your campaigns",
+                        Category = "LandingPage",
+                        Description = "Features section subtitle",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Features.List",
+                        Value = "[{\"icon\":\"bi-broadcast\",\"title\":\"Multi-Channel Campaigns\",\"description\":\"Send SMS, MMS, and Email campaigns from one unified platform. Reach your audience on their preferred channels.\",\"color\":\"primary\"},{\"icon\":\"bi-graph-up-arrow\",\"title\":\"Advanced Analytics\",\"description\":\"Track campaign performance in real-time with detailed analytics and reporting. Make data-driven decisions to optimize your results.\",\"color\":\"success\"},{\"icon\":\"bi-clock-history\",\"title\":\"Automation & Scheduling\",\"description\":\"Schedule campaigns in advance and automate your marketing workflows. Save time and improve efficiency.\",\"color\":\"info\"},{\"icon\":\"bi-people\",\"title\":\"Contact Management\",\"description\":\"Organize your contacts with dynamic groups and tags. Segment your audience for targeted messaging.\",\"color\":\"warning\"},{\"icon\":\"bi-file-earmark-text\",\"title\":\"Template Library\",\"description\":\"Create reusable message templates with dynamic variables. Personalize content at scale.\",\"color\":\"danger\"},{\"icon\":\"bi-shield-check\",\"title\":\"Compliance & Security\",\"description\":\"Stay compliant with GDPR, CAN-SPAM, and TCPA regulations. Enterprise-grade security for your data.\",\"color\":\"secondary\"}]",
+                        Category = "LandingPage",
+                        Description = "Features list (JSON array)",
+                        DataType = SettingDataType.Json,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+
+                    // Pricing Section
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Pricing.SectionTitle",
+                        Value = "Simple, Transparent Pricing",
+                        Category = "LandingPage",
+                        Description = "Pricing section title",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Pricing.SectionSubtitle",
+                        Value = "Choose the plan that fits your business needs",
+                        Category = "LandingPage",
+                        Description = "Pricing section subtitle",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Pricing.ShowYearlyToggle",
+                        Value = "true",
+                        Category = "LandingPage",
+                        Description = "Show monthly/yearly pricing toggle",
+                        DataType = SettingDataType.Boolean,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+
+                    // CTA Section
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.CTA.Title",
+                        Value = "Ready to Transform Your Marketing?",
+                        Category = "LandingPage",
+                        Description = "Call-to-action section title",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.CTA.Subtitle",
+                        Value = "Join thousands of businesses using our platform to grow their reach",
+                        Category = "LandingPage",
+                        Description = "Call-to-action section subtitle",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.CTA.ButtonText",
+                        Value = "Start Free Trial",
+                        Category = "LandingPage",
+                        Description = "Call-to-action button text",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.CTA.ButtonLink",
+                        Value = "/Auth/Register",
+                        Category = "LandingPage",
+                        Description = "Call-to-action button link",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.CTA.BackgroundColor",
+                        Value = "#667eea",
+                        Category = "LandingPage",
+                        Description = "Call-to-action section background color",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+
+                    // Contact Section
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Contact.Email",
+                        Value = "support@marketingplatform.com",
+                        Category = "LandingPage",
+                        Description = "Contact email address",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Contact.Phone",
+                        Value = "+1 (555) 123-4567",
+                        Category = "LandingPage",
+                        Description = "Contact phone number",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Contact.Address",
+                        Value = "123 Marketing Street, San Francisco, CA 94102",
+                        Category = "LandingPage",
+                        Description = "Company address",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+
+                    // Testimonials Section
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Testimonials.ShowSection",
+                        Value = "true",
+                        Category = "LandingPage",
+                        Description = "Show testimonials section",
+                        DataType = SettingDataType.Boolean,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Testimonials.SectionTitle",
+                        Value = "What Our Customers Say",
+                        Category = "LandingPage",
+                        Description = "Testimonials section title",
+                        DataType = SettingDataType.String,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PlatformSetting
+                    {
+                        Key = "LandingPage.Testimonials.List",
+                        Value = "[{\"name\":\"John Smith\",\"company\":\"TechCorp Inc.\",\"position\":\"Marketing Director\",\"testimonial\":\"This platform has transformed how we communicate with our customers. The automation features alone have saved us countless hours.\",\"rating\":5,\"image\":\"/images/testimonials/john.jpg\"},{\"name\":\"Sarah Johnson\",\"company\":\"E-commerce Plus\",\"position\":\"CEO\",\"testimonial\":\"Outstanding service and support. Our email campaigns have never performed better. Highly recommended!\",\"rating\":5,\"image\":\"/images/testimonials/sarah.jpg\"},{\"name\":\"Michael Chen\",\"company\":\"Retail Solutions\",\"position\":\"Operations Manager\",\"testimonial\":\"The multi-channel approach is exactly what we needed. We can now reach our customers on their preferred platforms seamlessly.\",\"rating\":5,\"image\":\"/images/testimonials/michael.jpg\"}]",
+                        Category = "LandingPage",
+                        Description = "Testimonials list (JSON array)",
+                        DataType = SettingDataType.Json,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
                     }
                 };
 
