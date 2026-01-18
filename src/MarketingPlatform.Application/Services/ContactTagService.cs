@@ -74,16 +74,19 @@ namespace MarketingPlatform.Application.Services
                 .Take(request.PageSize)
                 .ToList();
 
+            var tagIds = items.Select(t => t.Id).ToList();
+
+            // Get contact counts for all tags in a single query
+            var assignmentCounts = (await _assignmentRepository.FindAsync(a =>
+                tagIds.Contains(a.ContactTagId) && !a.IsDeleted))
+                .GroupBy(a => a.ContactTagId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
             var dtos = new List<ContactTagDto>();
             foreach (var tag in items)
             {
                 var dto = _mapper.Map<ContactTagDto>(tag);
-                
-                // Get contact count for each tag
-                var assignments = await _assignmentRepository.FindAsync(a =>
-                    a.ContactTagId == tag.Id && !a.IsDeleted);
-                dto.ContactCount = assignments.Count();
-                
+                dto.ContactCount = assignmentCounts.ContainsKey(tag.Id) ? assignmentCounts[tag.Id] : 0;
                 dtos.Add(dto);
             }
 
@@ -261,16 +264,17 @@ namespace MarketingPlatform.Application.Services
             var tags = await _tagRepository.FindAsync(t =>
                 tagIds.Contains(t.Id) && !t.IsDeleted);
 
+            // Get contact counts for all tags in a single query
+            var assignmentCounts = (await _assignmentRepository.FindAsync(a =>
+                tagIds.Contains(a.ContactTagId) && !a.IsDeleted))
+                .GroupBy(a => a.ContactTagId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
             var dtos = new List<ContactTagDto>();
             foreach (var tag in tags)
             {
                 var dto = _mapper.Map<ContactTagDto>(tag);
-                
-                // Get contact count for each tag
-                var tagAssignments = await _assignmentRepository.FindAsync(a =>
-                    a.ContactTagId == tag.Id && !a.IsDeleted);
-                dto.ContactCount = tagAssignments.Count();
-                
+                dto.ContactCount = assignmentCounts.ContainsKey(tag.Id) ? assignmentCounts[tag.Id] : 0;
                 dtos.Add(dto);
             }
 

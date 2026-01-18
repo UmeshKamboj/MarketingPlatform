@@ -149,7 +149,7 @@ namespace MarketingPlatform.Application.Services
             return addedCount;
         }
 
-        public async Task<bool> IsSupressedAsync(string userId, string phoneOrEmail)
+        public async Task<bool> IsSuppressedAsync(string userId, string phoneOrEmail)
         {
             var suppression = await _suppressionRepository.FirstOrDefaultAsync(s =>
                 s.UserId == userId &&

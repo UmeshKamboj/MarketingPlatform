@@ -113,7 +113,7 @@ namespace MarketingPlatform.API.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var result = await _suppressionService.IsSupressedAsync(userId, phoneOrEmail);
+            var result = await _suppressionService.IsSuppressedAsync(userId, phoneOrEmail);
             return Ok(ApiResponse<bool>.SuccessResponse(result));
         }
     }

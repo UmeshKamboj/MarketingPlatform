@@ -10,6 +10,6 @@ namespace MarketingPlatform.Application.Interfaces
         Task<SuppressionListDto> CreateAsync(string userId, CreateSuppressionListDto dto);
         Task<bool> DeleteAsync(string userId, int id);
         Task<int> BulkCreateAsync(string userId, BulkSuppressionDto dto);
-        Task<bool> IsSupressedAsync(string userId, string phoneOrEmail);
+        Task<bool> IsSuppressedAsync(string userId, string phoneOrEmail);
     }
 }
