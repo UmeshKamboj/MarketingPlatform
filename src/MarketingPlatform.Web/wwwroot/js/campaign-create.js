@@ -467,10 +467,20 @@ function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} alert-dismissible fade show position-fixed`;
     notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
-    notification.innerHTML = `
-        ${message.replace(/\n/g, '<br>')}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
+    
+    // Safely set text content to prevent XSS
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    messageDiv.innerHTML = messageDiv.innerHTML.replace(/\n/g, '<br>');
+    
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'btn-close';
+    closeButton.setAttribute('data-bs-dismiss', 'alert');
+    closeButton.setAttribute('aria-label', 'Close');
+    
+    notification.appendChild(messageDiv);
+    notification.appendChild(closeButton);
     
     document.body.appendChild(notification);
     
