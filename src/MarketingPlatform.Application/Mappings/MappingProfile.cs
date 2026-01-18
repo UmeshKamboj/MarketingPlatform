@@ -10,6 +10,7 @@ using MarketingPlatform.Application.DTOs.ContactTag;
 using MarketingPlatform.Application.DTOs.Keyword;
 using MarketingPlatform.Application.DTOs.URL;
 using MarketingPlatform.Application.DTOs.Compliance;
+using MarketingPlatform.Application.DTOs.Role;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Models;
 
@@ -92,6 +93,13 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<ComplianceAuditLog, ComplianceAuditLogDto>()
                 .ForMember(dest => dest.ContactName, opt => opt.Ignore()) // Handled manually in service
                 .ForMember(dest => dest.CampaignName, opt => opt.Ignore()); // Handled manually in service
+
+            // Role mappings
+            CreateMap<Role, RoleDto>()
+                .ForMember(dest => dest.PermissionNames, opt => opt.Ignore()) // Handled manually in service
+                .ForMember(dest => dest.UserCount, opt => opt.Ignore()); // Handled manually in service
+            CreateMap<CreateRoleDto, Role>()
+                .ForMember(dest => dest.Permissions, opt => opt.Ignore()); // Handled manually in service
         }
     }
 }
