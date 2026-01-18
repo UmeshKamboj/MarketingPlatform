@@ -497,7 +497,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("CampaignSchedules");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelRoutingConfig", b =>
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceAuditLog", b =>
                 {
                     b.Property<int>("Id")
