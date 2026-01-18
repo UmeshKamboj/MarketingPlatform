@@ -64,6 +64,12 @@ namespace MarketingPlatform.Application.Services
         {
             try
             {
+                if (_client == null)
+                {
+                    _logger.LogError("PayPal client is not configured");
+                    throw new InvalidOperationException("PayPal credentials are not configured");
+                }
+
                 var request = new HttpRequest("/v1/catalogs/products", HttpMethod.Post)
                 {
                     ContentType = "application/json"
@@ -106,6 +112,12 @@ namespace MarketingPlatform.Application.Services
         {
             try
             {
+                if (_client == null)
+                {
+                    _logger.LogError("PayPal client is not configured");
+                    throw new InvalidOperationException("PayPal credentials are not configured");
+                }
+
                 var request = new HttpRequest($"/v1/catalogs/products/{productId}", new HttpMethod("PATCH"))
                 {
                     ContentType = "application/json"
@@ -157,6 +169,12 @@ namespace MarketingPlatform.Application.Services
         {
             try
             {
+                if (_client == null)
+                {
+                    _logger.LogError("PayPal client is not configured");
+                    throw new InvalidOperationException("PayPal credentials are not configured");
+                }
+
                 var request = new HttpRequest("/v1/billing/plans", HttpMethod.Post)
                 {
                     ContentType = "application/json"
@@ -229,6 +247,12 @@ namespace MarketingPlatform.Application.Services
         {
             try
             {
+                if (_client == null)
+                {
+                    _logger.LogError("PayPal client is not configured");
+                    throw new InvalidOperationException("PayPal credentials are not configured");
+                }
+
                 var request = new HttpRequest($"/v1/billing/plans/{planId}", new HttpMethod("PATCH"))
                 {
                     ContentType = "application/json"
@@ -261,6 +285,12 @@ namespace MarketingPlatform.Application.Services
         {
             try
             {
+                if (_client == null)
+                {
+                    _logger.LogError("PayPal client is not configured");
+                    throw new InvalidOperationException("PayPal credentials are not configured");
+                }
+
                 var request = new HttpRequest($"/v1/billing/plans?product_id={productId}", HttpMethod.Get);
                 var response = await _client.Execute(request);
                 var result = Json.Deserialize<Dictionary<string, JsonElement>>(
