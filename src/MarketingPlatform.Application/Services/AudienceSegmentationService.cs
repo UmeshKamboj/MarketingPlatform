@@ -38,15 +38,25 @@ namespace MarketingPlatform.Application.Services
 
         public async Task<AudienceSegmentDto> EvaluateSegmentAsync(string userId, SegmentCriteriaDto criteria)
         {
+            // Note: For large datasets (>10k contacts), consider implementing database-level filtering
+            // or pagination to avoid memory issues
             var allContacts = await _contactRepository.FindAsync(c => 
                 c.UserId == userId && !c.IsDeleted && c.IsActive);
             var contactsList = allContacts.ToList();
+
+            // Pre-load all tag assignments for performance (avoid N+1 queries)
+            var contactIds = contactsList.Select(c => c.Id).ToList();
+            var allTagAssignments = await _tagAssignmentRepository.FindAsync(ta =>
+                contactIds.Contains(ta.ContactId) && !ta.IsDeleted);
+            var tagAssignmentsByContact = allTagAssignments
+                .GroupBy(ta => ta.ContactId)
+                .ToDictionary(g => g.Key, g => g.Select(ta => ta.ContactTagId).ToList());
 
             var matchedContactIds = new List<int>();
 
             foreach (var contact in contactsList)
             {
-                if (await EvaluateContactAgainstCriteriaAsync(contact, criteria))
+                if (await EvaluateContactAgainstCriteriaAsync(contact, criteria, tagAssignmentsByContact))
                 {
                     matchedContactIds.Add(contact.Id);
                 }
@@ -129,7 +139,7 @@ namespace MarketingPlatform.Application.Services
             }
         }
 
-        private async Task<bool> EvaluateContactAgainstCriteriaAsync(Contact contact, SegmentCriteriaDto criteria)
+        private async Task<bool> EvaluateContactAgainstCriteriaAsync(Contact contact, SegmentCriteriaDto criteria, Dictionary<int, List<int>> tagAssignmentsByContact)
         {
             if (criteria.Rules == null || !criteria.Rules.Any())
                 return true; // No rules means all contacts match
@@ -138,7 +148,7 @@ namespace MarketingPlatform.Application.Services
 
             foreach (var rule in criteria.Rules)
             {
-                var ruleResult = await EvaluateRuleAsync(contact, rule);
+                var ruleResult = await EvaluateRuleAsync(contact, rule, tagAssignmentsByContact);
                 results.Add(ruleResult);
             }
 
@@ -153,18 +163,16 @@ namespace MarketingPlatform.Application.Services
             }
         }
 
-        private async Task<bool> EvaluateRuleAsync(Contact contact, SegmentRuleDto rule)
+        private async Task<bool> EvaluateRuleAsync(Contact contact, SegmentRuleDto rule, Dictionary<int, List<int>> tagAssignmentsByContact)
         {
             var field = rule.Field?.ToLower() ?? "";
             var operatorType = rule.Operator?.ToLower() ?? "equals";
             var value = rule.Value ?? "";
 
-            // Handle tag-based rules
+            // Handle tag-based rules using pre-loaded assignments
             if (field == "tag")
             {
-                var tagAssignments = await _tagAssignmentRepository.FindAsync(ta =>
-                    ta.ContactId == contact.Id && !ta.IsDeleted);
-                var tagIds = tagAssignments.Select(ta => ta.ContactTagId).ToList();
+                var tagIds = tagAssignmentsByContact.TryGetValue(contact.Id, out var tags) ? tags : new List<int>();
 
                 if (operatorType == "in" || operatorType == "contains")
                 {

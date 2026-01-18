@@ -86,7 +86,7 @@ namespace MarketingPlatform.Application.Services
             foreach (var tag in items)
             {
                 var dto = _mapper.Map<ContactTagDto>(tag);
-                dto.ContactCount = assignmentCounts.ContainsKey(tag.Id) ? assignmentCounts[tag.Id] : 0;
+                dto.ContactCount = assignmentCounts.TryGetValue(tag.Id, out var count) ? count : 0;
                 dtos.Add(dto);
             }
 
@@ -274,7 +274,7 @@ namespace MarketingPlatform.Application.Services
             foreach (var tag in tags)
             {
                 var dto = _mapper.Map<ContactTagDto>(tag);
-                dto.ContactCount = assignmentCounts.ContainsKey(tag.Id) ? assignmentCounts[tag.Id] : 0;
+                dto.ContactCount = assignmentCounts.TryGetValue(tag.Id, out var count) ? count : 0;
                 dtos.Add(dto);
             }
 

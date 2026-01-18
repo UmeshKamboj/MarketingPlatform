@@ -123,6 +123,8 @@ namespace MarketingPlatform.Application.Services
                 .Select(s => s.PhoneOrEmail.ToLower())
                 .ToHashSet();
 
+            var suppressionsToAdd = new List<SuppressionList>();
+
             foreach (var phoneOrEmail in dto.PhoneOrEmails)
             {
                 if (string.IsNullOrWhiteSpace(phoneOrEmail))
@@ -140,12 +142,21 @@ namespace MarketingPlatform.Application.Services
                     Reason = dto.Reason
                 };
 
-                await _suppressionRepository.AddAsync(suppression);
+                suppressionsToAdd.Add(suppression);
                 existingSet.Add(normalized);
                 addedCount++;
             }
 
-            await _unitOfWork.SaveChangesAsync();
+            // Add all suppressions in a single batch
+            if (suppressionsToAdd.Any())
+            {
+                foreach (var suppression in suppressionsToAdd)
+                {
+                    await _suppressionRepository.AddAsync(suppression);
+                }
+                await _unitOfWork.SaveChangesAsync();
+            }
+
             return addedCount;
         }
 
