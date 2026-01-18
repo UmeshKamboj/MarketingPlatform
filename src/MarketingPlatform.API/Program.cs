@@ -145,6 +145,9 @@ builder.Services.AddScoped<IComplianceService, ComplianceService>();
 builder.Services.AddScoped<ISuperAdminService, SuperAdminService>();
 builder.Services.AddScoped<IPrivilegedActionLogService, PrivilegedActionLogService>();
 builder.Services.AddScoped<IPlatformConfigurationService, PlatformConfigurationService>();
+builder.Services.AddScoped<IPlatformSettingService, PlatformSettingService>();
+builder.Services.AddScoped<IFeatureToggleService, FeatureToggleService>();
+builder.Services.AddScoped<IComplianceRuleService, ComplianceRuleService>();
 
 // Scheduling & Automation Services
 builder.Services.AddScoped<ICampaignSchedulerService, CampaignSchedulerService>();
