@@ -44,6 +44,7 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<ProviderLog> ProviderLogs => Set<ProviderLog>();
         public DbSet<ComplianceSettings> ComplianceSettings => Set<ComplianceSettings>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<FrequencyControl> FrequencyControls => Set<FrequencyControl>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

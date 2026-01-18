@@ -14,6 +14,8 @@ using MarketingPlatform.Infrastructure.Repositories;
 using MarketingPlatform.Application.Mappings;
 using MarketingPlatform.API.Middleware;
 using Serilog;
+using Hangfire;
+using Hangfire.SqlServer;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -85,6 +87,12 @@ builder.Services.AddScoped<IContactTagService, ContactTagService>();
 builder.Services.AddScoped<IAudienceSegmentationService, AudienceSegmentationService>();
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
 
+// Scheduling & Automation Services
+builder.Services.AddScoped<ICampaignSchedulerService, CampaignSchedulerService>();
+builder.Services.AddScoped<IWorkflowService, WorkflowService>();
+builder.Services.AddScoped<IEventTriggerService, EventTriggerService>();
+builder.Services.AddScoped<IRateLimitService, RateLimitService>();
+
 // Message Service
 builder.Services.AddScoped<IMessageService, MessageService>();
 
@@ -101,6 +109,33 @@ builder.Services.AddScoped<IEmailProvider, MockEmailProvider>();
 // Background Services
 builder.Services.AddHostedService<MessageQueueProcessor>();
 builder.Services.AddHostedService<DynamicGroupUpdateProcessor>();
+
+// Hangfire Configuration - Optimized to avoid DB locks and reduce load
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+    {
+        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+        QueuePollInterval = TimeSpan.FromSeconds(15), // Reduce polling frequency to minimize DB load
+        UseRecommendedIsolationLevel = true,
+        DisableGlobalLocks = true, // IMPORTANT: Disable global locks to prevent table locking
+        PrepareSchemaIfNecessary = true,
+        SchemaName = "hangfire"
+    }));
+
+// Add Hangfire server with optimized settings
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = 5; // Limit worker count to control DB connections
+    options.Queues = new[] { "default", "campaigns", "workflows", "rate-limits" }; // Separate queues
+    options.ServerCheckInterval = TimeSpan.FromMinutes(1);
+    options.HeartbeatInterval = TimeSpan.FromSeconds(30);
+    options.ServerTimeout = TimeSpan.FromMinutes(5);
+    options.SchedulePollingInterval = TimeSpan.FromSeconds(15); // Reduce schedule polling to minimize DB load
+});
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -154,8 +189,44 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Hangfire Dashboard with authorization
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireDashboardAuthorizationFilter() },
+    StatsPollingInterval = 30000 // Poll every 30 seconds instead of default to reduce DB load
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Configure recurring jobs for rate limit resets using service provider
+using (var scope = app.Services.CreateScope())
+{
+    var rateLimitService = scope.ServiceProvider.GetRequiredService<IRateLimitService>();
+    var eventTriggerService = scope.ServiceProvider.GetRequiredService<IEventTriggerService>();
+    
+    RecurringJob.AddOrUpdate(
+        "reset-daily-rate-limits",
+        () => rateLimitService.ResetDailyCountersAsync(),
+        Cron.Daily(0, 0)); // Run at midnight UTC
+
+    RecurringJob.AddOrUpdate(
+        "reset-weekly-rate-limits",
+        () => rateLimitService.ResetWeeklyCountersAsync(),
+        Cron.Weekly(DayOfWeek.Monday, 0, 0)); // Run at midnight Monday UTC
+
+    RecurringJob.AddOrUpdate(
+        "reset-monthly-rate-limits",
+        () => rateLimitService.ResetMonthlyCountersAsync(),
+        Cron.Monthly(1, 0, 0)); // Run at midnight on 1st of month UTC
+
+    RecurringJob.AddOrUpdate(
+        "check-inactivity-triggers",
+        () => eventTriggerService.CheckInactivityTriggersAsync(),
+        Cron.Daily(2, 0)); // Run at 2 AM UTC daily
+}
+
 app.MapControllers();
 
 // Database seeding
@@ -181,3 +252,15 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+// Hangfire Dashboard Authorization Filter
+public class HangfireDashboardAuthorizationFilter : Hangfire.Dashboard.IDashboardAuthorizationFilter
+{
+    public bool Authorize(Hangfire.Dashboard.DashboardContext context)
+    {
+        // Allow access in development mode
+        // In production, implement proper authentication check
+        // Example: check if user is authenticated and has admin role
+        return true;
+    }
+}
