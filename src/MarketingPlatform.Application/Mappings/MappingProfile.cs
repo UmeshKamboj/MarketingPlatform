@@ -3,6 +3,7 @@ using MarketingPlatform.Application.DTOs.User;
 using MarketingPlatform.Application.DTOs.Contact;
 using MarketingPlatform.Application.DTOs.ContactGroup;
 using MarketingPlatform.Application.DTOs.Campaign;
+using MarketingPlatform.Application.DTOs.Template;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.Application.Mappings
@@ -31,6 +32,11 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<CampaignContent, CampaignContentDto>();
             CreateMap<CampaignAudience, CampaignAudienceDto>();
             CreateMap<CampaignSchedule, CampaignScheduleDto>();
+
+            // Template mappings
+            CreateMap<MessageTemplate, TemplateDto>();
+            CreateMap<CreateTemplateDto, MessageTemplate>();
+            CreateMap<UpdateTemplateDto, MessageTemplate>();
         }
     }
 }
