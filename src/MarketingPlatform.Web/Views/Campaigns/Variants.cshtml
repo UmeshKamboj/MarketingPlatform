@@ -106,7 +106,25 @@
 
 @section Scripts {
 <script>
-    let campaignId = @ViewBag.CampaignId ?? 0;
+    let campaignId = parseInt('@ViewBag.CampaignId') || 0;
+
+    function getAuthHeaders() {
+        return {
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Content-Type': 'application/json'
+        };
+    }
+
+    function showNotification(message, type = 'info') {
+        // Simple notification - can be replaced with toast library
+        const alertClass = type === 'error' ? 'danger' : type;
+        const alert = $(`<div class="alert alert-${alertClass} alert-dismissible fade show position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`);
+        $('body').append(alert);
+        setTimeout(() => alert.alert('close'), 5000);
+    }
 
     $(document).ready(function() {
         if (campaignId > 0) {
@@ -119,7 +137,7 @@
         $.ajax({
             url: `/api/campaigns/${campaignId}`,
             method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            headers: getAuthHeaders(),
             success: function(response) {
                 if (response.success && response.data) {
                     $('#campaignName').text(response.data.name);
@@ -132,7 +150,7 @@
         $.ajax({
             url: `/api/campaigns/${campaignId}/variants`,
             method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            headers: getAuthHeaders(),
             success: function(response) {
                 if (response.success && response.data) {
                     renderVariants(response.data);
@@ -233,21 +251,18 @@
         $.ajax({
             url: `/api/campaigns/${campaignId}/variants`,
             method: 'POST',
-            headers: { 
-                'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders(),
             data: JSON.stringify(data),
             success: function(response) {
                 if (response.success) {
                     $('#createVariantModal').modal('hide');
                     $('#createVariantForm')[0].reset();
                     loadVariants();
-                    alert('Variant created successfully!');
+                    showNotification('Variant created successfully!', 'success');
                 }
             },
             error: function(xhr) {
-                alert('Error creating variant: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                showNotification('Error creating variant: ' + (xhr.responseJSON?.message || 'Unknown error'), 'error');
             }
         });
     }
@@ -258,15 +273,15 @@
         $.ajax({
             url: `/api/campaigns/${campaignId}/variants/${variantId}`,
             method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            headers: getAuthHeaders(),
             success: function(response) {
                 if (response.success) {
                     loadVariants();
-                    alert('Variant deleted successfully!');
+                    showNotification('Variant deleted successfully!', 'success');
                 }
             },
             error: function() {
-                alert('Error deleting variant');
+                showNotification('Error deleting variant', 'error');
             }
         });
     }
@@ -275,7 +290,7 @@
         $.ajax({
             url: `/api/campaigns/${campaignId}/variants/comparison`,
             method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            headers: getAuthHeaders(),
             success: function(response) {
                 if (response.success && response.data) {
                     renderComparison(response.data);
@@ -328,15 +343,15 @@
         $.ajax({
             url: `/api/campaigns/${campaignId}/variants/${variantId}/select-winner`,
             method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            headers: getAuthHeaders(),
             success: function(response) {
                 if (response.success) {
-                    alert('Winner selected successfully!');
+                    showNotification('Winner selected successfully!', 'success');
                     loadComparison();
                 }
             },
             error: function() {
-                alert('Error selecting winner');
+                showNotification('Error selecting winner', 'error');
             }
         });
     }

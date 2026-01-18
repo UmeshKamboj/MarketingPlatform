@@ -18,6 +18,11 @@ namespace MarketingPlatform.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<CampaignABTestingService> _logger;
+        private static readonly Random _random = new Random();
+        
+        // Traffic allocation tolerance constants
+        private const decimal MIN_TRAFFIC_ALLOCATION = 99m;
+        private const decimal MAX_TRAFFIC_ALLOCATION = 101m;
 
         public CampaignABTestingService(
             IRepository<Campaign> campaignRepository,
@@ -302,8 +307,7 @@ namespace MarketingPlatform.Application.Services
                 return null;
 
             // Select variant based on traffic percentage
-            var random = new Random();
-            var randomValue = random.NextDouble() * 100;
+            var randomValue = _random.NextDouble() * 100;
             
             decimal cumulativePercentage = 0;
             foreach (var variant in activeVariants.OrderBy(v => v.Id))
@@ -366,8 +370,8 @@ namespace MarketingPlatform.Application.Services
 
             var totalTraffic = variants.Sum(v => v.TrafficPercentage);
             
-            // Traffic must be between 99 and 101 to account for rounding
-            return totalTraffic >= 99 && totalTraffic <= 101;
+            // Traffic must be between MIN_TRAFFIC_ALLOCATION and MAX_TRAFFIC_ALLOCATION to account for rounding
+            return totalTraffic >= MIN_TRAFFIC_ALLOCATION && totalTraffic <= MAX_TRAFFIC_ALLOCATION;
         }
     }
 }
