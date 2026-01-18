@@ -4,6 +4,7 @@ using MarketingPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260118195946_AddSuperAdminAndPrivilegedLogging")]
+    partial class AddSuperAdminAndPrivilegedLogging
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -746,53 +749,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("CampaignVariantAnalytics");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelPricing", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Channel")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Configuration")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("FreeUnitsIncluded")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("MinimumCharge")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PricePerUnit")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<int>("PricingModelId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("PricingModelId", "Channel");
-
-                    b.ToTable("ChannelPricings");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelRoutingConfig", b =>
                 {
                     b.Property<int>("Id")
@@ -919,145 +875,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ComplianceAuditLogs");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceRule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicableRegions")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("ApplicableServices")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Configuration")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<DateTime>("EffectiveFrom")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("EffectiveTo")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsMandatory")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RuleType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Priority");
-
-                    b.HasIndex("RuleType");
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("IsDeleted", "Status");
-
-                    b.HasIndex("Status", "EffectiveFrom", "EffectiveTo");
-
-                    b.ToTable("ComplianceRules");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceRuleAudit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Action")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ComplianceRuleId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IpAddress")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NewState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PerformedBy")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("PreviousState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reason")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Action");
-
-                    b.HasIndex("ComplianceRuleId");
-
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("ComplianceRuleId", "CreatedAt");
-
-                    b.ToTable("ComplianceRuleAudits");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceSettings", b =>
@@ -1686,79 +1503,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("ExternalAuthProviders");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.FeatureToggle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Category")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("DisableAfter")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime?>("EnableAfter")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EnabledForRoles")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("EnabledForUsers")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Category");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("IsDeleted", "IsEnabled");
-
-                    b.ToTable("FeatureToggles");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.FileStorageSettings", b =>
                 {
                     b.Property<int>("Id")
@@ -2061,189 +1805,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("KeywordActivities");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.KeywordAssignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AssignedByUserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("KeywordId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("UnassignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssignedByUserId");
-
-                    b.HasIndex("CampaignId");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("KeywordId");
-
-                    b.ToTable("KeywordAssignments");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.KeywordConflict", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ExistingUserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("KeywordText")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("RequestingUserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Resolution")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("ResolvedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ResolvedByUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExistingUserId");
-
-                    b.HasIndex("KeywordText");
-
-                    b.HasIndex("RequestingUserId");
-
-                    b.HasIndex("ResolvedByUserId");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("KeywordConflicts");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.KeywordReservation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ApprovedByUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("KeywordText")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Purpose")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("RejectionReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("RequestedByUserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApprovedByUserId");
-
-                    b.HasIndex("KeywordText");
-
-                    b.HasIndex("RequestedByUserId");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("KeywordReservations");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.MessageDeliveryAttempt", b =>
                 {
                     b.Property<int>("Id")
@@ -2444,7 +2005,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformConfiguration", b =>
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformSetting", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2454,9 +2014,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     b.Property<int>("Category")
                         .HasColumnType("int");
-                    b.Property<string>("Category")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -2474,24 +2031,10 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("DataType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DefaultValue")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsEncrypted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsReadOnly")
                         .HasColumnType("bit");
 
                     b.Property<string>("Key")
@@ -2505,13 +2048,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Scope")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -2626,69 +2162,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("EntityType", "EntityId");
 
                     b.ToTable("PrivilegedActionLogs");
-                    b.HasIndex("Key")
-                        .IsUnique();
-
-                    b.HasIndex("Scope");
-
-                    b.HasIndex("IsDeleted", "Category");
-
-                    b.ToTable("PlatformSettings");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PricingModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("BasePrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("BillingPeriod")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Configuration")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("Name");
-
-                    b.HasIndex("Priority");
-
-                    b.ToTable("PricingModels");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ProviderLog", b =>
@@ -2919,57 +2392,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.RegionPricing", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Configuration")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("FlatAdjustment")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("PriceMultiplier")
-                        .HasColumnType("decimal(10,4)");
-
-                    b.Property<int>("PricingModelId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RegionCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("RegionName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("PricingModelId", "RegionCode");
-
-                    b.ToTable("RegionPricings");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -3189,68 +2611,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("SuppressionLists");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.TaxConfiguration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Configuration")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("FlatAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPercentage")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(10,4)");
-
-                    b.Property<string>("RegionCode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("Name");
-
-                    b.HasIndex("Priority");
-
-                    b.HasIndex("RegionCode");
-
-                    b.HasIndex("Type");
-
-                    b.ToTable("TaxConfigurations");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.URLClick", b =>
                 {
                     b.Property<int>("Id")
@@ -3336,53 +2696,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("URLShorteners");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.UsagePricing", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Configuration")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("PricePerUnit")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<int>("PricingModelId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TierEnd")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TierStart")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("PricingModelId", "Type", "TierStart");
-
-                    b.ToTable("UsagePricings");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.UsageTracking", b =>
@@ -4051,17 +3364,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("CampaignVariant");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelPricing", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.PricingModel", "PricingModel")
-                        .WithMany("ChannelPricings")
-                        .HasForeignKey("PricingModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PricingModel");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceAuditLog", b =>
                 {
                     b.HasOne("MarketingPlatform.Core.Entities.Campaign", "Campaign")
@@ -4083,17 +3385,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("Contact");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceRuleAudit", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.ComplianceRule", "ComplianceRule")
-                        .WithMany("AuditTrail")
-                        .HasForeignKey("ComplianceRuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ComplianceRule");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceSettings", b =>
@@ -4284,77 +3575,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("Keyword");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.KeywordAssignment", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "AssignedBy")
-                        .WithMany()
-                        .HasForeignKey("AssignedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MarketingPlatform.Core.Entities.Campaign", "Campaign")
-                        .WithMany()
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MarketingPlatform.Core.Entities.Keyword", "Keyword")
-                        .WithMany()
-                        .HasForeignKey("KeywordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AssignedBy");
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("Keyword");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.KeywordConflict", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "ExistingUser")
-                        .WithMany()
-                        .HasForeignKey("ExistingUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "RequestingUser")
-                        .WithMany()
-                        .HasForeignKey("RequestingUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "ResolvedBy")
-                        .WithMany()
-                        .HasForeignKey("ResolvedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ExistingUser");
-
-                    b.Navigation("RequestingUser");
-
-                    b.Navigation("ResolvedBy");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.KeywordReservation", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "ApprovedBy")
-                        .WithMany()
-                        .HasForeignKey("ApprovedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "RequestedBy")
-                        .WithMany()
-                        .HasForeignKey("RequestedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApprovedBy");
-
-                    b.Navigation("RequestedBy");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.MessageDeliveryAttempt", b =>
                 {
                     b.HasOne("MarketingPlatform.Core.Entities.CampaignMessage", "CampaignMessage")
@@ -4431,15 +3651,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.RegionPricing", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.PricingModel", "PricingModel")
-                        .WithMany("RegionPricings")
-                        .HasForeignKey("PricingModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PricingModel");
             modelBuilder.Entity("MarketingPlatform.Core.Entities.SuperAdminRole", b =>
                 {
                     b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "AssignedByUser")
@@ -4496,17 +3707,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Campaign");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.UsagePricing", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.PricingModel", "PricingModel")
-                        .WithMany("UsagePricings")
-                        .HasForeignKey("PricingModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PricingModel");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.UsageTracking", b =>
@@ -4709,11 +3909,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceRule", b =>
-                {
-                    b.Navigation("AuditTrail");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.Contact", b =>
                 {
                     b.Navigation("CampaignMessages");
@@ -4764,15 +3959,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
             modelBuilder.Entity("MarketingPlatform.Core.Entities.MessageTemplate", b =>
                 {
                     b.Navigation("CampaignContents");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PricingModel", b =>
-                {
-                    b.Navigation("ChannelPricings");
-
-                    b.Navigation("RegionPricings");
-
-                    b.Navigation("UsagePricings");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.Role", b =>

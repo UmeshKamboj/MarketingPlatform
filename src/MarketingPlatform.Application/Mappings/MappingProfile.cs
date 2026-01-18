@@ -11,6 +11,7 @@ using MarketingPlatform.Application.DTOs.Keyword;
 using MarketingPlatform.Application.DTOs.URL;
 using MarketingPlatform.Application.DTOs.Compliance;
 using MarketingPlatform.Application.DTOs.Role;
+using MarketingPlatform.Application.DTOs.SuperAdmin;
 using MarketingPlatform.Application.DTOs.Configuration;
 using MarketingPlatform.Application.DTOs.Pricing;
 using MarketingPlatform.Core.Entities;
@@ -129,6 +130,22 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<CreateRoleDto, Role>()
                 .ForMember(dest => dest.Permissions, opt => opt.Ignore()); // Handled manually in service
 
+            // Super Admin mappings
+            CreateMap<SuperAdminRole, SuperAdminRoleDto>()
+                .ForMember(dest => dest.UserEmail, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => 
+                    (src.User.FirstName + " " + src.User.LastName).Trim()))
+                .ForMember(dest => dest.AssignedByEmail, opt => opt.MapFrom(src => src.AssignedByUser != null ? src.AssignedByUser.Email : null))
+                .ForMember(dest => dest.RevokedByEmail, opt => opt.MapFrom(src => src.RevokedByUser != null ? src.RevokedByUser.Email : null));
+
+            CreateMap<PrivilegedActionLog, PrivilegedActionLogDto>()
+                .ForMember(dest => dest.ActionTypeName, opt => opt.MapFrom(src => src.ActionType.ToString()))
+                .ForMember(dest => dest.SeverityName, opt => opt.MapFrom(src => src.Severity.ToString()))
+                .ForMember(dest => dest.PerformedByEmail, opt => opt.MapFrom(src => src.PerformedByUser.Email));
+
+            CreateMap<PlatformConfiguration, PlatformConfigurationDto>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.ToString()))
+                .ForMember(dest => dest.LastModifiedByEmail, opt => opt.MapFrom(src => src.LastModifiedByUser != null ? src.LastModifiedByUser.Email : null));
             // Configuration mappings
             CreateMap<PlatformSetting, PlatformSettingDto>();
             CreateMap<CreatePlatformSettingDto, PlatformSetting>();
