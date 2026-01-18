@@ -139,6 +139,56 @@ namespace MarketingPlatform.Infrastructure.Data
                 }
             }
 
+            // Seed Additional Test Users
+            var testUsers = new List<(string email, string password, string firstName, string lastName, string role)>
+            {
+                ("manager@marketingplatform.com", "Manager@123456", "John", "Manager", "Manager"),
+                ("user@marketingplatform.com", "User@123456", "Jane", "User", "User"),
+                ("analyst@marketingplatform.com", "Analyst@123456", "Bob", "Analyst", "Analyst"),
+                ("viewer@marketingplatform.com", "Viewer@123456", "Alice", "Viewer", "Viewer")
+            };
+
+            foreach (var (email, password, firstName, lastName, role) in testUsers)
+            {
+                var existingUser = await userManager.FindByEmailAsync(email);
+                if (existingUser == null)
+                {
+                    var newUser = new ApplicationUser
+                    {
+                        UserName = email,
+                        Email = email,
+                        EmailConfirmed = true,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    var result = await userManager.CreateAsync(newUser, password);
+                    
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(newUser, role);
+                        
+                        // Assign custom role
+                        var customRole = context.CustomRoles.FirstOrDefault(r => r.Name == role);
+                        if (customRole != null)
+                        {
+                            var userRole = new Core.Entities.UserRole
+                            {
+                                UserId = newUser.Id,
+                                RoleId = customRole.Id,
+                                AssignedAt = DateTime.UtcNow,
+                                AssignedBy = "System"
+                            };
+                            context.CustomUserRoles.Add(userRole);
+                        }
+                    }
+                }
+            }
+            
+            await context.SaveChangesAsync();
+
             // Seed Subscription Plans
             if (!context.SubscriptionPlans.Any())
             {
