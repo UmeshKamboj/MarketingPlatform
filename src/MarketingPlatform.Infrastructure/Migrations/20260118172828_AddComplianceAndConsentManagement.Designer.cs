@@ -4,6 +4,7 @@ using MarketingPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260118172828_AddComplianceAndConsentManagement")]
+    partial class AddComplianceAndConsentManagement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -498,7 +501,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceAuditLog", b =>
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelRoutingConfig", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -514,17 +516,12 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     b.Property<int?>("CampaignId")
                         .HasColumnType("int");
-                    b.Property<string>("AdditionalSettings")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<int>("Channel")
                         .HasColumnType("int");
 
                     b.Property<int?>("ContactId")
                         .HasColumnType("int");
-                    b.Property<decimal?>("CostThreshold")
-                        .HasColumnType("decimal(18,6)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -560,52 +557,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ComplianceAuditLogs");
-                    b.Property<bool>("EnableFallback")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("FallbackProvider")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("InitialRetryDelaySeconds")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MaxRetries")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaxRetryDelaySeconds")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PrimaryProvider")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RetryStrategy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoutingStrategy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Channel");
-
-                    b.HasIndex("Channel", "IsActive", "Priority");
-
-                    b.ToTable("ChannelRoutingConfigs", (string)null);
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceSettings", b =>
@@ -1331,78 +1282,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("KeywordId");
 
                     b.ToTable("KeywordActivities");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.MessageDeliveryAttempt", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AdditionalMetadata")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.Property<int>("AttemptNumber")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("AttemptedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CampaignMessageId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Channel")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("CostAmount")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ErrorCode")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("ExternalMessageId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int?>("FallbackReason")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProviderName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("ResponseTimeMs")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Success")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttemptedAt");
-
-                    b.HasIndex("CampaignMessageId");
-
-                    b.HasIndex("CampaignMessageId", "AttemptNumber");
-
-                    b.ToTable("MessageDeliveryAttempts", (string)null);
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.MessageProvider", b =>
@@ -2543,17 +2422,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Keyword");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.MessageDeliveryAttempt", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.CampaignMessage", "CampaignMessage")
-                        .WithMany()
-                        .HasForeignKey("CampaignMessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CampaignMessage");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.MessageTemplate", b =>
