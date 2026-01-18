@@ -4,6 +4,7 @@ using MarketingPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260118201650_AddKeywordManagementAndPricingFeatures")]
+    partial class AddKeywordManagementAndPricingFeatures
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2443,7 +2446,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("MessageTemplates");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformConfiguration", b =>
             modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformSetting", b =>
                 {
                     b.Property<int>("Id")
@@ -2452,27 +2454,12 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Category")
-                        .HasColumnType("int");
                     b.Property<string>("Category")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("DataType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<int>("DataType")
                         .HasColumnType("int");
@@ -2499,13 +2486,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime?>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
@@ -2525,107 +2505,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     b.HasIndex("Category");
 
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("Key")
-                        .IsUnique();
-
-                    b.HasIndex("LastModifiedBy");
-
-                    b.ToTable("PlatformConfigurations");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PrivilegedActionLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActionDescription")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<int>("ActionType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AfterState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BeforeState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EntityId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("EntityName")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("EntityType")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("IPAddress")
-                        .HasMaxLength(45)
-                        .HasColumnType("nvarchar(45)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PerformedBy")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RequestPath")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Severity")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Success")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserAgent")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActionType");
-
-                    b.HasIndex("EntityType");
-
-                    b.HasIndex("PerformedBy");
-
-                    b.HasIndex("Severity");
-
-                    b.HasIndex("Timestamp");
-
-                    b.HasIndex("EntityType", "EntityId");
-
-                    b.ToTable("PrivilegedActionLogs");
                     b.HasIndex("Key")
                         .IsUnique();
 
@@ -3086,69 +2965,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("Name");
 
                     b.ToTable("SubscriptionPlans");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.SuperAdminRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AssignedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("AssignmentReason")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RevocationReason")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RevokedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssignedAt");
-
-                    b.HasIndex("AssignedBy");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("RevokedBy");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SuperAdminRoles");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.SuppressionList", b =>
@@ -4377,27 +4193,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformConfiguration", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "LastModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("LastModifiedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("LastModifiedByUser");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PrivilegedActionLog", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "PerformedByUser")
-                        .WithMany()
-                        .HasForeignKey("PerformedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("PerformedByUser");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ProviderLog", b =>
                 {
                     b.HasOne("MarketingPlatform.Core.Entities.MessageProvider", "MessageProvider")
@@ -4440,29 +4235,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("PricingModel");
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.SuperAdminRole", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "AssignedByUser")
-                        .WithMany()
-                        .HasForeignKey("AssignedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "RevokedByUser")
-                        .WithMany()
-                        .HasForeignKey("RevokedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssignedByUser");
-
-                    b.Navigation("RevokedByUser");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.SuppressionList", b =>

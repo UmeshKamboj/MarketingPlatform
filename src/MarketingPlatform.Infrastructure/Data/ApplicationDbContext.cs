@@ -33,6 +33,9 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<MessageTemplate> MessageTemplates => Set<MessageTemplate>();
         public DbSet<Keyword> Keywords => Set<Keyword>();
         public DbSet<KeywordActivity> KeywordActivities => Set<KeywordActivity>();
+        public DbSet<KeywordReservation> KeywordReservations => Set<KeywordReservation>();
+        public DbSet<KeywordAssignment> KeywordAssignments => Set<KeywordAssignment>();
+        public DbSet<KeywordConflict> KeywordConflicts => Set<KeywordConflict>();
         public DbSet<Workflow> Workflows => Set<Workflow>();
         public DbSet<WorkflowStep> WorkflowSteps => Set<WorkflowStep>();
         public DbSet<WorkflowExecution> WorkflowExecutions => Set<WorkflowExecution>();
@@ -68,6 +71,11 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<PlatformConfiguration> PlatformConfigurations => Set<PlatformConfiguration>();
         public DbSet<PlatformSetting> PlatformSettings => Set<PlatformSetting>();
         public DbSet<UserExternalLogin> UserExternalLogins => Set<UserExternalLogin>();
+        public DbSet<PricingModel> PricingModels => Set<PricingModel>();
+        public DbSet<ChannelPricing> ChannelPricings => Set<ChannelPricing>();
+        public DbSet<RegionPricing> RegionPricings => Set<RegionPricing>();
+        public DbSet<UsagePricing> UsagePricings => Set<UsagePricing>();
+        public DbSet<TaxConfiguration> TaxConfigurations => Set<TaxConfiguration>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

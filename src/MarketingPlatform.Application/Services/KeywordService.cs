@@ -13,10 +13,14 @@ namespace MarketingPlatform.Application.Services
     {
         private readonly IRepository<Keyword> _keywordRepository;
         private readonly IRepository<KeywordActivity> _keywordActivityRepository;
+        private readonly IRepository<KeywordReservation> _keywordReservationRepository;
+        private readonly IRepository<KeywordAssignment> _keywordAssignmentRepository;
+        private readonly IRepository<KeywordConflict> _keywordConflictRepository;
         private readonly IRepository<Campaign> _campaignRepository;
         private readonly IRepository<ContactGroup> _contactGroupRepository;
         private readonly IRepository<ContactGroupMember> _groupMemberRepository;
         private readonly IRepository<Contact> _contactRepository;
+        private readonly IRepository<ApplicationUser> _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<KeywordService> _logger;
@@ -25,10 +29,14 @@ namespace MarketingPlatform.Application.Services
         public KeywordService(
             IRepository<Keyword> keywordRepository,
             IRepository<KeywordActivity> keywordActivityRepository,
+            IRepository<KeywordReservation> keywordReservationRepository,
+            IRepository<KeywordAssignment> keywordAssignmentRepository,
+            IRepository<KeywordConflict> keywordConflictRepository,
             IRepository<Campaign> campaignRepository,
             IRepository<ContactGroup> contactGroupRepository,
             IRepository<ContactGroupMember> groupMemberRepository,
             IRepository<Contact> contactRepository,
+            IRepository<ApplicationUser> userRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<KeywordService> logger,
@@ -36,10 +44,14 @@ namespace MarketingPlatform.Application.Services
         {
             _keywordRepository = keywordRepository;
             _keywordActivityRepository = keywordActivityRepository;
+            _keywordReservationRepository = keywordReservationRepository;
+            _keywordAssignmentRepository = keywordAssignmentRepository;
+            _keywordConflictRepository = keywordConflictRepository;
             _campaignRepository = campaignRepository;
             _contactGroupRepository = contactGroupRepository;
             _groupMemberRepository = groupMemberRepository;
             _contactRepository = contactRepository;
+            _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
@@ -637,6 +649,427 @@ namespace MarketingPlatform.Application.Services
             dto.ActivityCount = await GetKeywordActivityCountAsync(keyword.Id);
 
             return dto;
+        }
+
+        // Keyword Reservation Methods (12.4.1)
+        public async Task<KeywordReservationDto> CreateReservationAsync(string userId, CreateKeywordReservationDto dto)
+        {
+            var normalizedKeywordText = dto.KeywordText.Trim().ToUpperInvariant();
+
+            // Check if keyword is already reserved or in use
+            var existingKeyword = await _keywordRepository.FirstOrDefaultAsync(k =>
+                k.KeywordText == normalizedKeywordText && !k.IsDeleted);
+            
+            if (existingKeyword != null)
+            {
+                // Check for existing reservation or create conflict
+                var existingReservation = await _keywordReservationRepository.FirstOrDefaultAsync(r =>
+                    r.KeywordText == normalizedKeywordText && 
+                    r.Status != ReservationStatus.Rejected && 
+                    r.Status != ReservationStatus.Expired &&
+                    !r.IsDeleted);
+
+                if (existingReservation != null)
+                {
+                    _logger.LogWarning("Keyword {KeywordText} is already reserved", normalizedKeywordText);
+                    throw new InvalidOperationException($"Keyword '{normalizedKeywordText}' is already reserved");
+                }
+
+                // Create conflict record
+                var conflict = new KeywordConflict
+                {
+                    KeywordText = normalizedKeywordText,
+                    RequestingUserId = userId,
+                    ExistingUserId = existingKeyword.UserId,
+                    Status = ReservationStatus.Pending
+                };
+                await _keywordConflictRepository.AddAsync(conflict);
+                await _unitOfWork.SaveChangesAsync();
+
+                _logger.LogInformation("Keyword conflict created for {KeywordText}", normalizedKeywordText);
+                throw new InvalidOperationException($"Keyword '{normalizedKeywordText}' is already in use. A conflict has been created for resolution.");
+            }
+
+            var reservation = new KeywordReservation
+            {
+                KeywordText = normalizedKeywordText,
+                RequestedByUserId = userId,
+                Status = ReservationStatus.Pending,
+                Purpose = dto.Purpose,
+                ExpiresAt = dto.ExpiresAt,
+                Priority = dto.Priority
+            };
+
+            await _keywordReservationRepository.AddAsync(reservation);
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Keyword reservation created for {KeywordText} by user {UserId}", normalizedKeywordText, userId);
+
+            return await GetReservationByIdAsync(reservation.Id) 
+                ?? throw new InvalidOperationException("Failed to retrieve created reservation");
+        }
+
+        public async Task<KeywordReservationDto?> GetReservationByIdAsync(int reservationId)
+        {
+            var reservation = await _keywordReservationRepository.FirstOrDefaultAsync(r =>
+                r.Id == reservationId && !r.IsDeleted);
+
+            if (reservation == null)
+                return null;
+
+            var dto = _mapper.Map<KeywordReservationDto>(reservation);
+
+            // Load user names
+            var requestedBy = await _userRepository.FirstOrDefaultAsync(u => u.Id == reservation.RequestedByUserId);
+            dto.RequestedByUserName = requestedBy?.UserName;
+
+            if (reservation.ApprovedByUserId != null)
+            {
+                var approvedBy = await _userRepository.FirstOrDefaultAsync(u => u.Id == reservation.ApprovedByUserId);
+                dto.ApprovedByUserName = approvedBy?.UserName;
+            }
+
+            return dto;
+        }
+
+        public async Task<PaginatedResult<KeywordReservationDto>> GetReservationsAsync(PagedRequest request)
+        {
+            var query = (await _keywordReservationRepository.FindAsync(r => !r.IsDeleted)).AsQueryable();
+
+            // Apply sorting
+            query = query.OrderByDescending(r => r.CreatedAt);
+
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
+
+            var reservations = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var dtos = new List<KeywordReservationDto>();
+            foreach (var reservation in reservations)
+            {
+                var dto = await GetReservationByIdAsync(reservation.Id);
+                if (dto != null)
+                    dtos.Add(dto);
+            }
+
+            return new PaginatedResult<KeywordReservationDto>
+            {
+                Items = dtos,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
+        }
+
+        public async Task<bool> UpdateReservationAsync(string userId, int reservationId, UpdateKeywordReservationDto dto)
+        {
+            var reservation = await _keywordReservationRepository.FirstOrDefaultAsync(r =>
+                r.Id == reservationId && r.RequestedByUserId == userId && !r.IsDeleted);
+
+            if (reservation == null)
+                return false;
+
+            reservation.Status = dto.Status;
+            reservation.ExpiresAt = dto.ExpiresAt;
+            reservation.RejectionReason = dto.RejectionReason;
+            reservation.Priority = dto.Priority;
+            reservation.UpdatedAt = DateTime.UtcNow;
+
+            _keywordReservationRepository.Update(reservation);
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Keyword reservation {ReservationId} updated", reservationId);
+            return true;
+        }
+
+        public async Task<bool> ApproveReservationAsync(string approverUserId, int reservationId)
+        {
+            var reservation = await _keywordReservationRepository.FirstOrDefaultAsync(r =>
+                r.Id == reservationId && !r.IsDeleted);
+
+            if (reservation == null || reservation.Status != ReservationStatus.Pending)
+                return false;
+
+            reservation.Status = ReservationStatus.Approved;
+            reservation.ApprovedByUserId = approverUserId;
+            reservation.ApprovedAt = DateTime.UtcNow;
+            reservation.UpdatedAt = DateTime.UtcNow;
+
+            _keywordReservationRepository.Update(reservation);
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Keyword reservation {ReservationId} approved by {UserId}", reservationId, approverUserId);
+            return true;
+        }
+
+        public async Task<bool> RejectReservationAsync(string approverUserId, int reservationId, string reason)
+        {
+            var reservation = await _keywordReservationRepository.FirstOrDefaultAsync(r =>
+                r.Id == reservationId && !r.IsDeleted);
+
+            if (reservation == null || reservation.Status != ReservationStatus.Pending)
+                return false;
+
+            reservation.Status = ReservationStatus.Rejected;
+            reservation.ApprovedByUserId = approverUserId;
+            reservation.RejectionReason = reason;
+            reservation.UpdatedAt = DateTime.UtcNow;
+
+            _keywordReservationRepository.Update(reservation);
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Keyword reservation {ReservationId} rejected by {UserId}", reservationId, approverUserId);
+            return true;
+        }
+
+        // Keyword Assignment Methods (12.4.2)
+        public async Task<KeywordAssignmentDto> AssignKeywordToCampaignAsync(string userId, CreateKeywordAssignmentDto dto)
+        {
+            // Verify keyword exists and belongs to user
+            var keyword = await _keywordRepository.FirstOrDefaultAsync(k =>
+                k.Id == dto.KeywordId && k.UserId == userId && !k.IsDeleted);
+
+            if (keyword == null)
+            {
+                _logger.LogWarning("Keyword {KeywordId} not found for user {UserId}", dto.KeywordId, userId);
+                throw new InvalidOperationException($"Keyword with ID {dto.KeywordId} not found");
+            }
+
+            // Verify campaign exists and belongs to user
+            var campaign = await _campaignRepository.FirstOrDefaultAsync(c =>
+                c.Id == dto.CampaignId && c.UserId == userId && !c.IsDeleted);
+
+            if (campaign == null)
+            {
+                _logger.LogWarning("Campaign {CampaignId} not found for user {UserId}", dto.CampaignId, userId);
+                throw new InvalidOperationException($"Campaign with ID {dto.CampaignId} not found");
+            }
+
+            // Check if keyword is already assigned to this campaign
+            var existingAssignment = await _keywordAssignmentRepository.FirstOrDefaultAsync(a =>
+                a.KeywordId == dto.KeywordId && a.CampaignId == dto.CampaignId && a.IsActive && !a.IsDeleted);
+
+            if (existingAssignment != null)
+            {
+                _logger.LogWarning("Keyword {KeywordId} is already assigned to campaign {CampaignId}", dto.KeywordId, dto.CampaignId);
+                throw new InvalidOperationException("Keyword is already assigned to this campaign");
+            }
+
+            var assignment = new KeywordAssignment
+            {
+                KeywordId = dto.KeywordId,
+                CampaignId = dto.CampaignId,
+                AssignedByUserId = userId,
+                AssignedAt = DateTime.UtcNow,
+                IsActive = true,
+                Notes = dto.Notes
+            };
+
+            await _keywordAssignmentRepository.AddAsync(assignment);
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Keyword {KeywordId} assigned to campaign {CampaignId}", dto.KeywordId, dto.CampaignId);
+
+            return await GetAssignmentByIdAsync(assignment.Id) 
+                ?? throw new InvalidOperationException("Failed to retrieve created assignment");
+        }
+
+        public async Task<KeywordAssignmentDto?> GetAssignmentByIdAsync(int assignmentId)
+        {
+            var assignment = await _keywordAssignmentRepository.FirstOrDefaultAsync(a =>
+                a.Id == assignmentId && !a.IsDeleted);
+
+            if (assignment == null)
+                return null;
+
+            var dto = _mapper.Map<KeywordAssignmentDto>(assignment);
+
+            // Load related data
+            var keyword = await _keywordRepository.GetByIdAsync(assignment.KeywordId);
+            dto.KeywordText = keyword?.KeywordText ?? "";
+
+            var campaign = await _campaignRepository.GetByIdAsync(assignment.CampaignId);
+            dto.CampaignName = campaign?.Name;
+
+            var assignedBy = await _userRepository.FirstOrDefaultAsync(u => u.Id == assignment.AssignedByUserId);
+            dto.AssignedByUserName = assignedBy?.UserName;
+
+            return dto;
+        }
+
+        public async Task<PaginatedResult<KeywordAssignmentDto>> GetAssignmentsAsync(PagedRequest request)
+        {
+            var query = (await _keywordAssignmentRepository.FindAsync(a => !a.IsDeleted)).AsQueryable();
+
+            // Apply sorting
+            query = query.OrderByDescending(a => a.AssignedAt);
+
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
+
+            var assignments = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var dtos = new List<KeywordAssignmentDto>();
+            foreach (var assignment in assignments)
+            {
+                var dto = await GetAssignmentByIdAsync(assignment.Id);
+                if (dto != null)
+                    dtos.Add(dto);
+            }
+
+            return new PaginatedResult<KeywordAssignmentDto>
+            {
+                Items = dtos,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
+        }
+
+        public async Task<List<KeywordAssignmentDto>> GetAssignmentsByCampaignAsync(int campaignId)
+        {
+            var assignments = await _keywordAssignmentRepository.FindAsync(a =>
+                a.CampaignId == campaignId && a.IsActive && !a.IsDeleted);
+
+            var dtos = new List<KeywordAssignmentDto>();
+            foreach (var assignment in assignments)
+            {
+                var dto = await GetAssignmentByIdAsync(assignment.Id);
+                if (dto != null)
+                    dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
+        public async Task<bool> UnassignKeywordAsync(string userId, int assignmentId)
+        {
+            var assignment = await _keywordAssignmentRepository.FirstOrDefaultAsync(a =>
+                a.Id == assignmentId && a.AssignedByUserId == userId && !a.IsDeleted);
+
+            if (assignment == null)
+                return false;
+
+            assignment.IsActive = false;
+            assignment.UnassignedAt = DateTime.UtcNow;
+            assignment.UpdatedAt = DateTime.UtcNow;
+
+            _keywordAssignmentRepository.Update(assignment);
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Keyword assignment {AssignmentId} unassigned", assignmentId);
+            return true;
+        }
+
+        // Keyword Conflict Resolution Methods (12.4.3)
+        public async Task<KeywordConflictDto?> CheckForConflictAsync(string keywordText, string requestingUserId)
+        {
+            var normalizedKeywordText = keywordText.Trim().ToUpperInvariant();
+
+            // Check if keyword is in use by another user
+            var existingKeyword = await _keywordRepository.FirstOrDefaultAsync(k =>
+                k.KeywordText == normalizedKeywordText && k.UserId != requestingUserId && !k.IsDeleted);
+
+            if (existingKeyword == null)
+                return null;
+
+            // Check if conflict already exists
+            var existingConflict = await _keywordConflictRepository.FirstOrDefaultAsync(c =>
+                c.KeywordText == normalizedKeywordText &&
+                c.RequestingUserId == requestingUserId &&
+                c.Status == ReservationStatus.Pending &&
+                !c.IsDeleted);
+
+            if (existingConflict != null)
+            {
+                var dto = _mapper.Map<KeywordConflictDto>(existingConflict);
+                
+                var requestingUser = await _userRepository.FirstOrDefaultAsync(u => u.Id == existingConflict.RequestingUserId);
+                dto.RequestingUserName = requestingUser?.UserName;
+
+                var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Id == existingConflict.ExistingUserId);
+                dto.ExistingUserName = existingUser?.UserName;
+
+                return dto;
+            }
+
+            return null;
+        }
+
+        public async Task<PaginatedResult<KeywordConflictDto>> GetConflictsAsync(PagedRequest request)
+        {
+            var query = (await _keywordConflictRepository.FindAsync(c => !c.IsDeleted)).AsQueryable();
+
+            // Apply sorting - pending conflicts first
+            query = query.OrderBy(c => c.Status == ReservationStatus.Pending ? 0 : 1)
+                         .ThenByDescending(c => c.CreatedAt);
+
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
+
+            var conflicts = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var dtos = new List<KeywordConflictDto>();
+            foreach (var conflict in conflicts)
+            {
+                var dto = _mapper.Map<KeywordConflictDto>(conflict);
+                
+                var requestingUser = await _userRepository.FirstOrDefaultAsync(u => u.Id == conflict.RequestingUserId);
+                dto.RequestingUserName = requestingUser?.UserName;
+
+                var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Id == conflict.ExistingUserId);
+                dto.ExistingUserName = existingUser?.UserName;
+
+                if (conflict.ResolvedByUserId != null)
+                {
+                    var resolvedBy = await _userRepository.FirstOrDefaultAsync(u => u.Id == conflict.ResolvedByUserId);
+                    dto.ResolvedByUserName = resolvedBy?.UserName;
+                }
+
+                dtos.Add(dto);
+            }
+
+            return new PaginatedResult<KeywordConflictDto>
+            {
+                Items = dtos,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
+        }
+
+        public async Task<bool> ResolveConflictAsync(string resolverUserId, int conflictId, ResolveKeywordConflictDto dto)
+        {
+            var conflict = await _keywordConflictRepository.FirstOrDefaultAsync(c =>
+                c.Id == conflictId && !c.IsDeleted);
+
+            if (conflict == null || conflict.Status != ReservationStatus.Pending)
+                return false;
+
+            conflict.Status = dto.Status;
+            conflict.Resolution = dto.Resolution;
+            conflict.ResolvedByUserId = resolverUserId;
+            conflict.ResolvedAt = DateTime.UtcNow;
+            conflict.UpdatedAt = DateTime.UtcNow;
+
+            _keywordConflictRepository.Update(conflict);
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Keyword conflict {ConflictId} resolved by {UserId} with status {Status}", 
+                conflictId, resolverUserId, dto.Status);
+            return true;
         }
     }
 }

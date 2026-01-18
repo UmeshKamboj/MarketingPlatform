@@ -192,6 +192,195 @@ namespace MarketingPlatform.API.Controllers
                 return BadRequest(ApiResponse<KeywordActivityDto>.ErrorResponse("Failed to process inbound keyword", new List<string> { ex.Message }));
             }
         }
+
+        // ======= Keyword Reservation Endpoints (12.4.1) =======
+        
+        [HttpPost("reservations")]
+        public async Task<ActionResult<ApiResponse<KeywordReservationDto>>> CreateReservation([FromBody] CreateKeywordReservationDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var reservation = await _keywordService.CreateReservationAsync(userId, dto);
+                return Ok(ApiResponse<KeywordReservationDto>.SuccessResponse(reservation, "Keyword reservation created successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Failed to create keyword reservation");
+                return BadRequest(ApiResponse<KeywordReservationDto>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating keyword reservation");
+                return BadRequest(ApiResponse<KeywordReservationDto>.ErrorResponse("Failed to create keyword reservation", new List<string> { ex.Message }));
+            }
+        }
+
+        [HttpGet("reservations")]
+        public async Task<ActionResult<ApiResponse<PaginatedResult<KeywordReservationDto>>>> GetReservations([FromQuery] PagedRequest request)
+        {
+            var reservations = await _keywordService.GetReservationsAsync(request);
+            return Ok(ApiResponse<PaginatedResult<KeywordReservationDto>>.SuccessResponse(reservations));
+        }
+
+        [HttpGet("reservations/{id}")]
+        public async Task<ActionResult<ApiResponse<KeywordReservationDto>>> GetReservation(int id)
+        {
+            var reservation = await _keywordService.GetReservationByIdAsync(id);
+            if (reservation == null)
+                return NotFound(ApiResponse<KeywordReservationDto>.ErrorResponse("Reservation not found"));
+
+            return Ok(ApiResponse<KeywordReservationDto>.SuccessResponse(reservation));
+        }
+
+        [HttpPut("reservations/{id}")]
+        public async Task<ActionResult<ApiResponse<bool>>> UpdateReservation(int id, [FromBody] UpdateKeywordReservationDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await _keywordService.UpdateReservationAsync(userId, id, dto);
+            if (!result)
+                return NotFound(ApiResponse<bool>.ErrorResponse("Reservation not found or you don't have permission to update it"));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(result, "Reservation updated successfully"));
+        }
+
+        [HttpPost("reservations/{id}/approve")]
+        public async Task<ActionResult<ApiResponse<bool>>> ApproveReservation(int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await _keywordService.ApproveReservationAsync(userId, id);
+            if (!result)
+                return NotFound(ApiResponse<bool>.ErrorResponse("Reservation not found or cannot be approved"));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(result, "Reservation approved successfully"));
+        }
+
+        [HttpPost("reservations/{id}/reject")]
+        public async Task<ActionResult<ApiResponse<bool>>> RejectReservation(int id, [FromBody] RejectReservationDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await _keywordService.RejectReservationAsync(userId, id, dto.Reason);
+            if (!result)
+                return NotFound(ApiResponse<bool>.ErrorResponse("Reservation not found or cannot be rejected"));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(result, "Reservation rejected successfully"));
+        }
+
+        // ======= Keyword Assignment Endpoints (12.4.2) =======
+        
+        [HttpPost("assignments")]
+        public async Task<ActionResult<ApiResponse<KeywordAssignmentDto>>> AssignKeyword([FromBody] CreateKeywordAssignmentDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var assignment = await _keywordService.AssignKeywordToCampaignAsync(userId, dto);
+                return Ok(ApiResponse<KeywordAssignmentDto>.SuccessResponse(assignment, "Keyword assigned to campaign successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Failed to assign keyword");
+                return BadRequest(ApiResponse<KeywordAssignmentDto>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error assigning keyword");
+                return BadRequest(ApiResponse<KeywordAssignmentDto>.ErrorResponse("Failed to assign keyword", new List<string> { ex.Message }));
+            }
+        }
+
+        [HttpGet("assignments")]
+        public async Task<ActionResult<ApiResponse<PaginatedResult<KeywordAssignmentDto>>>> GetAssignments([FromQuery] PagedRequest request)
+        {
+            var assignments = await _keywordService.GetAssignmentsAsync(request);
+            return Ok(ApiResponse<PaginatedResult<KeywordAssignmentDto>>.SuccessResponse(assignments));
+        }
+
+        [HttpGet("assignments/{id}")]
+        public async Task<ActionResult<ApiResponse<KeywordAssignmentDto>>> GetAssignment(int id)
+        {
+            var assignment = await _keywordService.GetAssignmentByIdAsync(id);
+            if (assignment == null)
+                return NotFound(ApiResponse<KeywordAssignmentDto>.ErrorResponse("Assignment not found"));
+
+            return Ok(ApiResponse<KeywordAssignmentDto>.SuccessResponse(assignment));
+        }
+
+        [HttpGet("assignments/campaign/{campaignId}")]
+        public async Task<ActionResult<ApiResponse<List<KeywordAssignmentDto>>>> GetAssignmentsByCampaign(int campaignId)
+        {
+            var assignments = await _keywordService.GetAssignmentsByCampaignAsync(campaignId);
+            return Ok(ApiResponse<List<KeywordAssignmentDto>>.SuccessResponse(assignments));
+        }
+
+        [HttpPost("assignments/{id}/unassign")]
+        public async Task<ActionResult<ApiResponse<bool>>> UnassignKeyword(int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await _keywordService.UnassignKeywordAsync(userId, id);
+            if (!result)
+                return NotFound(ApiResponse<bool>.ErrorResponse("Assignment not found or you don't have permission to unassign it"));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(result, "Keyword unassigned successfully"));
+        }
+
+        // ======= Keyword Conflict Resolution Endpoints (12.4.3) =======
+        
+        [HttpGet("conflicts")]
+        public async Task<ActionResult<ApiResponse<PaginatedResult<KeywordConflictDto>>>> GetConflicts([FromQuery] PagedRequest request)
+        {
+            var conflicts = await _keywordService.GetConflictsAsync(request);
+            return Ok(ApiResponse<PaginatedResult<KeywordConflictDto>>.SuccessResponse(conflicts));
+        }
+
+        [HttpGet("conflicts/check")]
+        public async Task<ActionResult<ApiResponse<KeywordConflictDto>>> CheckForConflict([FromQuery] string keywordText)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            if (string.IsNullOrWhiteSpace(keywordText))
+                return BadRequest(ApiResponse<KeywordConflictDto>.ErrorResponse("Keyword text is required"));
+
+            var conflict = await _keywordService.CheckForConflictAsync(keywordText, userId);
+            if (conflict == null)
+                return Ok(ApiResponse<KeywordConflictDto>.SuccessResponse(null!, "No conflict found"));
+
+            return Ok(ApiResponse<KeywordConflictDto>.SuccessResponse(conflict));
+        }
+
+        [HttpPost("conflicts/{id}/resolve")]
+        public async Task<ActionResult<ApiResponse<bool>>> ResolveConflict(int id, [FromBody] ResolveKeywordConflictDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await _keywordService.ResolveConflictAsync(userId, id, dto);
+            if (!result)
+                return NotFound(ApiResponse<bool>.ErrorResponse("Conflict not found or cannot be resolved"));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(result, "Conflict resolved successfully"));
+        }
     }
 
     // DTO for inbound SMS webhook
@@ -199,5 +388,11 @@ namespace MarketingPlatform.API.Controllers
     {
         public string PhoneNumber { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
+    }
+
+    // DTO for rejecting reservation
+    public class RejectReservationDto
+    {
+        public string Reason { get; set; } = string.Empty;
     }
 }
