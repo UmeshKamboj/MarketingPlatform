@@ -60,6 +60,9 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<UserExternalLogin> UserExternalLogins => Set<UserExternalLogin>();
         public DbSet<FileStorageSettings> FileStorageSettings => Set<FileStorageSettings>();
         public DbSet<EncryptionAuditLog> EncryptionAuditLogs => Set<EncryptionAuditLog>();
+        public DbSet<SuperAdminRole> SuperAdminRoles => Set<SuperAdminRole>();
+        public DbSet<PrivilegedActionLog> PrivilegedActionLogs => Set<PrivilegedActionLog>();
+        public DbSet<PlatformConfiguration> PlatformConfigurations => Set<PlatformConfiguration>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

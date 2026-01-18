@@ -53,6 +53,12 @@ namespace MarketingPlatform.Core.Enums
         // Audit Log Permissions
         ViewAuditLogs = 1 << 29,          // 536870912
         
+        // Super Admin Permissions
+        ViewSuperAdminLogs = 1 << 30,     // 1073741824
+        ManageSuperAdmins = 1 << 31,      // 2147483648
+        ViewPlatformConfig = 1 << 32,     // 4294967296
+        ManagePlatformConfig = 1 << 33,   // 8589934592
+        
         // All Permissions (SuperAdmin)
         All = ~0
     }
