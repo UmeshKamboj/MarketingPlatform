@@ -12,6 +12,7 @@ using MarketingPlatform.Application.DTOs.URL;
 using MarketingPlatform.Application.DTOs.Compliance;
 using MarketingPlatform.Application.DTOs.Role;
 using MarketingPlatform.Application.DTOs.Configuration;
+using MarketingPlatform.Application.DTOs.Pricing;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Models;
 
@@ -87,6 +88,26 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<UpdateKeywordDto, Keyword>();
             CreateMap<KeywordActivity, KeywordActivityDto>()
                 .ForMember(dest => dest.KeywordText, opt => opt.Ignore()); // Handled manually in service
+            
+            // Keyword Reservation mappings
+            CreateMap<KeywordReservation, KeywordReservationDto>()
+                .ForMember(dest => dest.RequestedByUserName, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedByUserName, opt => opt.Ignore());
+            CreateMap<CreateKeywordReservationDto, KeywordReservation>();
+            
+            // Keyword Assignment mappings
+            CreateMap<KeywordAssignment, KeywordAssignmentDto>()
+                .ForMember(dest => dest.KeywordText, opt => opt.Ignore())
+                .ForMember(dest => dest.CampaignName, opt => opt.Ignore())
+                .ForMember(dest => dest.AssignedByUserName, opt => opt.Ignore());
+            CreateMap<CreateKeywordAssignmentDto, KeywordAssignment>();
+            
+            // Keyword Conflict mappings
+            CreateMap<KeywordConflict, KeywordConflictDto>()
+                .ForMember(dest => dest.RequestingUserName, opt => opt.Ignore())
+                .ForMember(dest => dest.ExistingUserName, opt => opt.Ignore())
+                .ForMember(dest => dest.ResolvedByUserName, opt => opt.Ignore());
+            
             // URL Shortener mappings
             CreateMap<URLShortener, UrlShortenerDto>();
             CreateMap<CreateShortenedUrlDto, URLShortener>();
@@ -122,6 +143,34 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<UpdateComplianceRuleDto, ComplianceRule>();
 
             CreateMap<ComplianceRuleAudit, ComplianceRuleAuditDto>();
+
+            // Pricing Model mappings
+            CreateMap<PricingModel, PricingModelDto>();
+            CreateMap<CreatePricingModelDto, PricingModel>();
+            CreateMap<UpdatePricingModelDto, PricingModel>();
+
+            // Channel Pricing mappings
+            CreateMap<ChannelPricing, ChannelPricingDto>()
+                .ForMember(dest => dest.PricingModelName, opt => opt.Ignore());
+            CreateMap<CreateChannelPricingDto, ChannelPricing>();
+            CreateMap<UpdateChannelPricingDto, ChannelPricing>();
+
+            // Region Pricing mappings
+            CreateMap<RegionPricing, RegionPricingDto>()
+                .ForMember(dest => dest.PricingModelName, opt => opt.Ignore());
+            CreateMap<CreateRegionPricingDto, RegionPricing>();
+            CreateMap<UpdateRegionPricingDto, RegionPricing>();
+
+            // Usage Pricing mappings
+            CreateMap<UsagePricing, UsagePricingDto>()
+                .ForMember(dest => dest.PricingModelName, opt => opt.Ignore());
+            CreateMap<CreateUsagePricingDto, UsagePricing>();
+            CreateMap<UpdateUsagePricingDto, UsagePricing>();
+
+            // Tax Configuration mappings
+            CreateMap<TaxConfiguration, TaxConfigurationDto>();
+            CreateMap<CreateTaxConfigurationDto, TaxConfiguration>();
+            CreateMap<UpdateTaxConfigurationDto, TaxConfiguration>();
         }
     }
 }
