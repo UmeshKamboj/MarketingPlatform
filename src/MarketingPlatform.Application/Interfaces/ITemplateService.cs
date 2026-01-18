@@ -21,5 +21,6 @@ namespace MarketingPlatform.Application.Interfaces
         Task<string> RenderTemplateAsync(int templateId, Dictionary<string, string> variables);
         Task<List<string>> ExtractVariablesFromContentAsync(string content);
         Task<TemplateUsageStatsDto> GetTemplateUsageStatsAsync(string userId, int templateId);
+        Task<CharacterCountDto> CalculateCharacterCountAsync(string content, ChannelType channel, bool isSubject);
     }
 }

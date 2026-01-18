@@ -901,6 +901,64 @@ Check out our new {{ProductName}}! {{Description}} Price: ${{Price}}
 MediaUrls: ["https://example.com/product-image.jpg"]
 ```
 
+## Testing Character Count & URL Tracking
+
+### Calculate Character Count
+```bash
+POST /api/templates/calculate-character-count
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "content": "This is a test message with some content",
+  "channel": 0,
+  "isSubject": false
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "characterCount": 42,
+    "smsSegments": 1,
+    "containsUnicode": false,
+    "recommendedMaxLength": 160,
+    "exceedsRecommendedLength": false
+  }
+}
+```
+
+### Create Shortened URL
+```bash
+POST /api/urls
+Authorization: Bearer {token}
+{
+  "campaignId": 1,
+  "originalUrl": "https://example.com/product/12345?utm_source=sms",
+  "customShortCode": "summer2026"
+}
+```
+
+### Get URL Click Statistics
+```bash
+GET /api/urls/{id}/stats
+Authorization: Bearer {token}
+```
+
+### Get Campaign URL Statistics
+```bash
+GET /api/urls/campaign/{campaignId}/stats
+Authorization: Bearer {token}
+```
+
+### Public URL Redirect with Click Tracking
+```bash
+GET /r/{shortCode}
+```
+
+This endpoint tracks the click and redirects to the original URL.
+
 ## Testing Campaign Management
 
 See also: [SMS_KEYWORD_API_DOCUMENTATION.md](SMS_KEYWORD_API_DOCUMENTATION.md) for SMS Keyword Management features.
@@ -1133,6 +1191,12 @@ Response:
   - ✅ Inbound SMS webhook processing
   - ✅ Auto-response functionality
   - ✅ Auto opt-in to contact groups
+- ✅ Task 4.1: Message Composition & Templates:
+  - ✅ SMS, MMS, and Email editors with character count
+  - ✅ Personalization tokens ({{Name}}, {{City}}, etc.)
+  - ✅ Template management system
+  - ✅ URL tracking (shortener, click analytics per campaign/message)
+- ⏳ Keyword campaigns
 - ⏳ Automation & workflows
 - ⏳ Analytics & reporting
 - ⏳ Billing & subscriptions
@@ -1147,6 +1211,7 @@ Response:
 - [CAMPAIGN_LIFECYCLE_IMPLEMENTATION.md](CAMPAIGN_LIFECYCLE_IMPLEMENTATION.md) - Campaign lifecycle details
 - [DYNAMIC_CONTACT_GROUPS.md](DYNAMIC_CONTACT_GROUPS.md) - Dynamic contact groups implementation
 - [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Implementation summary
+🚧 **In Development** - Task 4.1 Complete - Message Composition & Templates with Character Count and URL Tracking
 
 ## License
 MIT License
