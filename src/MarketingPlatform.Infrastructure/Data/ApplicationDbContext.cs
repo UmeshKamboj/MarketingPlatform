@@ -43,6 +43,8 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<MessageProvider> MessageProviders => Set<MessageProvider>();
         public DbSet<ProviderLog> ProviderLogs => Set<ProviderLog>();
         public DbSet<ComplianceSettings> ComplianceSettings => Set<ComplianceSettings>();
+        public DbSet<ComplianceAuditLog> ComplianceAuditLogs => Set<ComplianceAuditLog>();
+        public DbSet<ContactConsent> ContactConsents => Set<ContactConsent>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<FrequencyControl> FrequencyControls => Set<FrequencyControl>();
 

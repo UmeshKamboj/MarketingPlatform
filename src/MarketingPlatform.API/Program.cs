@@ -87,6 +87,7 @@ builder.Services.AddScoped<IContactTagService, ContactTagService>();
 builder.Services.AddScoped<IAudienceSegmentationService, AudienceSegmentationService>();
 builder.Services.AddScoped<IKeywordService, KeywordService>();
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
+builder.Services.AddScoped<IComplianceService, ComplianceService>();
 
 // Scheduling & Automation Services
 builder.Services.AddScoped<ICampaignSchedulerService, CampaignSchedulerService>();

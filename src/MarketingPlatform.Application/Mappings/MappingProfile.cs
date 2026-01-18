@@ -9,6 +9,7 @@ using MarketingPlatform.Application.DTOs.SuppressionList;
 using MarketingPlatform.Application.DTOs.ContactTag;
 using MarketingPlatform.Application.DTOs.Keyword;
 using MarketingPlatform.Application.DTOs.URL;
+using MarketingPlatform.Application.DTOs.Compliance;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Models;
 
@@ -82,6 +83,15 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<URLShortener, UrlShortenerDto>();
             CreateMap<CreateShortenedUrlDto, URLShortener>();
             CreateMap<URLClick, UrlClickDto>();
+
+            // Compliance mappings
+            CreateMap<ComplianceSettings, ComplianceSettingsDto>();
+            CreateMap<UpdateComplianceSettingsDto, ComplianceSettings>();
+            CreateMap<ContactConsent, ContactConsentDto>();
+            CreateMap<ConsentHistory, ConsentHistoryDto>();
+            CreateMap<ComplianceAuditLog, ComplianceAuditLogDto>()
+                .ForMember(dest => dest.ContactName, opt => opt.Ignore()) // Handled manually in service
+                .ForMember(dest => dest.CampaignName, opt => opt.Ignore()); // Handled manually in service
         }
     }
 }
