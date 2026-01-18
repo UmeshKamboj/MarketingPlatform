@@ -79,6 +79,9 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IContactGroupService, ContactGroupService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
+builder.Services.AddScoped<ISuppressionListService, SuppressionListService>();
+builder.Services.AddScoped<IContactTagService, ContactTagService>();
+builder.Services.AddScoped<IAudienceSegmentationService, AudienceSegmentationService>();
 
 // Message Service
 builder.Services.AddScoped<IMessageService, MessageService>();

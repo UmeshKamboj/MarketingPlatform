@@ -5,6 +5,8 @@ using MarketingPlatform.Application.DTOs.ContactGroup;
 using MarketingPlatform.Application.DTOs.Campaign;
 using MarketingPlatform.Application.DTOs.Template;
 using MarketingPlatform.Application.DTOs.Message;
+using MarketingPlatform.Application.DTOs.SuppressionList;
+using MarketingPlatform.Application.DTOs.ContactTag;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.Application.Mappings
@@ -46,6 +48,15 @@ namespace MarketingPlatform.Application.Mappings
                 .ForMember(dest => dest.MediaUrls, opt => opt.Ignore()); // Handled manually in service
             CreateMap<CreateMessageDto, CampaignMessage>()
                 .ForMember(dest => dest.MediaUrls, opt => opt.Ignore()); // Handled manually in service
+
+            // SuppressionList mappings
+            CreateMap<SuppressionList, SuppressionListDto>();
+            CreateMap<CreateSuppressionListDto, SuppressionList>();
+
+            // ContactTag mappings
+            CreateMap<ContactTag, ContactTagDto>()
+                .ForMember(dest => dest.ContactCount, opt => opt.Ignore()); // Handled manually in service
+            CreateMap<CreateContactTagDto, ContactTag>();
         }
     }
 }
