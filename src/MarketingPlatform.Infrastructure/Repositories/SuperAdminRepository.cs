@@ -42,8 +42,9 @@ namespace MarketingPlatform.Infrastructure.Repositories
             {
                 item.IsActive = false;
                 item.RevokedAt = DateTime.UtcNow;
+                // Use the person performing the new assignment as the revoker for audit clarity
                 item.RevokedBy = superAdminRole.AssignedBy;
-                item.RevocationReason = "Superseded by new assignment";
+                item.RevocationReason = "Automatically revoked due to new super admin assignment";
             }
 
             await AddAsync(superAdminRole);
