@@ -26,7 +26,13 @@
                     <a class="nav-link" data-bs-toggle="tab" href="#running">Running</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#paused">Paused</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#completed">Completed</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#failed">Failed</a>
                 </li>
             </ul>
         </div>
@@ -46,6 +52,35 @@
     <script>
         const apiBaseUrl = '@ViewBag.ApiBaseUrl';
         
+        // Constants
+        const DEMO_MESSAGE = '(This is a demo - API integration required)';
+        const CONFIRMATION_UNDOABLE = 'This action cannot be undone.';
+        
+        // Campaign status enum
+        const CampaignStatus = {
+            Draft: 0,
+            Scheduled: 1,
+            Running: 2,
+            Paused: 3,
+            Completed: 4,
+            Failed: 5
+        };
+
+        // Campaign type enum
+        const CampaignType = {
+            SMS: 0,
+            MMS: 1,
+            Email: 2,
+            Multi: 3
+        };
+
+        // Schedule type enum
+        const ScheduleType = {
+            OneTime: 0,
+            Recurring: 1,
+            Drip: 2
+        };
+        
         // Load campaigns on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadCampaigns();
@@ -56,7 +91,7 @@
             
             try {
                 let url = `${apiBaseUrl}/campaigns`;
-                if (status) {
+                if (status !== null && status !== undefined) {
                     url = `${apiBaseUrl}/campaigns/status/${status}`;
                 }
                 
@@ -65,14 +100,9 @@
                 //     headers: { 'Authorization': 'Bearer ' + getToken() }
                 // });
                 
-                // For now, show a message
-                listContainer.innerHTML = `
-                    <div class="alert alert-info">
-                        <h5>Campaign List</h5>
-                        <p>Connect to the API at <code>${apiBaseUrl}/campaigns</code> to view campaigns.</p>
-                        <p class="mb-0">Authentication required. Please implement login functionality to view campaigns.</p>
-                    </div>
-                `;
+                // Mock data for demonstration
+                const mockCampaigns = getMockCampaigns(status);
+                renderCampaigns(mockCampaigns);
             } catch (error) {
                 listContainer.innerHTML = `
                     <div class="alert alert-danger">
@@ -82,16 +112,321 @@
             }
         }
 
+        function getMockCampaigns(status) {
+            // Mock campaign data for demonstration
+            const allCampaigns = [
+                {
+                    id: 1,
+                    name: 'Summer Sale 2026',
+                    description: 'Promotional campaign for summer',
+                    type: CampaignType.SMS,
+                    status: CampaignStatus.Draft,
+                    scheduledAt: null,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    name: 'Newsletter July',
+                    description: 'Monthly newsletter',
+                    type: CampaignType.Email,
+                    status: CampaignStatus.Scheduled,
+                    scheduledAt: new Date(Date.now() + 86400000).toISOString(),
+                    createdAt: new Date(Date.now() - 86400000).toISOString()
+                },
+                {
+                    id: 3,
+                    name: 'Flash Sale',
+                    description: 'Limited time offer',
+                    type: CampaignType.Multi,
+                    status: CampaignStatus.Running,
+                    scheduledAt: null,
+                    startedAt: new Date().toISOString(),
+                    createdAt: new Date(Date.now() - 172800000).toISOString()
+                },
+                {
+                    id: 4,
+                    name: 'Customer Survey',
+                    description: 'Quarterly customer feedback',
+                    type: CampaignType.Email,
+                    status: CampaignStatus.Paused,
+                    scheduledAt: null,
+                    createdAt: new Date(Date.now() - 259200000).toISOString()
+                },
+                {
+                    id: 5,
+                    name: 'Product Launch',
+                    description: 'New product announcement',
+                    type: CampaignType.SMS,
+                    status: CampaignStatus.Completed,
+                    scheduledAt: null,
+                    completedAt: new Date(Date.now() - 345600000).toISOString(),
+                    createdAt: new Date(Date.now() - 432000000).toISOString()
+                }
+            ];
+
+            if (status !== null && status !== undefined) {
+                return allCampaigns.filter(c => c.status === status);
+            }
+            return allCampaigns;
+        }
+
+        function renderCampaigns(campaigns) {
+            const listContainer = document.getElementById('campaigns-list');
+            
+            if (!campaigns || campaigns.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> No campaigns found.
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="table-responsive"><table class="table table-hover">';
+            html += '<thead><tr>';
+            html += '<th>Name</th>';
+            html += '<th>Type</th>';
+            html += '<th>Status</th>';
+            html += '<th>Schedule</th>';
+            html += '<th>Created</th>';
+            html += '<th>Actions</th>';
+            html += '</tr></thead><tbody>';
+
+            campaigns.forEach(campaign => {
+                html += '<tr>';
+                html += `<td><strong>${escapeHtml(campaign.name)}</strong><br/><small class="text-muted">${escapeHtml(campaign.description || '')}</small></td>`;
+                html += `<td>${getCampaignTypeBadge(campaign.type)}</td>`;
+                html += `<td>${getStatusBadge(campaign.status)}</td>`;
+                html += `<td>${getScheduleInfo(campaign)}</td>`;
+                html += `<td>${formatDate(campaign.createdAt)}</td>`;
+                html += `<td>${getActionButtons(campaign)}</td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            listContainer.innerHTML = html;
+        }
+
+        function getCampaignTypeBadge(type) {
+            const typeNames = ['SMS', 'MMS', 'Email', 'Multi-Channel'];
+            const typeColors = ['primary', 'info', 'success', 'warning'];
+            return `<span class="badge bg-${typeColors[type]}">${typeNames[type]}</span>`;
+        }
+
+        function getStatusBadge(status) {
+            const statusNames = ['Draft', 'Scheduled', 'Running', 'Paused', 'Completed', 'Failed'];
+            const statusColors = ['secondary', 'warning', 'primary', 'info', 'success', 'danger'];
+            return `<span class="badge bg-${statusColors[status]}">${statusNames[status]}</span>`;
+        }
+
+        function getScheduleInfo(campaign) {
+            if (campaign.scheduledAt) {
+                return `<small>Scheduled: ${formatDate(campaign.scheduledAt)}</small>`;
+            }
+            if (campaign.startedAt) {
+                return `<small>Started: ${formatDate(campaign.startedAt)}</small>`;
+            }
+            if (campaign.completedAt) {
+                return `<small>Completed: ${formatDate(campaign.completedAt)}</small>`;
+            }
+            return '<small class="text-muted">Not scheduled</small>';
+        }
+
+        function getActionButtons(campaign) {
+            let buttons = '';
+            
+            // View/Edit button
+            buttons += `<button class="btn btn-sm btn-outline-primary me-1" onclick="viewCampaign(${campaign.id})" title="View Details">
+                <i class="bi bi-eye"></i>
+            </button>`;
+            
+            // Duplicate button (available for all campaigns)
+            buttons += `<button class="btn btn-sm btn-outline-secondary me-1" onclick="duplicateCampaign(${campaign.id})" title="Duplicate Campaign">
+                <i class="bi bi-files"></i>
+            </button>`;
+            
+            // Status-specific action buttons
+            switch(campaign.status) {
+                case CampaignStatus.Draft:
+                    buttons += `<button class="btn btn-sm btn-outline-success me-1" onclick="startCampaign(${campaign.id})" title="Start Campaign">
+                        <i class="bi bi-play-fill"></i>
+                    </button>`;
+                    buttons += `<button class="btn btn-sm btn-outline-danger" onclick="deleteCampaign(${campaign.id})" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>`;
+                    break;
+                    
+                case CampaignStatus.Scheduled:
+                    buttons += `<button class="btn btn-sm btn-outline-success me-1" onclick="startCampaign(${campaign.id})" title="Start Now">
+                        <i class="bi bi-play-fill"></i>
+                    </button>`;
+                    buttons += `<button class="btn btn-sm btn-outline-danger" onclick="cancelCampaign(${campaign.id})" title="Cancel">
+                        <i class="bi bi-x-circle"></i>
+                    </button>`;
+                    break;
+                    
+                case CampaignStatus.Running:
+                    buttons += `<button class="btn btn-sm btn-outline-warning me-1" onclick="pauseCampaign(${campaign.id})" title="Pause Campaign">
+                        <i class="bi bi-pause-fill"></i>
+                    </button>`;
+                    buttons += `<button class="btn btn-sm btn-outline-danger" onclick="cancelCampaign(${campaign.id})" title="Cancel">
+                        <i class="bi bi-x-circle"></i>
+                    </button>`;
+                    break;
+                    
+                case CampaignStatus.Paused:
+                    buttons += `<button class="btn btn-sm btn-outline-success me-1" onclick="resumeCampaign(${campaign.id})" title="Resume Campaign">
+                        <i class="bi bi-play-fill"></i>
+                    </button>`;
+                    buttons += `<button class="btn btn-sm btn-outline-danger" onclick="cancelCampaign(${campaign.id})" title="Cancel">
+                        <i class="bi bi-x-circle"></i>
+                    </button>`;
+                    break;
+                    
+                case CampaignStatus.Completed:
+                case CampaignStatus.Failed:
+                    buttons += `<button class="btn btn-sm btn-outline-danger" onclick="deleteCampaign(${campaign.id})" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>`;
+                    break;
+            }
+            
+            return buttons;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Campaign action functions
+        async function viewCampaign(id) {
+            // Navigate to campaign details/edit page
+            window.location.href = `/Campaigns/Details/${id}`;
+        }
+
+        async function duplicateCampaign(id) {
+            if (!confirm('Are you sure you want to duplicate this campaign?')) return;
+            
+            try {
+                // In production, call the API
+                // const response = await fetch(`${apiBaseUrl}/campaigns/${id}/duplicate`, {
+                //     method: 'POST',
+                //     headers: { 'Authorization': 'Bearer ' + getToken() }
+                // });
+                
+                alert(`Campaign duplicated successfully! ${DEMO_MESSAGE}`);
+                loadCampaigns(); // Reload the list
+            } catch (error) {
+                alert('Failed to duplicate campaign: ' + error.message);
+            }
+        }
+
+        async function startCampaign(id) {
+            if (!confirm('Are you sure you want to start this campaign?')) return;
+            
+            try {
+                // In production, call the API
+                // const response = await fetch(`${apiBaseUrl}/campaigns/${id}/start`, {
+                //     method: 'POST',
+                //     headers: { 'Authorization': 'Bearer ' + getToken() }
+                // });
+                
+                alert(`Campaign started successfully! ${DEMO_MESSAGE}`);
+                loadCampaigns(); // Reload the list
+            } catch (error) {
+                alert('Failed to start campaign: ' + error.message);
+            }
+        }
+
+        async function pauseCampaign(id) {
+            if (!confirm('Are you sure you want to pause this campaign?')) return;
+            
+            try {
+                // In production, call the API
+                // const response = await fetch(`${apiBaseUrl}/campaigns/${id}/pause`, {
+                //     method: 'POST',
+                //     headers: { 'Authorization': 'Bearer ' + getToken() }
+                // });
+                
+                alert(`Campaign paused successfully! ${DEMO_MESSAGE}`);
+                loadCampaigns(); // Reload the list
+            } catch (error) {
+                alert('Failed to pause campaign: ' + error.message);
+            }
+        }
+
+        async function resumeCampaign(id) {
+            if (!confirm('Are you sure you want to resume this campaign?')) return;
+            
+            try {
+                // In production, call the API
+                // const response = await fetch(`${apiBaseUrl}/campaigns/${id}/resume`, {
+                //     method: 'POST',
+                //     headers: { 'Authorization': 'Bearer ' + getToken() }
+                // });
+                
+                alert(`Campaign resumed successfully! ${DEMO_MESSAGE}`);
+                loadCampaigns(); // Reload the list
+            } catch (error) {
+                alert('Failed to resume campaign: ' + error.message);
+            }
+        }
+
+        async function cancelCampaign(id) {
+            if (!confirm(`Are you sure you want to cancel this campaign? ${CONFIRMATION_UNDOABLE}`)) return;
+            
+            try {
+                // In production, call the API
+                // const response = await fetch(`${apiBaseUrl}/campaigns/${id}/cancel`, {
+                //     method: 'POST',
+                //     headers: { 'Authorization': 'Bearer ' + getToken() }
+                // });
+                
+                alert(`Campaign cancelled successfully! ${DEMO_MESSAGE}`);
+                loadCampaigns(); // Reload the list
+            } catch (error) {
+                alert('Failed to cancel campaign: ' + error.message);
+            }
+        }
+
+        async function deleteCampaign(id) {
+            if (!confirm(`Are you sure you want to delete this campaign? ${CONFIRMATION_UNDOABLE}`)) return;
+            
+            try {
+                // In production, call the API
+                // const response = await fetch(`${apiBaseUrl}/campaigns/${id}`, {
+                //     method: 'DELETE',
+                //     headers: { 'Authorization': 'Bearer ' + getToken() }
+                // });
+                
+                alert(`Campaign deleted successfully! ${DEMO_MESSAGE}`);
+                loadCampaigns(); // Reload the list
+            } catch (error) {
+                alert('Failed to delete campaign: ' + error.message);
+            }
+        }
+
         // Tab click handlers
         document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
             tab.addEventListener('shown.bs.tab', function(e) {
                 const target = e.target.getAttribute('href');
                 const statusMap = {
                     '#all': null,
-                    '#draft': 0,
-                    '#scheduled': 1,
-                    '#running': 2,
-                    '#completed': 4
+                    '#draft': CampaignStatus.Draft,
+                    '#scheduled': CampaignStatus.Scheduled,
+                    '#running': CampaignStatus.Running,
+                    '#paused': CampaignStatus.Paused,
+                    '#completed': CampaignStatus.Completed,
+                    '#failed': CampaignStatus.Failed
                 };
                 loadCampaigns(statusMap[target]);
             });
