@@ -7,6 +7,7 @@ using MarketingPlatform.Application.DTOs.Template;
 using MarketingPlatform.Application.DTOs.Message;
 using MarketingPlatform.Application.DTOs.SuppressionList;
 using MarketingPlatform.Application.DTOs.ContactTag;
+using MarketingPlatform.Application.DTOs.Keyword;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Models;
 
@@ -66,6 +67,16 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<ContactTag, ContactTagDto>()
                 .ForMember(dest => dest.ContactCount, opt => opt.Ignore()); // Handled manually in service
             CreateMap<CreateContactTagDto, ContactTag>();
+
+            // Keyword mappings
+            CreateMap<Keyword, KeywordDto>()
+                .ForMember(dest => dest.LinkedCampaignName, opt => opt.Ignore()) // Handled manually in service
+                .ForMember(dest => dest.OptInGroupName, opt => opt.Ignore()) // Handled manually in service
+                .ForMember(dest => dest.ActivityCount, opt => opt.Ignore()); // Handled manually in service
+            CreateMap<CreateKeywordDto, Keyword>();
+            CreateMap<UpdateKeywordDto, Keyword>();
+            CreateMap<KeywordActivity, KeywordActivityDto>()
+                .ForMember(dest => dest.KeywordText, opt => opt.Ignore()); // Handled manually in service
         }
     }
 }
