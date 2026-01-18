@@ -60,6 +60,10 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<UserExternalLogin> UserExternalLogins => Set<UserExternalLogin>();
         public DbSet<FileStorageSettings> FileStorageSettings => Set<FileStorageSettings>();
         public DbSet<EncryptionAuditLog> EncryptionAuditLogs => Set<EncryptionAuditLog>();
+        public DbSet<PlatformSetting> PlatformSettings => Set<PlatformSetting>();
+        public DbSet<FeatureToggle> FeatureToggles => Set<FeatureToggle>();
+        public DbSet<ComplianceRule> ComplianceRules => Set<ComplianceRule>();
+        public DbSet<ComplianceRuleAudit> ComplianceRuleAudits => Set<ComplianceRuleAudit>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +79,9 @@ namespace MarketingPlatform.Infrastructure.Data
             modelBuilder.Entity<ContactGroup>().HasQueryFilter(c => !c.IsDeleted);
             modelBuilder.Entity<MessageTemplate>().HasQueryFilter(m => !m.IsDeleted);
             modelBuilder.Entity<Workflow>().HasQueryFilter(w => !w.IsDeleted);
+            modelBuilder.Entity<PlatformSetting>().HasQueryFilter(s => !s.IsDeleted);
+            modelBuilder.Entity<FeatureToggle>().HasQueryFilter(f => !f.IsDeleted);
+            modelBuilder.Entity<ComplianceRule>().HasQueryFilter(r => !r.IsDeleted);
         }
     }
 }

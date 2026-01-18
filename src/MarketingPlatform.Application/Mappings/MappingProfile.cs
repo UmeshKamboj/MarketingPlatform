@@ -11,6 +11,7 @@ using MarketingPlatform.Application.DTOs.Keyword;
 using MarketingPlatform.Application.DTOs.URL;
 using MarketingPlatform.Application.DTOs.Compliance;
 using MarketingPlatform.Application.DTOs.Role;
+using MarketingPlatform.Application.DTOs.Configuration;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Models;
 
@@ -106,6 +107,21 @@ namespace MarketingPlatform.Application.Mappings
                 .ForMember(dest => dest.UserCount, opt => opt.Ignore()); // Handled manually in service
             CreateMap<CreateRoleDto, Role>()
                 .ForMember(dest => dest.Permissions, opt => opt.Ignore()); // Handled manually in service
+
+            // Configuration mappings
+            CreateMap<PlatformSetting, PlatformSettingDto>();
+            CreateMap<CreatePlatformSettingDto, PlatformSetting>();
+            CreateMap<UpdatePlatformSettingDto, PlatformSetting>();
+
+            CreateMap<FeatureToggle, FeatureToggleDto>();
+            CreateMap<CreateFeatureToggleDto, FeatureToggle>();
+            CreateMap<UpdateFeatureToggleDto, FeatureToggle>();
+
+            CreateMap<ComplianceRule, ComplianceRuleDto>();
+            CreateMap<CreateComplianceRuleDto, ComplianceRule>();
+            CreateMap<UpdateComplianceRuleDto, ComplianceRule>();
+
+            CreateMap<ComplianceRuleAudit, ComplianceRuleAuditDto>();
         }
     }
 }
