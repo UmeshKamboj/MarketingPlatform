@@ -145,7 +145,7 @@ namespace MarketingPlatform.Application.Services
             if (duplicateCheck.HasDuplicates)
             {
                 var duplicateInfo = string.Join(", ", duplicateCheck.Duplicates.Select(d => d.DuplicateReason));
-                throw new InvalidOperationException($"Duplicate contact found. Matching fields: {duplicateInfo}. Use duplicate resolution to handle this.");
+                throw new InvalidOperationException($"Duplicate contact found with matching {duplicateInfo}. Use the POST /api/contacts/duplicates/resolve endpoint to handle duplicates, or modify the conflicting fields.");
             }
 
             var contact = _mapper.Map<Contact>(dto);
@@ -181,7 +181,7 @@ namespace MarketingPlatform.Application.Services
                 if (duplicateCheck.HasDuplicates)
                 {
                     var duplicateInfo = string.Join(", ", duplicateCheck.Duplicates.Select(d => d.DuplicateReason));
-                    throw new InvalidOperationException($"Duplicate contact found. Matching fields: {duplicateInfo}. Use duplicate resolution to handle this.");
+                    throw new InvalidOperationException($"Duplicate contact found with matching {duplicateInfo}. Use the POST /api/contacts/duplicates/resolve endpoint to handle duplicates, or modify the conflicting fields.");
                 }
             }
 
@@ -627,6 +627,7 @@ namespace MarketingPlatform.Application.Services
                 var phoneDuplicates = await _contactRepository.FindAsync(c =>
                     c.UserId == userId &&
                     !c.IsDeleted &&
+                    c.PhoneNumber != null &&
                     c.PhoneNumber.ToLower() == dto.PhoneNumber.ToLower() &&
                     (!excludeContactId.HasValue || c.Id != excludeContactId.Value));
 
@@ -663,6 +664,7 @@ namespace MarketingPlatform.Application.Services
             var report = new DuplicateReportDto();
             var groups = new Dictionary<string, DuplicateGroupDto>();
 
+            // Note: For large datasets (>10k contacts), consider pagination or background processing
             var allContacts = await _contactRepository.FindAsync(c => c.UserId == userId && !c.IsDeleted);
             var contactsList = allContacts.ToList();
 
@@ -699,8 +701,8 @@ namespace MarketingPlatform.Application.Services
             // Group by phone number
             var phoneGroups = contactsList
                 .Where(c => !string.IsNullOrEmpty(c.PhoneNumber))
-                .GroupBy(c => c.PhoneNumber.ToLower())
-                .Where(g => g.Count() > 1);
+                .GroupBy(c => c.PhoneNumber?.ToLower() ?? string.Empty)
+                .Where(g => g.Count() > 1 && !string.IsNullOrEmpty(g.Key));
 
             foreach (var group in phoneGroups)
             {
@@ -775,6 +777,7 @@ namespace MarketingPlatform.Application.Services
 
                     case ResolutionAction.MergeIntoPrimary:
                         // Merge data into primary (fill in missing fields)
+                        // Note: PhoneNumber is required with default empty string, so we check for empty
                         foreach (var contact in duplicateContacts)
                         {
                             if (string.IsNullOrEmpty(primaryContact.Email) && !string.IsNullOrEmpty(contact.Email))
