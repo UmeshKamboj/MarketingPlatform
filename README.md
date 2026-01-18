@@ -172,11 +172,61 @@ POST /api/auth/logout
 Authorization: Bearer {token}
 ```
 
+## Testing User Management
+
+### Get Current User Profile (requires Bearer token)
+```bash
+GET /api/users/profile
+Authorization: Bearer {token}
+```
+
+### Update Profile
+```bash
+PUT /api/users/profile
+Authorization: Bearer {token}
+{
+  "firstName": "Updated",
+  "lastName": "Name",
+  "phoneNumber": "+1234567890"
+}
+```
+
+### Get User Stats
+```bash
+GET /api/users/stats
+Authorization: Bearer {token}
+```
+
+### List All Users (Admin only)
+```bash
+GET /api/users?pageNumber=1&pageSize=10&searchTerm=test
+Authorization: Bearer {admin_token}
+```
+
+### Get Specific User
+```bash
+GET /api/users/{userId}
+Authorization: Bearer {token}
+```
+
+### Deactivate User (Admin only)
+```bash
+POST /api/users/{userId}/deactivate
+Authorization: Bearer {admin_token}
+```
+
+### Activate User (Admin only)
+```bash
+POST /api/users/{userId}/activate
+Authorization: Bearer {admin_token}
+```
+
 ## Features (Planned)
 
 - ✅ Task 1.1: Solution structure and core projects
 - ✅ Task 1.2: Database foundation
-- ✅ Task 1.3: Authentication & Authorization Core ← **Current**
+- ✅ Task 1.3: Authentication & Authorization Core
+- ✅ Task 2.1: API Foundation - Repository Pattern & Core Services ← **Current**
 - ⏳ Campaign management
 - ⏳ Contact & group management
 - ⏳ Template management
@@ -187,7 +237,7 @@ Authorization: Bearer {token}
 - ⏳ Super admin platform
 
 ## Project Status
-🚧 **In Development** - Task 1.3 Complete
+🚧 **In Development** - Task 2.1 Complete
 
 ## License
 MIT License
