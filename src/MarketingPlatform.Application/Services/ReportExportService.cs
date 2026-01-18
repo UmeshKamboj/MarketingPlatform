@@ -9,7 +9,7 @@ namespace MarketingPlatform.Application.Services
 {
     public class ReportExportService : IReportExportService
     {
-        public async Task<byte[]> ExportToCsvAsync<T>(List<T> data, string[] headers) where T : class
+        public async Task<byte[]> ExportToCsvAsync<T>(List<T> data) where T : class
         {
             using var memoryStream = new MemoryStream();
             using var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
@@ -34,6 +34,9 @@ namespace MarketingPlatform.Application.Services
             // Get properties
             var properties = typeof(T).GetProperties();
 
+            if (data.Count == 0 || properties.Length == 0)
+                return package.GetAsByteArray();
+
             // Add headers
             for (int i = 0; i < properties.Length; i++)
             {
@@ -53,7 +56,8 @@ namespace MarketingPlatform.Application.Services
             }
 
             // Auto-fit columns
-            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            if (worksheet.Dimension != null)
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
             return await Task.FromResult(package.GetAsByteArray());
         }

@@ -202,7 +202,7 @@ namespace MarketingPlatform.API.Controllers
             try
             {
                 var data = await _analyticsService.GetCampaignPerformanceAsync(userId, filter);
-                var csvData = await _exportService.ExportToCsvAsync(data, Array.Empty<string>());
+                var csvData = await _exportService.ExportToCsvAsync(data);
                 
                 return File(csvData, "text/csv", $"campaign-performance-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv");
             }
@@ -251,7 +251,7 @@ namespace MarketingPlatform.API.Controllers
             try
             {
                 var data = await _analyticsService.GetContactEngagementHistoryAsync(userId, filter);
-                var csvData = await _exportService.ExportToCsvAsync(data, Array.Empty<string>());
+                var csvData = await _exportService.ExportToCsvAsync(data);
                 
                 return File(csvData, "text/csv", $"contact-engagement-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv");
             }
@@ -300,7 +300,7 @@ namespace MarketingPlatform.API.Controllers
             try
             {
                 var data = await _analyticsService.GetConversionTrackingForCampaignsAsync(userId, filter);
-                var csvData = await _exportService.ExportToCsvAsync(data, Array.Empty<string>());
+                var csvData = await _exportService.ExportToCsvAsync(data);
                 
                 return File(csvData, "text/csv", $"conversions-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv");
             }
