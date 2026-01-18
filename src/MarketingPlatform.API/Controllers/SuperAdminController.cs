@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MarketingPlatform.Application.DTOs.Common;
 using MarketingPlatform.Application.DTOs.SuperAdmin;
+using MarketingPlatform.Application.DTOs.Analytics;
 using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Enums;
 using System.Security.Claims;
@@ -16,17 +17,20 @@ namespace MarketingPlatform.API.Controllers
         private readonly ISuperAdminService _superAdminService;
         private readonly IPrivilegedActionLogService _logService;
         private readonly IPlatformConfigurationService _configService;
+        private readonly ISuperAdminAnalyticsService _analyticsService;
         private readonly ILogger<SuperAdminController> _logger;
 
         public SuperAdminController(
             ISuperAdminService superAdminService,
             IPrivilegedActionLogService logService,
             IPlatformConfigurationService configService,
+            ISuperAdminAnalyticsService analyticsService,
             ILogger<SuperAdminController> logger)
         {
             _superAdminService = superAdminService;
             _logService = logService;
             _configService = configService;
+            _analyticsService = analyticsService;
             _logger = logger;
         }
 
@@ -428,6 +432,107 @@ namespace MarketingPlatform.API.Controllers
             {
                 _logger.LogError(ex, "Error toggling feature");
                 return BadRequest(ApiResponse<bool>.ErrorResponse(ex.Message));
+            }
+        }
+
+        #endregion
+
+        #region Analytics & Monitoring
+
+        /// <summary>
+        /// Get platform-wide analytics
+        /// </summary>
+        [HttpGet("analytics/platform")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult<ApiResponse<PlatformAnalyticsDto>>> GetPlatformAnalytics()
+        {
+            try
+            {
+                var analytics = await _analyticsService.GetPlatformAnalyticsAsync();
+                return Ok(ApiResponse<PlatformAnalyticsDto>.SuccessResponse(analytics));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving platform analytics");
+                return BadRequest(ApiResponse<PlatformAnalyticsDto>.ErrorResponse(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Get billing analytics
+        /// </summary>
+        [HttpGet("analytics/billing")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult<ApiResponse<BillingAnalyticsDto>>> GetBillingAnalytics(
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate)
+        {
+            try
+            {
+                var analytics = await _analyticsService.GetBillingAnalyticsAsync(startDate, endDate);
+                return Ok(ApiResponse<BillingAnalyticsDto>.SuccessResponse(analytics));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving billing analytics");
+                return BadRequest(ApiResponse<BillingAnalyticsDto>.ErrorResponse(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Get monthly revenue trends
+        /// </summary>
+        [HttpGet("analytics/revenue/monthly")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult<ApiResponse<List<MonthlyRevenueDto>>>> GetMonthlyRevenue([FromQuery] int months = 12)
+        {
+            try
+            {
+                var revenue = await _analyticsService.GetMonthlyRevenueAsync(months);
+                return Ok(ApiResponse<List<MonthlyRevenueDto>>.SuccessResponse(revenue));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving monthly revenue");
+                return BadRequest(ApiResponse<List<MonthlyRevenueDto>>.ErrorResponse(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Get system health status
+        /// </summary>
+        [HttpGet("health")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult<ApiResponse<SystemHealthDto>>> GetSystemHealth()
+        {
+            try
+            {
+                var health = await _analyticsService.GetSystemHealthAsync();
+                return Ok(ApiResponse<SystemHealthDto>.SuccessResponse(health));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving system health");
+                return BadRequest(ApiResponse<SystemHealthDto>.ErrorResponse(ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Get provider health metrics
+        /// </summary>
+        [HttpGet("health/providers")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult<ApiResponse<List<ProviderHealthDto>>>> GetProviderHealth()
+        {
+            try
+            {
+                var providerHealth = await _analyticsService.GetProviderHealthAsync();
+                return Ok(ApiResponse<List<ProviderHealthDto>>.SuccessResponse(providerHealth));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving provider health");
+                return BadRequest(ApiResponse<List<ProviderHealthDto>>.ErrorResponse(ex.Message));
             }
         }
 

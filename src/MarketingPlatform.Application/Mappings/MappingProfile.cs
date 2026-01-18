@@ -14,6 +14,7 @@ using MarketingPlatform.Application.DTOs.Role;
 using MarketingPlatform.Application.DTOs.SuperAdmin;
 using MarketingPlatform.Application.DTOs.Configuration;
 using MarketingPlatform.Application.DTOs.Subscription;
+using MarketingPlatform.Application.DTOs.Billing;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Models;
 
@@ -146,6 +147,12 @@ namespace MarketingPlatform.Application.Mappings
                 .ForMember(dest => dest.Features, opt => opt.Ignore()); // Handled manually in service
             CreateMap<CreateSubscriptionPlanDto, SubscriptionPlan>()
                 .ForMember(dest => dest.Features, opt => opt.Ignore()); // Handled manually in service
+
+            // Billing mappings
+            CreateMap<UserSubscription, UserSubscriptionDto>()
+                .ForMember(dest => dest.PlanName, opt => opt.MapFrom(src => src.SubscriptionPlan.Name));
+            CreateMap<Invoice, InvoiceDto>();
+            CreateMap<BillingHistory, BillingHistoryDto>();
         }
     }
 }
