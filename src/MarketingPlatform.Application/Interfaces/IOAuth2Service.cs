@@ -1,4 +1,5 @@
 using MarketingPlatform.Application.DTOs.Auth;
+using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.Application.Interfaces
 {
@@ -38,5 +39,36 @@ namespace MarketingPlatform.Application.Interfaces
         /// Get all enabled external authentication providers
         /// </summary>
         Task<IEnumerable<ExternalAuthProviderDto>> GetEnabledProvidersAsync();
+
+        // Admin Provider Management Methods
+        /// <summary>
+        /// Get all external authentication providers (Admin only)
+        /// </summary>
+        Task<IEnumerable<ExternalAuthProvider>> GetAllProvidersAsync();
+
+        /// <summary>
+        /// Get external authentication provider by ID (Admin only)
+        /// </summary>
+        Task<ExternalAuthProvider?> GetProviderByIdAsync(int id);
+
+        /// <summary>
+        /// Create a new external authentication provider (Admin only)
+        /// </summary>
+        Task<ExternalAuthProvider> CreateProviderAsync(ExternalAuthProvider provider);
+
+        /// <summary>
+        /// Update an external authentication provider (Admin only)
+        /// </summary>
+        Task<ExternalAuthProvider?> UpdateProviderAsync(int id, ExternalAuthProvider updatedProvider);
+
+        /// <summary>
+        /// Delete an external authentication provider (Admin only)
+        /// </summary>
+        Task<bool> DeleteProviderAsync(int id);
+
+        /// <summary>
+        /// Enable or disable an external authentication provider (Admin only)
+        /// </summary>
+        Task<bool> ToggleProviderStatusAsync(int id, bool isEnabled);
     }
 }

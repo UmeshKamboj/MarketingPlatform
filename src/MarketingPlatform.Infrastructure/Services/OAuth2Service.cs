@@ -264,6 +264,96 @@ namespace MarketingPlatform.Infrastructure.Services
             });
         }
 
+        // Admin Provider Management Methods
+        public async Task<IEnumerable<ExternalAuthProvider>> GetAllProvidersAsync()
+        {
+            return await _providerRepository.GetAllAsync();
+        }
+
+        public async Task<ExternalAuthProvider?> GetProviderByIdAsync(int id)
+        {
+            return await _providerRepository.GetByIdAsync(id);
+        }
+
+        public async Task<ExternalAuthProvider> CreateProviderAsync(ExternalAuthProvider provider)
+        {
+            provider.CreatedAt = DateTime.UtcNow;
+            await _providerRepository.AddAsync(provider);
+            await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("Created new OAuth2 provider: {ProviderName}", provider.Name);
+            return provider;
+        }
+
+        public async Task<ExternalAuthProvider?> UpdateProviderAsync(int id, ExternalAuthProvider updatedProvider)
+        {
+            var provider = await _providerRepository.GetByIdAsync(id);
+            
+            if (provider == null)
+                return null;
+
+            // Update properties
+            provider.DisplayName = updatedProvider.DisplayName;
+            provider.ClientId = updatedProvider.ClientId;
+            provider.ClientSecret = updatedProvider.ClientSecret;
+            provider.Authority = updatedProvider.Authority;
+            provider.TenantId = updatedProvider.TenantId;
+            provider.Domain = updatedProvider.Domain;
+            provider.Region = updatedProvider.Region;
+            provider.UserPoolId = updatedProvider.UserPoolId;
+            provider.CallbackPath = updatedProvider.CallbackPath;
+            provider.Scopes = updatedProvider.Scopes;
+            provider.IsEnabled = updatedProvider.IsEnabled;
+            provider.IsDefault = updatedProvider.IsDefault;
+            provider.ConfigurationJson = updatedProvider.ConfigurationJson;
+            provider.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("Updated OAuth2 provider: {ProviderName} (ID: {ProviderId})", provider.Name, id);
+            return provider;
+        }
+
+        public async Task<bool> DeleteProviderAsync(int id)
+        {
+            var provider = await _providerRepository.GetByIdAsync(id);
+            
+            if (provider == null)
+                return false;
+
+            // Check if provider has any linked accounts
+            var hasLinkedAccounts = await _context.UserExternalLogins
+                .AnyAsync(uel => uel.ProviderId == id);
+
+            if (hasLinkedAccounts)
+            {
+                throw new InvalidOperationException(
+                    "Cannot delete provider with linked user accounts. Disable it instead or unlink all accounts first.");
+            }
+
+            _context.ExternalAuthProviders.Remove(provider);
+            await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("Deleted OAuth2 provider: {ProviderName} (ID: {ProviderId})", provider.Name, id);
+            return true;
+        }
+
+        public async Task<bool> ToggleProviderStatusAsync(int id, bool isEnabled)
+        {
+            var provider = await _providerRepository.GetByIdAsync(id);
+            
+            if (provider == null)
+                return false;
+
+            provider.IsEnabled = isEnabled;
+            provider.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("Toggled OAuth2 provider {ProviderName} status to {Status}", 
+                provider.Name, isEnabled ? "enabled" : "disabled");
+            return true;
+        }
+
         private async Task<ExternalAuthProvider> GetProviderConfigAsync(string providerName)
         {
             var provider = await _providerRepository.GetByNameAsync(providerName);

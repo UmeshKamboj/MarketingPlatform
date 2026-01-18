@@ -1,46 +1,40 @@
 using MarketingPlatform.Application.DTOs.Common;
+using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Enums;
-using MarketingPlatform.Core.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace MarketingPlatform.API.Controllers
 {
+    /// <summary>
+    /// Manages channel routing configurations for message delivery
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class RoutingConfigController : ControllerBase
     {
-        private readonly IRepository<ChannelRoutingConfig> _routingConfigRepository;
-        private readonly IRepository<MessageDeliveryAttempt> _deliveryAttemptRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMessageRoutingService _messageRoutingService;
         private readonly ILogger<RoutingConfigController> _logger;
 
         public RoutingConfigController(
-            IRepository<ChannelRoutingConfig> routingConfigRepository,
-            IRepository<MessageDeliveryAttempt> deliveryAttemptRepository,
-            IUnitOfWork unitOfWork,
+            IMessageRoutingService messageRoutingService,
             ILogger<RoutingConfigController> logger)
         {
-            _routingConfigRepository = routingConfigRepository;
-            _deliveryAttemptRepository = deliveryAttemptRepository;
-            _unitOfWork = unitOfWork;
+            _messageRoutingService = messageRoutingService;
             _logger = logger;
         }
 
         /// <summary>
         /// Get all routing configurations
         /// </summary>
+        /// <returns>List of all routing configurations ordered by channel and priority</returns>
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<List<ChannelRoutingConfig>>>> GetAllConfigs()
         {
-            var configs = await _routingConfigRepository.GetQueryable()
-                .OrderBy(c => c.Channel)
-                .ThenByDescending(c => c.Priority)
-                .ToListAsync();
+            var configs = await _messageRoutingService.GetAllConfigsAsync();
 
             return Ok(ApiResponse<List<ChannelRoutingConfig>>.SuccessResponse(
                 configs, 
@@ -50,11 +44,13 @@ namespace MarketingPlatform.API.Controllers
         /// <summary>
         /// Get routing configuration by ID
         /// </summary>
+        /// <param name="id">The routing configuration ID</param>
+        /// <returns>The routing configuration details</returns>
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<ChannelRoutingConfig>>> GetConfigById(int id)
         {
-            var config = await _routingConfigRepository.GetByIdAsync(id);
+            var config = await _messageRoutingService.GetConfigByIdAsync(id);
             
             if (config == null)
                 return NotFound(ApiResponse<ChannelRoutingConfig>.ErrorResponse("Routing configuration not found"));
@@ -67,14 +63,13 @@ namespace MarketingPlatform.API.Controllers
         /// <summary>
         /// Get routing configuration by channel
         /// </summary>
+        /// <param name="channel">The channel type (SMS, MMS, Email)</param>
+        /// <returns>The active routing configuration for the specified channel</returns>
         [HttpGet("channel/{channel}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<ChannelRoutingConfig>>> GetConfigByChannel(ChannelType channel)
         {
-            var config = await _routingConfigRepository.GetQueryable()
-                .Where(c => c.Channel == channel && c.IsActive)
-                .OrderByDescending(c => c.Priority)
-                .FirstOrDefaultAsync();
+            var config = await _messageRoutingService.GetConfigByChannelAsync(channel);
 
             if (config == null)
                 return NotFound(ApiResponse<ChannelRoutingConfig>.ErrorResponse(
@@ -88,6 +83,8 @@ namespace MarketingPlatform.API.Controllers
         /// <summary>
         /// Create a new routing configuration
         /// </summary>
+        /// <param name="config">The routing configuration to create</param>
+        /// <returns>The created routing configuration</returns>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<ChannelRoutingConfig>>> CreateConfig(
@@ -95,12 +92,10 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                config.CreatedAt = DateTime.UtcNow;
-                await _routingConfigRepository.AddAsync(config);
-                await _unitOfWork.SaveChangesAsync();
+                var createdConfig = await _messageRoutingService.CreateConfigAsync(config);
 
                 return Ok(ApiResponse<ChannelRoutingConfig>.SuccessResponse(
-                    config, 
+                    createdConfig, 
                     "Routing configuration created successfully"));
             }
             catch (Exception ex)
@@ -114,6 +109,9 @@ namespace MarketingPlatform.API.Controllers
         /// <summary>
         /// Update an existing routing configuration
         /// </summary>
+        /// <param name="id">The routing configuration ID to update</param>
+        /// <param name="updatedConfig">The updated routing configuration data</param>
+        /// <returns>The updated routing configuration</returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<ChannelRoutingConfig>>> UpdateConfig(
@@ -122,29 +120,11 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var config = await _routingConfigRepository.GetByIdAsync(id);
+                var config = await _messageRoutingService.UpdateConfigAsync(id, updatedConfig);
                 
                 if (config == null)
                     return NotFound(ApiResponse<ChannelRoutingConfig>.ErrorResponse(
                         "Routing configuration not found"));
-
-                // Update properties
-                config.PrimaryProvider = updatedConfig.PrimaryProvider;
-                config.FallbackProvider = updatedConfig.FallbackProvider;
-                config.RoutingStrategy = updatedConfig.RoutingStrategy;
-                config.EnableFallback = updatedConfig.EnableFallback;
-                config.MaxRetries = updatedConfig.MaxRetries;
-                config.RetryStrategy = updatedConfig.RetryStrategy;
-                config.InitialRetryDelaySeconds = updatedConfig.InitialRetryDelaySeconds;
-                config.MaxRetryDelaySeconds = updatedConfig.MaxRetryDelaySeconds;
-                config.CostThreshold = updatedConfig.CostThreshold;
-                config.IsActive = updatedConfig.IsActive;
-                config.Priority = updatedConfig.Priority;
-                config.AdditionalSettings = updatedConfig.AdditionalSettings;
-                config.UpdatedAt = DateTime.UtcNow;
-
-                _routingConfigRepository.Update(config);
-                await _unitOfWork.SaveChangesAsync();
 
                 return Ok(ApiResponse<ChannelRoutingConfig>.SuccessResponse(
                     config, 
@@ -161,19 +141,18 @@ namespace MarketingPlatform.API.Controllers
         /// <summary>
         /// Delete a routing configuration
         /// </summary>
+        /// <param name="id">The routing configuration ID to delete</param>
+        /// <returns>Success status</returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<bool>>> DeleteConfig(int id)
         {
             try
             {
-                var config = await _routingConfigRepository.GetByIdAsync(id);
+                var deleted = await _messageRoutingService.DeleteConfigAsync(id);
                 
-                if (config == null)
+                if (!deleted)
                     return NotFound(ApiResponse<bool>.ErrorResponse("Routing configuration not found"));
-
-                _routingConfigRepository.Remove(config);
-                await _unitOfWork.SaveChangesAsync();
 
                 return Ok(ApiResponse<bool>.SuccessResponse(
                     true, 
@@ -190,13 +169,12 @@ namespace MarketingPlatform.API.Controllers
         /// <summary>
         /// Get delivery attempts for a message
         /// </summary>
+        /// <param name="messageId">The campaign message ID</param>
+        /// <returns>List of delivery attempts for the specified message</returns>
         [HttpGet("delivery-attempts/{messageId}")]
         public async Task<ActionResult<ApiResponse<List<MessageDeliveryAttempt>>>> GetDeliveryAttempts(int messageId)
         {
-            var attempts = await _deliveryAttemptRepository.GetQueryable()
-                .Where(a => a.CampaignMessageId == messageId)
-                .OrderBy(a => a.AttemptNumber)
-                .ToListAsync();
+            var attempts = await _messageRoutingService.GetDeliveryAttemptsAsync(messageId);
 
             return Ok(ApiResponse<List<MessageDeliveryAttempt>>.SuccessResponse(
                 attempts, 
@@ -206,6 +184,10 @@ namespace MarketingPlatform.API.Controllers
         /// <summary>
         /// Get delivery statistics by channel
         /// </summary>
+        /// <param name="channel">The channel type</param>
+        /// <param name="startDate">Optional start date for statistics (defaults to 30 days ago)</param>
+        /// <param name="endDate">Optional end date for statistics (defaults to now)</param>
+        /// <returns>Delivery statistics for the specified channel and date range</returns>
         [HttpGet("stats/channel/{channel}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<object>>> GetChannelStats(
@@ -213,27 +195,7 @@ namespace MarketingPlatform.API.Controllers
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            startDate ??= DateTime.UtcNow.AddDays(-30);
-            endDate ??= DateTime.UtcNow;
-
-            var attempts = await _deliveryAttemptRepository.GetQueryable()
-                .Where(a => a.Channel == channel && 
-                           a.AttemptedAt >= startDate && 
-                           a.AttemptedAt <= endDate)
-                .ToListAsync();
-
-            var stats = new
-            {
-                Channel = channel.ToString(),
-                TotalAttempts = attempts.Count,
-                SuccessfulAttempts = attempts.Count(a => a.Success),
-                FailedAttempts = attempts.Count(a => !a.Success),
-                SuccessRate = attempts.Any() ? (decimal)attempts.Count(a => a.Success) / attempts.Count * 100 : 0,
-                AverageResponseTimeMs = attempts.Any() ? attempts.Average(a => a.ResponseTimeMs) : 0,
-                TotalCost = attempts.Where(a => a.CostAmount.HasValue).Sum(a => a.CostAmount.Value),
-                FallbackCount = attempts.Count(a => a.FallbackReason.HasValue),
-                Period = new { StartDate = startDate, EndDate = endDate }
-            };
+            var stats = await _messageRoutingService.GetChannelStatsAsync(channel, startDate, endDate);
 
             return Ok(ApiResponse<object>.SuccessResponse(
                 stats, 
@@ -243,37 +205,16 @@ namespace MarketingPlatform.API.Controllers
         /// <summary>
         /// Get overall delivery statistics
         /// </summary>
+        /// <param name="startDate">Optional start date for statistics (defaults to 30 days ago)</param>
+        /// <param name="endDate">Optional end date for statistics (defaults to now)</param>
+        /// <returns>Overall delivery statistics including breakdown by channel</returns>
         [HttpGet("stats/overall")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ApiResponse<object>>> GetOverallStats(
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            startDate ??= DateTime.UtcNow.AddDays(-30);
-            endDate ??= DateTime.UtcNow;
-
-            var attempts = await _deliveryAttemptRepository.GetQueryable()
-                .Where(a => a.AttemptedAt >= startDate && a.AttemptedAt <= endDate)
-                .ToListAsync();
-
-            var stats = new
-            {
-                TotalAttempts = attempts.Count,
-                SuccessfulAttempts = attempts.Count(a => a.Success),
-                FailedAttempts = attempts.Count(a => !a.Success),
-                SuccessRate = attempts.Any() ? (decimal)attempts.Count(a => a.Success) / attempts.Count * 100 : 0,
-                AverageResponseTimeMs = attempts.Any() ? attempts.Average(a => a.ResponseTimeMs) : 0,
-                TotalCost = attempts.Where(a => a.CostAmount.HasValue).Sum(a => a.CostAmount.Value),
-                FallbackCount = attempts.Count(a => a.FallbackReason.HasValue),
-                ByChannel = attempts.GroupBy(a => a.Channel).Select(g => new
-                {
-                    Channel = g.Key.ToString(),
-                    TotalAttempts = g.Count(),
-                    SuccessfulAttempts = g.Count(a => a.Success),
-                    SuccessRate = (decimal)g.Count(a => a.Success) / g.Count() * 100
-                }),
-                Period = new { StartDate = startDate, EndDate = endDate }
-            };
+            var stats = await _messageRoutingService.GetOverallStatsAsync(startDate, endDate);
 
             return Ok(ApiResponse<object>.SuccessResponse(
                 stats, 
