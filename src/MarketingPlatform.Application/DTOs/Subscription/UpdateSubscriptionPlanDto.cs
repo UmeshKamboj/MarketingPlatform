@@ -12,5 +12,6 @@ namespace MarketingPlatform.Application.DTOs.Subscription
         public int? ContactLimit { get; set; }
         public Dictionary<string, object>? Features { get; set; }
         public bool? IsActive { get; set; }
+        public bool? IsVisible { get; set; }
     }
 }
