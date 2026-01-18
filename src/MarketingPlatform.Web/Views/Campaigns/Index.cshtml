@@ -52,6 +52,10 @@
     <script>
         const apiBaseUrl = '@ViewBag.ApiBaseUrl';
         
+        // Constants
+        const DEMO_MESSAGE = '(This is a demo - API integration required)';
+        const CONFIRMATION_UNDOABLE = 'This action cannot be undone.';
+        
         // Campaign status enum
         const CampaignStatus = {
             Draft: 0,
@@ -319,7 +323,7 @@
                 //     headers: { 'Authorization': 'Bearer ' + getToken() }
                 // });
                 
-                alert('Campaign duplicated successfully! (This is a demo - API integration required)');
+                alert(`Campaign duplicated successfully! ${DEMO_MESSAGE}`);
                 loadCampaigns(); // Reload the list
             } catch (error) {
                 alert('Failed to duplicate campaign: ' + error.message);
@@ -336,7 +340,7 @@
                 //     headers: { 'Authorization': 'Bearer ' + getToken() }
                 // });
                 
-                alert('Campaign started successfully! (This is a demo - API integration required)');
+                alert(`Campaign started successfully! ${DEMO_MESSAGE}`);
                 loadCampaigns(); // Reload the list
             } catch (error) {
                 alert('Failed to start campaign: ' + error.message);
@@ -353,7 +357,7 @@
                 //     headers: { 'Authorization': 'Bearer ' + getToken() }
                 // });
                 
-                alert('Campaign paused successfully! (This is a demo - API integration required)');
+                alert(`Campaign paused successfully! ${DEMO_MESSAGE}`);
                 loadCampaigns(); // Reload the list
             } catch (error) {
                 alert('Failed to pause campaign: ' + error.message);
@@ -370,7 +374,7 @@
                 //     headers: { 'Authorization': 'Bearer ' + getToken() }
                 // });
                 
-                alert('Campaign resumed successfully! (This is a demo - API integration required)');
+                alert(`Campaign resumed successfully! ${DEMO_MESSAGE}`);
                 loadCampaigns(); // Reload the list
             } catch (error) {
                 alert('Failed to resume campaign: ' + error.message);
@@ -378,7 +382,7 @@
         }
 
         async function cancelCampaign(id) {
-            if (!confirm('Are you sure you want to cancel this campaign? This action cannot be undone.')) return;
+            if (!confirm(`Are you sure you want to cancel this campaign? ${CONFIRMATION_UNDOABLE}`)) return;
             
             try {
                 // In production, call the API
@@ -387,7 +391,7 @@
                 //     headers: { 'Authorization': 'Bearer ' + getToken() }
                 // });
                 
-                alert('Campaign cancelled successfully! (This is a demo - API integration required)');
+                alert(`Campaign cancelled successfully! ${DEMO_MESSAGE}`);
                 loadCampaigns(); // Reload the list
             } catch (error) {
                 alert('Failed to cancel campaign: ' + error.message);
@@ -395,7 +399,7 @@
         }
 
         async function deleteCampaign(id) {
-            if (!confirm('Are you sure you want to delete this campaign? This action cannot be undone.')) return;
+            if (!confirm(`Are you sure you want to delete this campaign? ${CONFIRMATION_UNDOABLE}`)) return;
             
             try {
                 // In production, call the API
@@ -404,7 +408,7 @@
                 //     headers: { 'Authorization': 'Bearer ' + getToken() }
                 // });
                 
-                alert('Campaign deleted successfully! (This is a demo - API integration required)');
+                alert(`Campaign deleted successfully! ${DEMO_MESSAGE}`);
                 loadCampaigns(); // Reload the list
             } catch (error) {
                 alert('Failed to delete campaign: ' + error.message);
