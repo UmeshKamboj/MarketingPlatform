@@ -588,6 +588,7 @@ namespace MarketingPlatform.Application.Services
         private async Task ProcessSingleMessageAsync(int messageId)
         {
             var message = await _messageRepository.GetQueryable()
+                .AsNoTracking()
                 .Where(m => m.Id == messageId)
                 .FirstOrDefaultAsync();
 
