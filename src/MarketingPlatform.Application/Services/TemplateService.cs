@@ -14,6 +14,18 @@ namespace MarketingPlatform.Application.Services
 {
     public class TemplateService : ITemplateService
     {
+        // SMS/MMS character limits
+        private const int SmsGsm7SingleSegment = 160;
+        private const int SmsGsm7ConcatenatedSegment = 153;
+        private const int SmsUnicodeSingleSegment = 70;
+        private const int SmsUnicodeConcatenatedSegment = 67;
+        
+        // Email limits
+        private const int EmailSubjectRecommendedMax = 60;
+        
+        // Unicode special characters not in GSM-7 basic set
+        private static readonly char[] UnicodeSpecialChars = { '€', '[', ']', '{', '}', '\\', '^', '~', '|' };
+
         private readonly IRepository<MessageTemplate> _templateRepository;
         private readonly IRepository<Contact> _contactRepository;
         private readonly IRepository<CampaignContent> _campaignContentRepository;
@@ -551,11 +563,15 @@ namespace MarketingPlatform.Application.Services
                 // Unicode UCS-2 encoding: 70 chars per segment (concatenated: 67 chars per segment)
                 if (containsUnicode)
                 {
-                    smsSegments = charCount <= 70 ? 1 : (int)Math.Ceiling((double)charCount / 67);
+                    smsSegments = charCount <= SmsUnicodeSingleSegment 
+                        ? 1 
+                        : (int)Math.Ceiling((double)charCount / SmsUnicodeConcatenatedSegment);
                 }
                 else
                 {
-                    smsSegments = charCount <= 160 ? 1 : (int)Math.Ceiling((double)charCount / 153);
+                    smsSegments = charCount <= SmsGsm7SingleSegment 
+                        ? 1 
+                        : (int)Math.Ceiling((double)charCount / SmsGsm7ConcatenatedSegment);
                 }
             }
 
@@ -576,7 +592,7 @@ namespace MarketingPlatform.Application.Services
             foreach (char c in text)
             {
                 // Characters above ASCII 127 or certain special chars indicate Unicode
-                if (c > 127 || c == '€' || c == '[' || c == ']' || c == '{' || c == '}' || c == '\\' || c == '^' || c == '~' || c == '|')
+                if (c > 127 || UnicodeSpecialChars.Contains(c))
                 {
                     return true;
                 }
@@ -588,13 +604,13 @@ namespace MarketingPlatform.Application.Services
         {
             if (isSubject && channel == ChannelType.Email)
             {
-                return 60; // Email subject line recommended max
+                return EmailSubjectRecommendedMax;
             }
 
             return channel switch
             {
-                ChannelType.SMS => isUnicode ? 70 : 160,
-                ChannelType.MMS => isUnicode ? 70 : 160,
+                ChannelType.SMS => isUnicode ? SmsUnicodeSingleSegment : SmsGsm7SingleSegment,
+                ChannelType.MMS => isUnicode ? SmsUnicodeSingleSegment : SmsGsm7SingleSegment,
                 ChannelType.Email => null, // No strict limit for email body
                 _ => null
             };

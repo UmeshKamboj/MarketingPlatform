@@ -13,6 +13,12 @@ namespace MarketingPlatform.Application.Services
 {
     public class UrlShortenerService : IUrlShortenerService
     {
+        private const int ShortCodeLength = 6;
+        private const int ShortCodeMinLength = 4;
+        private const int ShortCodeMaxLength = 12;
+        private const int MaxGenerationAttempts = 10;
+        private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
         private readonly IRepository<URLShortener> _urlShortenerRepository;
         private readonly IRepository<URLClick> _urlClickRepository;
         private readonly IRepository<Campaign> _campaignRepository;
@@ -341,10 +347,9 @@ namespace MarketingPlatform.Application.Services
         // Private helper methods
         private async Task<string> GenerateUniqueShortCodeAsync()
         {
-            const int maxAttempts = 10;
-            for (int i = 0; i < maxAttempts; i++)
+            for (int i = 0; i < MaxGenerationAttempts; i++)
             {
-                var shortCode = GenerateShortCode(6);
+                var shortCode = GenerateShortCode(ShortCodeLength);
                 var existing = await _urlShortenerRepository.FirstOrDefaultAsync(u =>
                     u.ShortCode == shortCode && !u.IsDeleted);
 
@@ -357,10 +362,20 @@ namespace MarketingPlatform.Application.Services
 
         private string GenerateShortCode(int length)
         {
-            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            // Use cryptographically secure random number generator
+            var randomBytes = new byte[length];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+
+            var result = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                result[i] = AllowedChars[randomBytes[i] % AllowedChars.Length];
+            }
+
+            return new string(result);
         }
 
         private bool IsValidShortCode(string shortCode)
@@ -368,7 +383,7 @@ namespace MarketingPlatform.Application.Services
             if (string.IsNullOrWhiteSpace(shortCode))
                 return false;
 
-            if (shortCode.Length < 4 || shortCode.Length > 12)
+            if (shortCode.Length < ShortCodeMinLength || shortCode.Length > ShortCodeMaxLength)
                 return false;
 
             return shortCode.All(c => char.IsLetterOrDigit(c));
