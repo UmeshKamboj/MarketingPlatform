@@ -29,18 +29,18 @@ namespace MarketingPlatform.Infrastructure.Services
         {
             var roles = await _userManager.GetRolesAsync(user);
             
-            // Get custom role permissions
-            var userRoles = await _context.CustomUserRoles
+            // Get custom role permissions and names in a single query
+            var userRoleData = await _context.CustomUserRoles
                 .Include(ur => ur.Role)
                 .Where(ur => ur.UserId == user.Id && ur.Role.IsActive)
-                .Select(ur => ur.Role)
+                .Select(ur => new { ur.Role.Name, ur.Role.Permissions })
                 .ToListAsync();
             
-            // Combine all permissions
+            // Combine all permissions using bitwise OR
             long combinedPermissions = 0;
-            foreach (var role in userRoles)
+            foreach (var roleData in userRoleData)
             {
-                combinedPermissions |= role.Permissions;
+                combinedPermissions |= roleData.Permissions;
             }
             
             var claims = new List<Claim>
@@ -59,9 +59,9 @@ namespace MarketingPlatform.Infrastructure.Services
             }
             
             // Add custom role names
-            foreach (var role in userRoles)
+            foreach (var roleData in userRoleData)
             {
-                claims.Add(new Claim("CustomRole", role.Name));
+                claims.Add(new Claim("CustomRole", roleData.Name));
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!));

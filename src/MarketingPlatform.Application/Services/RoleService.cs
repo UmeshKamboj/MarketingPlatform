@@ -171,6 +171,11 @@ namespace MarketingPlatform.Application.Services
             }
 
             var users = await _userRoleRepository.GetUsersInRoleAsync(roleId);
+            if (!users.Any())
+            {
+                return Enumerable.Empty<UserRoleDto>();
+            }
+
             var userRoles = await _userRoleRepository.GetUserRolesAsync(users.First().Id);
 
             return users.Select(user =>

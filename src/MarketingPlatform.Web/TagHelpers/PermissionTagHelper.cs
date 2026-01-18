@@ -24,7 +24,7 @@ namespace MarketingPlatform.Web.TagHelpers
             }
 
             var user = _httpContextAccessor.HttpContext?.User;
-            if (user == null || !user.Identity?.IsAuthenticated == true)
+            if (user == null || user.Identity?.IsAuthenticated != true)
             {
                 output.SuppressOutput();
                 return;
