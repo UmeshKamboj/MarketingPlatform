@@ -143,9 +143,9 @@ namespace MarketingPlatform.Application.Services
                 Subject = dto.Content.Subject,
                 MessageBody = dto.Content.MessageBody,
                 HTMLContent = dto.Content.HTMLContent,
-                MediaUrls = dto.Content.MediaUrls != null ? JsonConvert.SerializeObject(dto.Content.MediaUrls) : null,
+                MediaUrls = SerializeJson(dto.Content.MediaUrls),
                 MessageTemplateId = dto.Content.TemplateId,
-                PersonalizationTokens = dto.Content.PersonalizationTokens != null ? JsonConvert.SerializeObject(dto.Content.PersonalizationTokens) : null
+                PersonalizationTokens = SerializeJson(dto.Content.PersonalizationTokens)
             };
             await _contentRepository.AddAsync(content);
 
@@ -154,9 +154,9 @@ namespace MarketingPlatform.Application.Services
             {
                 CampaignId = campaign.Id,
                 TargetType = dto.Audience.TargetType,
-                GroupIds = dto.Audience.GroupIds != null ? JsonConvert.SerializeObject(dto.Audience.GroupIds) : null,
+                GroupIds = SerializeJson(dto.Audience.GroupIds),
                 SegmentCriteria = dto.Audience.SegmentCriteria,
-                ExclusionListIds = dto.Audience.ExclusionListIds != null ? JsonConvert.SerializeObject(dto.Audience.ExclusionListIds) : null
+                ExclusionListIds = SerializeJson(dto.Audience.ExclusionListIds)
             };
             await _audienceRepository.AddAsync(audience);
 
@@ -219,9 +219,9 @@ namespace MarketingPlatform.Application.Services
                     content.Subject = dto.Content.Subject;
                     content.MessageBody = dto.Content.MessageBody;
                     content.HTMLContent = dto.Content.HTMLContent;
-                    content.MediaUrls = dto.Content.MediaUrls != null ? JsonConvert.SerializeObject(dto.Content.MediaUrls) : null;
+                    content.MediaUrls = SerializeJson(dto.Content.MediaUrls);
                     content.MessageTemplateId = dto.Content.TemplateId;
-                    content.PersonalizationTokens = dto.Content.PersonalizationTokens != null ? JsonConvert.SerializeObject(dto.Content.PersonalizationTokens) : null;
+                    content.PersonalizationTokens = SerializeJson(dto.Content.PersonalizationTokens);
                     content.UpdatedAt = DateTime.UtcNow;
 
                     _contentRepository.Update(content);
@@ -235,9 +235,9 @@ namespace MarketingPlatform.Application.Services
                 if (audience != null)
                 {
                     audience.TargetType = dto.Audience.TargetType;
-                    audience.GroupIds = dto.Audience.GroupIds != null ? JsonConvert.SerializeObject(dto.Audience.GroupIds) : null;
+                    audience.GroupIds = SerializeJson(dto.Audience.GroupIds);
                     audience.SegmentCriteria = dto.Audience.SegmentCriteria;
-                    audience.ExclusionListIds = dto.Audience.ExclusionListIds != null ? JsonConvert.SerializeObject(dto.Audience.ExclusionListIds) : null;
+                    audience.ExclusionListIds = SerializeJson(dto.Audience.ExclusionListIds);
                     audience.UpdatedAt = DateTime.UtcNow;
 
                     _audienceRepository.Update(audience);
@@ -629,6 +629,22 @@ namespace MarketingPlatform.Application.Services
             catch (JsonException ex)
             {
                 _logger.LogError(ex, "Failed to deserialize JSON: {Json}", json);
+                return null;
+            }
+        }
+
+        private string? SerializeJson<T>(T? obj) where T : class
+        {
+            if (obj == null)
+                return null;
+
+            try
+            {
+                return JsonConvert.SerializeObject(obj);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to serialize object to JSON");
                 return null;
             }
         }

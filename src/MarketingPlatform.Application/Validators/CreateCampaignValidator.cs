@@ -1,5 +1,6 @@
 using FluentValidation;
 using MarketingPlatform.Application.DTOs.Campaign;
+using MarketingPlatform.Core.Enums;
 
 namespace MarketingPlatform.Application.Validators
 {
@@ -26,7 +27,7 @@ namespace MarketingPlatform.Application.Validators
 
             RuleFor(x => x.Audience.GroupIds)
                 .NotEmpty()
-                .When(x => x.Audience.TargetType == Core.Enums.TargetType.Groups)
+                .When(x => x.Audience.TargetType == TargetType.Groups)
                 .WithMessage("Group IDs required when targeting groups");
         }
     }
