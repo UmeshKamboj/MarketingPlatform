@@ -177,7 +177,14 @@ namespace MarketingPlatform.Application.Services
 
             await _unitOfWork.SaveChangesAsync();
 
-            return await GetCampaignByIdAsync(userId, campaign.Id) ?? throw new Exception("Failed to retrieve created campaign");
+            var createdCampaign = await GetCampaignByIdAsync(userId, campaign.Id);
+            if (createdCampaign == null)
+            {
+                _logger.LogError("Failed to retrieve created campaign {CampaignId}", campaign.Id);
+                throw new InvalidOperationException($"Failed to retrieve created campaign with ID {campaign.Id}");
+            }
+
+            return createdCampaign;
         }
 
         public async Task<bool> UpdateCampaignAsync(string userId, int campaignId, UpdateCampaignDto dto)
@@ -502,7 +509,10 @@ namespace MarketingPlatform.Application.Services
                 c.Id == campaignId && c.UserId == userId && !c.IsDeleted);
 
             if (campaign == null)
-                throw new Exception("Campaign not found");
+            {
+                _logger.LogWarning("Campaign {CampaignId} not found for user {UserId}", campaignId, userId);
+                throw new ArgumentException($"Campaign with ID {campaignId} not found");
+            }
 
             var messages = await _messageRepository.FindAsync(m => m.CampaignId == campaignId && !m.IsDeleted);
 
@@ -532,8 +542,8 @@ namespace MarketingPlatform.Application.Services
             if (audience.TargetType == TargetType.All)
             {
                 // Count all active contacts for the user
-                var allContacts = await _contactRepository.FindAsync(c => c.UserId == userId && !c.IsDeleted);
-                return allContacts.Count();
+                var count = await _contactRepository.CountAsync(c => c.UserId == userId && !c.IsDeleted);
+                return count;
             }
             else if (audience.TargetType == TargetType.Groups && audience.GroupIds != null && audience.GroupIds.Any())
             {
@@ -542,10 +552,10 @@ namespace MarketingPlatform.Application.Services
                     audience.GroupIds.Contains(gm.ContactGroupId) && !gm.IsDeleted);
 
                 var contactIds = groupMembers.Select(gm => gm.ContactId).Distinct().ToList();
-                var contacts = await _contactRepository.FindAsync(c =>
+                var count = await _contactRepository.CountAsync(c =>
                     contactIds.Contains(c.Id) && c.UserId == userId && !c.IsDeleted);
 
-                return contacts.Count();
+                return count;
             }
             else if (audience.TargetType == TargetType.Segments)
             {
@@ -571,9 +581,9 @@ namespace MarketingPlatform.Application.Services
                     Subject = content.Subject,
                     MessageBody = content.MessageBody ?? string.Empty,
                     HTMLContent = content.HTMLContent,
-                    MediaUrls = !string.IsNullOrEmpty(content.MediaUrls) ? JsonConvert.DeserializeObject<List<string>>(content.MediaUrls) : null,
+                    MediaUrls = DeserializeJson<List<string>>(content.MediaUrls),
                     TemplateId = content.MessageTemplateId,
-                    PersonalizationTokens = !string.IsNullOrEmpty(content.PersonalizationTokens) ? JsonConvert.DeserializeObject<Dictionary<string, string>>(content.PersonalizationTokens) : null
+                    PersonalizationTokens = DeserializeJson<Dictionary<string, string>>(content.PersonalizationTokens)
                 };
             }
 
@@ -584,9 +594,9 @@ namespace MarketingPlatform.Application.Services
                 dto.Audience = new CampaignAudienceDto
                 {
                     TargetType = audience.TargetType,
-                    GroupIds = !string.IsNullOrEmpty(audience.GroupIds) ? JsonConvert.DeserializeObject<List<int>>(audience.GroupIds) : null,
+                    GroupIds = DeserializeJson<List<int>>(audience.GroupIds),
                     SegmentCriteria = audience.SegmentCriteria,
-                    ExclusionListIds = !string.IsNullOrEmpty(audience.ExclusionListIds) ? JsonConvert.DeserializeObject<List<int>>(audience.ExclusionListIds) : null
+                    ExclusionListIds = DeserializeJson<List<int>>(audience.ExclusionListIds)
                 };
             }
 
@@ -605,6 +615,22 @@ namespace MarketingPlatform.Application.Services
             }
 
             return dto;
+        }
+
+        private T? DeserializeJson<T>(string? json) where T : class
+        {
+            if (string.IsNullOrEmpty(json))
+                return null;
+
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize JSON: {Json}", json);
+                return null;
+            }
         }
     }
 }
