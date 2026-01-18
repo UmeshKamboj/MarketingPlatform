@@ -7,6 +7,7 @@ namespace MarketingPlatform.Application.DTOs.ContactGroup
         public string? Description { get; set; }
         public bool IsStatic { get; set; }
         public bool IsDynamic { get; set; }
+        public GroupRuleCriteriaDto? RuleCriteria { get; set; }
         public int ContactCount { get; set; }
         public DateTime CreatedAt { get; set; }
     }

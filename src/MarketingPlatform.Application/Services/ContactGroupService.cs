@@ -5,6 +5,7 @@ using MarketingPlatform.Application.DTOs.ContactGroup;
 using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Interfaces.Repositories;
+using MarketingPlatform.Core.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -18,6 +19,7 @@ namespace MarketingPlatform.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<ContactGroupService> _logger;
+        private readonly IDynamicGroupEvaluationService _dynamicGroupService;
 
         public ContactGroupService(
             IRepository<ContactGroup> groupRepository,
@@ -25,7 +27,8 @@ namespace MarketingPlatform.Application.Services
             IRepository<ContactGroupMember> memberRepository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ILogger<ContactGroupService> logger)
+            ILogger<ContactGroupService> logger,
+            IDynamicGroupEvaluationService dynamicGroupService)
         {
             _groupRepository = groupRepository;
             _contactRepository = contactRepository;
@@ -33,6 +36,7 @@ namespace MarketingPlatform.Application.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _dynamicGroupService = dynamicGroupService;
         }
 
         public async Task<ContactGroupDto?> GetGroupByIdAsync(string userId, int groupId)
@@ -43,7 +47,15 @@ namespace MarketingPlatform.Application.Services
             if (group == null)
                 return null;
 
-            return _mapper.Map<ContactGroupDto>(group);
+            var dto = _mapper.Map<ContactGroupDto>(group);
+            
+            // Deserialize rule criteria if it's a dynamic group
+            if (group.IsDynamic && !string.IsNullOrEmpty(group.RuleCriteria))
+            {
+                dto.RuleCriteria = DeserializeRuleCriteria(group.RuleCriteria);
+            }
+
+            return dto;
         }
 
         public async Task<PaginatedResult<ContactGroupDto>> GetGroupsAsync(string userId, PagedRequest request)
@@ -98,14 +110,51 @@ namespace MarketingPlatform.Application.Services
 
         public async Task<ContactGroupDto> CreateGroupAsync(string userId, CreateContactGroupDto dto)
         {
-            var group = _mapper.Map<ContactGroup>(dto);
-            group.UserId = userId;
-            group.ContactCount = 0;
+            // Validate that a group is either static or dynamic, not both
+            if (dto.IsStatic && dto.IsDynamic)
+            {
+                throw new InvalidOperationException("A group cannot be both static and dynamic");
+            }
+
+            // Validate dynamic group has rule criteria
+            if (dto.IsDynamic && (dto.RuleCriteria == null || !dto.RuleCriteria.Rules.Any()))
+            {
+                throw new InvalidOperationException("Dynamic groups must have rule criteria defined");
+            }
+
+            var group = new ContactGroup
+            {
+                UserId = userId,
+                Name = dto.Name,
+                Description = dto.Description,
+                IsStatic = dto.IsStatic,
+                IsDynamic = dto.IsDynamic,
+                ContactCount = 0
+            };
+
+            // Serialize rule criteria for dynamic groups
+            if (dto.IsDynamic && dto.RuleCriteria != null)
+            {
+                var criteria = _mapper.Map<GroupRuleCriteria>(dto.RuleCriteria);
+                group.RuleCriteria = JsonConvert.SerializeObject(criteria);
+            }
 
             await _groupRepository.AddAsync(group);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<ContactGroupDto>(group);
+            // For dynamic groups, immediately evaluate and populate members
+            if (group.IsDynamic)
+            {
+                await _dynamicGroupService.UpdateDynamicGroupMembershipsAsync(userId, group.Id);
+            }
+
+            var result = _mapper.Map<ContactGroupDto>(group);
+            if (group.IsDynamic && !string.IsNullOrEmpty(group.RuleCriteria))
+            {
+                result.RuleCriteria = DeserializeRuleCriteria(group.RuleCriteria);
+            }
+
+            return result;
         }
 
         public async Task<bool> UpdateGroupAsync(string userId, int groupId, CreateContactGroupDto dto)
@@ -116,15 +165,44 @@ namespace MarketingPlatform.Application.Services
             if (group == null)
                 return false;
 
+            // Validate that a group is either static or dynamic, not both
+            if (dto.IsStatic && dto.IsDynamic)
+            {
+                throw new InvalidOperationException("A group cannot be both static and dynamic");
+            }
+
+            // Validate dynamic group has rule criteria
+            if (dto.IsDynamic && (dto.RuleCriteria == null || !dto.RuleCriteria.Rules.Any()))
+            {
+                throw new InvalidOperationException("Dynamic groups must have rule criteria defined");
+            }
+
             group.Name = dto.Name;
             group.Description = dto.Description;
             group.IsStatic = dto.IsStatic;
             group.IsDynamic = dto.IsDynamic;
-            group.RuleCriteria = dto.RuleCriteria;
+
+            // Serialize rule criteria for dynamic groups
+            if (dto.IsDynamic && dto.RuleCriteria != null)
+            {
+                var criteria = _mapper.Map<GroupRuleCriteria>(dto.RuleCriteria);
+                group.RuleCriteria = JsonConvert.SerializeObject(criteria);
+            }
+            else
+            {
+                group.RuleCriteria = null;
+            }
+
             group.UpdatedAt = DateTime.UtcNow;
 
             _groupRepository.Update(group);
             await _unitOfWork.SaveChangesAsync();
+
+            // For dynamic groups, re-evaluate and update members
+            if (group.IsDynamic)
+            {
+                await _dynamicGroupService.UpdateDynamicGroupMembershipsAsync(userId, groupId);
+            }
 
             return true;
         }
@@ -422,6 +500,22 @@ namespace MarketingPlatform.Application.Services
             try
             {
                 return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private GroupRuleCriteriaDto? DeserializeRuleCriteria(string? json)
+        {
+            if (string.IsNullOrEmpty(json))
+                return null;
+
+            try
+            {
+                var criteria = JsonConvert.DeserializeObject<GroupRuleCriteria>(json);
+                return _mapper.Map<GroupRuleCriteriaDto>(criteria);
             }
             catch
             {

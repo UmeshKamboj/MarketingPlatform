@@ -14,11 +14,16 @@ namespace MarketingPlatform.API.Controllers
     public class ContactGroupsController : ControllerBase
     {
         private readonly IContactGroupService _groupService;
+        private readonly IDynamicGroupEvaluationService _dynamicGroupService;
         private readonly ILogger<ContactGroupsController> _logger;
 
-        public ContactGroupsController(IContactGroupService groupService, ILogger<ContactGroupsController> logger)
+        public ContactGroupsController(
+            IContactGroupService groupService, 
+            IDynamicGroupEvaluationService dynamicGroupService,
+            ILogger<ContactGroupsController> logger)
         {
             _groupService = groupService;
+            _dynamicGroupService = dynamicGroupService;
             _logger = logger;
         }
 
@@ -163,6 +168,47 @@ namespace MarketingPlatform.API.Controllers
 
             var contacts = await _groupService.GetGroupContactsAsync(userId, id, request);
             return Ok(ApiResponse<PaginatedResult<ContactDto>>.SuccessResponse(contacts));
+        }
+
+        [HttpPost("{id}/refresh")]
+        public async Task<ActionResult<ApiResponse<bool>>> RefreshDynamicGroup(int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var result = await _dynamicGroupService.UpdateDynamicGroupMembershipsAsync(userId, id);
+                if (!result)
+                    return NotFound(ApiResponse<bool>.ErrorResponse("Dynamic group not found or is not a dynamic group"));
+
+                return Ok(ApiResponse<bool>.SuccessResponse(result, "Dynamic group refreshed successfully"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error refreshing dynamic group");
+                return BadRequest(ApiResponse<bool>.ErrorResponse(ex.Message));
+            }
+        }
+
+        [HttpPost("refresh-all")]
+        public async Task<ActionResult<ApiResponse<bool>>> RefreshAllDynamicGroups()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                await _dynamicGroupService.UpdateAllDynamicGroupsAsync(userId);
+                return Ok(ApiResponse<bool>.SuccessResponse(true, "All dynamic groups refreshed successfully"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error refreshing all dynamic groups");
+                return BadRequest(ApiResponse<bool>.ErrorResponse(ex.Message));
+            }
         }
     }
 }

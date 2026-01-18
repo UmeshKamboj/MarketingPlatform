@@ -8,6 +8,7 @@ using MarketingPlatform.Application.DTOs.Message;
 using MarketingPlatform.Application.DTOs.SuppressionList;
 using MarketingPlatform.Application.DTOs.ContactTag;
 using MarketingPlatform.Core.Entities;
+using MarketingPlatform.Core.Models;
 
 namespace MarketingPlatform.Application.Mappings
 {
@@ -25,8 +26,16 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<UpdateContactDto, Contact>();
 
             // ContactGroup mappings
-            CreateMap<ContactGroup, ContactGroupDto>();
-            CreateMap<CreateContactGroupDto, ContactGroup>();
+            CreateMap<ContactGroup, ContactGroupDto>()
+                .ForMember(dest => dest.RuleCriteria, opt => opt.Ignore()); // Handled manually in service
+            CreateMap<CreateContactGroupDto, ContactGroup>()
+                .ForMember(dest => dest.RuleCriteria, opt => opt.Ignore()); // Handled manually in service
+
+            // Dynamic group rule mappings
+            CreateMap<GroupRuleCriteria, GroupRuleCriteriaDto>();
+            CreateMap<GroupRuleCriteriaDto, GroupRuleCriteria>();
+            CreateMap<GroupRule, GroupRuleDto>();
+            CreateMap<GroupRuleDto, GroupRule>();
 
             // Campaign mappings
             CreateMap<Campaign, CampaignDto>();
