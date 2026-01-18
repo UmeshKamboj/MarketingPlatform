@@ -56,7 +56,10 @@ namespace MarketingPlatform.Application.Services
                     contactIds.Contains(ta.ContactId) && !ta.IsDeleted);
 
                 // Create lookup dictionaries for faster access
-                var engagementLookup = engagements.ToDictionary(e => e.ContactId);
+                // Handle potential duplicates by taking the first engagement per contact
+                var engagementLookup = engagements
+                    .GroupBy(e => e.ContactId)
+                    .ToDictionary(g => g.Key, g => g.First());
                 var tagAssignmentLookup = tagAssignments
                     .GroupBy(ta => ta.ContactId)
                     .ToDictionary(g => g.Key, g => g.ToList());
@@ -270,6 +273,7 @@ namespace MarketingPlatform.Application.Services
 
         private bool EvaluateStringField(string? fieldValue, RuleOperator op, string? ruleValue)
         {
+            var isFieldNull = string.IsNullOrEmpty(fieldValue);
             fieldValue = fieldValue?.ToLower() ?? "";
             ruleValue = ruleValue?.ToLower() ?? "";
 
@@ -288,9 +292,9 @@ namespace MarketingPlatform.Application.Services
                 case RuleOperator.EndsWith:
                     return fieldValue.EndsWith(ruleValue);
                 case RuleOperator.IsNull:
-                    return string.IsNullOrEmpty(fieldValue);
+                    return isFieldNull;
                 case RuleOperator.IsNotNull:
-                    return !string.IsNullOrEmpty(fieldValue);
+                    return !isFieldNull;
                 case RuleOperator.In:
                     var values = ruleValue.Split(',').Select(v => v.Trim()).ToList();
                     return values.Contains(fieldValue);
@@ -385,6 +389,7 @@ namespace MarketingPlatform.Application.Services
 
             if (string.IsNullOrEmpty(ruleValue))
             {
+                // Check if contact has any tags
                 return op == RuleOperator.IsNotNull ? hasTag : !hasTag;
             }
 
@@ -416,13 +421,20 @@ namespace MarketingPlatform.Application.Services
                 catch (JsonException)
                 {
                     // Invalid JSON, treat as no attributes
-                    return false;
+                    return op == RuleOperator.IsNull;
                 }
             }
 
             if (attributes == null || !attributes.ContainsKey(attributeName))
             {
+                // Attribute doesn't exist
                 return op == RuleOperator.IsNull;
+            }
+
+            // Handle IsNotNull case when attribute exists
+            if (op == RuleOperator.IsNotNull)
+            {
+                return true;
             }
 
             var attributeValue = attributes[attributeName];
