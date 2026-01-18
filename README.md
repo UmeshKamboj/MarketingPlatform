@@ -384,6 +384,269 @@ GET /api/contactgroups/{id}/contacts?pageNumber=1&pageSize=20
 Authorization: Bearer {token}
 ```
 
+## Testing Template Management
+
+### Create SMS Template
+```bash
+POST /api/templates
+Authorization: Bearer {token}
+{
+  "name": "Welcome SMS",
+  "description": "Welcome message for new customers",
+  "channel": 0,
+  "category": 0,
+  "messageBody": "Hi {{FirstName}}! Welcome to {{CompanyName}}. Reply STOP to unsubscribe.",
+  "variables": [
+    {
+      "name": "FirstName",
+      "defaultValue": "Customer",
+      "isRequired": true,
+      "description": "Customer's first name"
+    },
+    {
+      "name": "CompanyName",
+      "defaultValue": "Our Company",
+      "isRequired": false,
+      "description": "Your company name"
+    }
+  ]
+}
+```
+
+### Create Email Template
+```bash
+POST /api/templates
+Authorization: Bearer {token}
+{
+  "name": "Newsletter Template",
+  "description": "Monthly newsletter",
+  "channel": 2,
+  "category": 1,
+  "subject": "{{Month}} Newsletter - {{CompanyName}}",
+  "messageBody": "Plain text version for {{FirstName}} {{LastName}}",
+  "htmlContent": "<html><body><h1>Hello {{FirstName}}!</h1><p>{{NewsContent}}</p></body></html>",
+  "variables": [
+    {
+      "name": "FirstName",
+      "isRequired": true
+    },
+    {
+      "name": "LastName",
+      "isRequired": true
+    },
+    {
+      "name": "Month",
+      "defaultValue": "January",
+      "isRequired": false
+    },
+    {
+      "name": "CompanyName",
+      "defaultValue": "Marketing Platform",
+      "isRequired": false
+    },
+    {
+      "name": "NewsContent",
+      "isRequired": true
+    }
+  ]
+}
+```
+
+### List All Templates
+```bash
+GET /api/templates?pageNumber=1&pageSize=20&searchTerm=welcome
+Authorization: Bearer {token}
+```
+
+### Get Single Template
+```bash
+GET /api/templates/{id}
+Authorization: Bearer {token}
+```
+
+### Get Templates by Channel
+```bash
+GET /api/templates/channel/0
+Authorization: Bearer {token}
+```
+
+Channel values:
+- 0 = SMS
+- 1 = MMS
+- 2 = Email
+
+### Get Templates by Category
+```bash
+GET /api/templates/category/0
+Authorization: Bearer {token}
+```
+
+Category values:
+- 0 = Promotional
+- 1 = Transactional
+- 2 = Reminder
+- 3 = Alert
+- 4 = Custom
+
+### Update Template
+```bash
+PUT /api/templates/{id}
+Authorization: Bearer {token}
+{
+  "name": "Updated Welcome SMS",
+  "description": "Updated description",
+  "messageBody": "Hello {{FirstName}}! Thanks for joining {{CompanyName}}!"
+}
+```
+
+### Delete Template
+```bash
+DELETE /api/templates/{id}
+Authorization: Bearer {token}
+```
+
+Note: Cannot delete templates that are in use (UsageCount > 0)
+
+### Duplicate Template
+```bash
+POST /api/templates/{id}/duplicate
+Authorization: Bearer {token}
+```
+
+### Set as Default Template
+```bash
+POST /api/templates/{id}/set-default
+Authorization: Bearer {token}
+```
+
+Note: Only one default template per Channel + Category combination
+
+### Activate Template
+```bash
+POST /api/templates/{id}/activate
+Authorization: Bearer {token}
+```
+
+### Deactivate Template
+```bash
+POST /api/templates/{id}/deactivate
+Authorization: Bearer {token}
+```
+
+### Preview Template with Variables
+```bash
+POST /api/templates/preview
+Authorization: Bearer {token}
+{
+  "templateId": 1,
+  "variableValues": {
+    "FirstName": "John",
+    "LastName": "Doe",
+    "CompanyName": "Acme Corp"
+  }
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "subject": null,
+    "messageBody": "Hello John! Thanks for joining Acme Corp!",
+    "htmlContent": null,
+    "mediaUrls": null,
+    "missingVariables": []
+  }
+}
+```
+
+### Preview with Contact Data
+```bash
+POST /api/templates/preview
+Authorization: Bearer {token}
+{
+  "templateId": 1,
+  "contactId": 100,
+  "variableValues": {
+    "CompanyName": "Acme Corp"
+  }
+}
+```
+
+Note: Contact data (FirstName, LastName, Email, Phone) is automatically loaded
+
+### Extract Variables from Content
+```bash
+POST /api/templates/extract-variables
+Authorization: Bearer {token}
+Content-Type: application/json
+"Hello {{FirstName}} {{LastName}}! Your order {{OrderNumber}} is ready."
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": ["FirstName", "LastName", "OrderNumber"]
+}
+```
+
+### Get Template Usage Statistics
+```bash
+GET /api/templates/{id}/stats
+Authorization: Bearer {token}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "templateId": 1,
+    "templateName": "Welcome SMS",
+    "totalCampaigns": 15,
+    "totalMessages": 12500,
+    "lastUsedAt": "2026-01-15T14:30:00Z",
+    "successRate": 96.5
+  }
+}
+```
+
+### Template Variable Syntax
+Templates support variable substitution using `{{VariableName}}` syntax:
+- Variable names must be alphanumeric with underscores
+- Variable matching is case-insensitive
+- Variables can be in subject, messageBody, or htmlContent
+- Common contact variables: FirstName, LastName, Email, Phone, PhoneNumber
+
+### Template Examples
+
+**SMS Template:**
+```
+Hi {{FirstName}}! Your appointment with {{DoctorName}} is on {{AppointmentDate}} at {{AppointmentTime}}. Reply YES to confirm.
+```
+
+**Email Template:**
+```
+Subject: {{Subject}}
+Body HTML:
+<html>
+  <body>
+    <h1>Hello {{FirstName}} {{LastName}}!</h1>
+    <p>Thank you for your order #{{OrderNumber}}.</p>
+    <p>Total: ${{OrderTotal}}</p>
+    <a href="{{TrackingLink}}">Track Your Order</a>
+  </body>
+</html>
+```
+
+**MMS Template:**
+```
+Check out our new {{ProductName}}! {{Description}} Price: ${{Price}}
+MediaUrls: ["https://example.com/product-image.jpg"]
+```
+
 ## Testing Campaign Management
 
 ### Create SMS Campaign
@@ -600,8 +863,8 @@ Response:
 - ✅ Task 1.3: Authentication & Authorization Core
 - ✅ Task 2.1: API Foundation - Repository Pattern & Core Services
 - ✅ Task 2.2: Contact Management - Full CRUD with Import/Export
-- ✅ Task 2.3: Campaign Management - Core Campaign CRUD & Scheduling ← **Current**
-- ⏳ Template management
+- ✅ Task 2.3: Campaign Management - Core Campaign CRUD & Scheduling
+- ✅ Task 2.5: Template Management - Reusable Message Templates with Variables ← **Current**
 - ⏳ Keyword campaigns
 - ⏳ Automation & workflows
 - ⏳ Analytics & reporting
@@ -609,7 +872,7 @@ Response:
 - ⏳ Super admin platform
 
 ## Project Status
-🚧 **In Development** - Task 2.3 Complete
+🚧 **In Development** - Task 2.5 Complete
 
 ## License
 MIT License
