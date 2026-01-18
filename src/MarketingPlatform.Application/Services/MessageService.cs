@@ -13,6 +13,23 @@ namespace MarketingPlatform.Application.Services
 {
     public class MessageService : IMessageService
     {
+        // Constants for test messages
+        private const string TestMessagePrefix = "[TEST]";
+        private const string TestMessageBodyPrefix = "[TEST MESSAGE]\n\n";
+
+        // SMS/MMS character limits
+        private const int SmsGsm7SingleSegment = 160;
+        private const int SmsGsm7ConcatenatedSegment = 153;
+        private const int SmsUnicodeSingleSegment = 70;
+        private const int SmsUnicodeConcatenatedSegment = 67;
+
+        // Unicode special characters not in GSM-7 basic set
+        private static readonly char[] UnicodeSpecialChars = { '€', '[', ']', '{', '}', '\\', '^', '~', '|' };
+
+        // Regex for variable extraction
+        private static readonly System.Text.RegularExpressions.Regex VariableRegex = 
+            new System.Text.RegularExpressions.Regex(@"\{\{([^}]+)\}\}", System.Text.RegularExpressions.RegexOptions.Compiled);
+
         private readonly IRepository<CampaignMessage> _messageRepository;
         private readonly IRepository<Contact> _contactRepository;
         private readonly IRepository<Campaign> _campaignRepository;
@@ -751,9 +768,9 @@ namespace MarketingPlatform.Application.Services
                     bool success = false;
                     string? errorMessage = null;
 
-                    // Add [TEST] prefix to subject/body to indicate test message
-                    var testSubject = renderedSubject != null ? $"[TEST] {renderedSubject}" : null;
-                    var testBody = $"[TEST MESSAGE]\n\n{renderedBody}";
+                    // Add test prefix to subject/body to indicate test message
+                    var testSubject = renderedSubject != null ? $"{TestMessagePrefix} {renderedSubject}" : null;
+                    var testBody = $"{TestMessageBodyPrefix}{renderedBody}";
 
                     switch (request.Channel)
                     {
@@ -777,7 +794,7 @@ namespace MarketingPlatform.Application.Services
                         case ChannelType.Email:
                             var emailResult = await _emailProvider.SendEmailAsync(
                                 recipient,
-                                testSubject ?? "[TEST]",
+                                testSubject ?? TestMessagePrefix,
                                 testBody,
                                 renderedHtml);
                             success = emailResult.Success;
@@ -836,20 +853,18 @@ namespace MarketingPlatform.Application.Services
 
         private string RenderContent(string content, Dictionary<string, string> variables)
         {
-            var result = content;
+            if (string.IsNullOrEmpty(content) || variables.Count == 0)
+                return content;
+
+            var result = new System.Text.StringBuilder(content);
 
             foreach (var kvp in variables)
             {
                 var placeholder = $"{{{{{kvp.Key}}}}}";
-                var index = 0;
-                while ((index = result.IndexOf(placeholder, index, StringComparison.OrdinalIgnoreCase)) != -1)
-                {
-                    result = result.Remove(index, placeholder.Length).Insert(index, kvp.Value);
-                    index += kvp.Value.Length;
-                }
+                result.Replace(placeholder, kvp.Value);
             }
 
-            return result;
+            return result.ToString();
         }
 
         private List<string> FindMissingVariables(string content, Dictionary<string, string> providedVariables)
@@ -863,8 +878,7 @@ namespace MarketingPlatform.Application.Services
             if (string.IsNullOrWhiteSpace(content))
                 return new List<string>();
 
-            var regex = new System.Text.RegularExpressions.Regex(@"\{\{([^}]+)\}\}");
-            var matches = regex.Matches(content);
+            var matches = VariableRegex.Matches(content);
 
             return matches
                 .Select(m => m.Groups[1].Value.Trim())
@@ -879,12 +893,6 @@ namespace MarketingPlatform.Application.Services
 
             var charCount = content.Length;
             var containsUnicode = ContainsUnicodeCharacters(content);
-
-            // SMS character limits
-            const int SmsGsm7SingleSegment = 160;
-            const int SmsGsm7ConcatenatedSegment = 153;
-            const int SmsUnicodeSingleSegment = 70;
-            const int SmsUnicodeConcatenatedSegment = 67;
 
             if (containsUnicode)
             {
@@ -902,10 +910,9 @@ namespace MarketingPlatform.Application.Services
 
         private bool ContainsUnicodeCharacters(string text)
         {
-            var unicodeSpecialChars = new[] { '€', '[', ']', '{', '}', '\\', '^', '~', '|' };
             foreach (char c in text)
             {
-                if (c > 127 || unicodeSpecialChars.Contains(c))
+                if (c > 127 || UnicodeSpecialChars.Contains(c))
                 {
                     return true;
                 }
