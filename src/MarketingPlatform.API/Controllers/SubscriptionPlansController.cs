@@ -161,6 +161,34 @@ namespace MarketingPlatform.API.Controllers
             }
         }
 
+        [HttpPut("{id}/show-on-landing")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult<ApiResponse<bool>>> SetShowOnLanding(int id, [FromBody] bool showOnLanding)
+        {
+            try
+            {
+                var plan = await _subscriptionPlanService.GetPlanByIdAsync(id);
+                if (plan == null)
+                    return NotFound(ApiResponse<bool>.ErrorResponse("Subscription plan not found"));
+
+                var updateDto = new UpdateSubscriptionPlanDto
+                {
+                    ShowOnLanding = showOnLanding
+                };
+
+                var result = await _subscriptionPlanService.UpdatePlanAsync(id, updateDto);
+                if (result == null)
+                    return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to update ShowOnLanding flag"));
+
+                return Ok(ApiResponse<bool>.SuccessResponse(true, $"Plan {(showOnLanding ? "will now" : "will no longer")} be displayed on the landing page"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating ShowOnLanding flag for {PlanId}", id);
+                return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to update ShowOnLanding flag", new List<string> { ex.Message }));
+            }
+        }
+
         [HttpGet("{id}/features")]
         public async Task<ActionResult<ApiResponse<Dictionary<string, object>>>> GetFeatures(int id)
         {

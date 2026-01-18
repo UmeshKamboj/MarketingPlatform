@@ -207,7 +207,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Features = "[\"Basic campaign management\", \"Basic analytics\", \"Email support\"]",
                         IsActive = true,
                         IsVisible = true,
-                        ShowOnLanding = true,
+                        ShowOnLanding = true, // Display on landing page
                         CreatedAt = DateTime.UtcNow
                     },
                     new SubscriptionPlan
@@ -223,7 +223,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Features = "[\"Advanced campaign management\", \"Workflows & automation\", \"Advanced analytics\", \"Priority support\", \"Custom templates\"]",
                         IsActive = true,
                         IsVisible = true,
-                        ShowOnLanding = true,
+                        ShowOnLanding = true, // Display on landing page (Most Popular)
                         CreatedAt = DateTime.UtcNow
                     },
                     new SubscriptionPlan
@@ -239,7 +239,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         Features = "[\"Unlimited campaigns\", \"Advanced workflows\", \"Premium analytics\", \"24/7 support\", \"Dedicated account manager\", \"API access\", \"White-label options\"]",
                         IsActive = true,
                         IsVisible = true,
-                        ShowOnLanding = true,
+                        ShowOnLanding = true, // Display on landing page
                         CreatedAt = DateTime.UtcNow
                     }
                 };

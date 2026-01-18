@@ -117,6 +117,9 @@ namespace MarketingPlatform.Application.Services
             
             if (dto.IsVisible.HasValue)
                 plan.IsVisible = dto.IsVisible.Value;
+            
+            if (dto.ShowOnLanding.HasValue)
+                plan.ShowOnLanding = dto.ShowOnLanding.Value;
 
             plan.UpdatedAt = DateTime.UtcNow;
 

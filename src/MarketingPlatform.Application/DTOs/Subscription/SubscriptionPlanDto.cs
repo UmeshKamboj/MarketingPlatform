@@ -20,6 +20,7 @@ namespace MarketingPlatform.Application.DTOs.Subscription
         public string? PayPalPlanIdYearly { get; set; }
         public bool IsActive { get; set; }
         public bool IsVisible { get; set; }
+        public bool ShowOnLanding { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }
