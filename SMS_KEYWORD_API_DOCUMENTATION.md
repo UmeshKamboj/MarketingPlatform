@@ -31,6 +31,15 @@ The SMS Keyword Management System allows users to create and manage SMS keywords
 - Auto-response sending based on keyword configuration
 - Automatic contact opt-in to groups when keyword is used
 
+### 5. Keyword Analytics & Engagement Metrics
+- Comprehensive analytics endpoint for keyword performance
+- Opt-in conversion tracking (successful vs failed opt-ins)
+- Response success rate monitoring
+- Unique contact engagement tracking
+- Repeat usage analysis
+- Time-based activity metrics (24h, 7d, 30d)
+- Campaign-related activity analytics
+
 ## API Endpoints
 
 ### Keywords Management
@@ -211,6 +220,54 @@ Get activity history for a specific keyword.
   }
 }
 ```
+
+### Keyword Analytics
+
+#### GET /api/keywords/{id}/analytics
+Get comprehensive analytics and engagement metrics for a specific keyword.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "keywordId": 1,
+    "keywordText": "JOIN",
+    "totalResponses": 142,
+    "uniqueContacts": 95,
+    "repeatUsageCount": 47,
+    "totalOptIns": 95,
+    "successfulOptIns": 92,
+    "failedOptIns": 3,
+    "optInConversionRate": 64.79,
+    "responsesSent": 140,
+    "responsesFailed": 2,
+    "responseSuccessRate": 98.59,
+    "linkedCampaignId": 5,
+    "linkedCampaignName": "Newsletter Campaign",
+    "campaignRelatedActivities": 142,
+    "firstUsedAt": "2026-01-10T08:15:00Z",
+    "lastUsedAt": "2026-01-18T14:30:00Z",
+    "activitiesLast24Hours": 12,
+    "activitiesLast7Days": 78,
+    "activitiesLast30Days": 142
+  }
+}
+```
+
+**Analytics Metrics Explained:**
+- **totalResponses**: Total number of times the keyword was used
+- **uniqueContacts**: Number of unique phone numbers that used the keyword
+- **repeatUsageCount**: Number of times the keyword was used by returning contacts (totalResponses - uniqueContacts)
+- **totalOptIns**: Number of contacts that exist in the system (from those who used the keyword)
+- **successfulOptIns**: Number of contacts successfully added to the opt-in group
+- **failedOptIns**: Number of contacts that could not be added to the opt-in group
+- **optInConversionRate**: Percentage of keyword uses that resulted in successful opt-ins
+- **responsesSent**: Number of auto-responses successfully sent
+- **responsesFailed**: Number of auto-responses that failed to send
+- **responseSuccessRate**: Percentage of successful auto-response deliveries
+- **campaignRelatedActivities**: Number of activities linked to the campaign (if linkedCampaignId is set)
+- **activitiesLast24Hours/7Days/30Days**: Time-based activity counts
 
 ### Inbound SMS Processing
 
