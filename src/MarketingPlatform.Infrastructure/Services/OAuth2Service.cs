@@ -14,6 +14,7 @@ namespace MarketingPlatform.Infrastructure.Services
         private readonly ApplicationDbContext _context;
         private readonly IExternalAuthProviderRepository _providerRepository;
         private readonly IUserExternalLoginRepository _externalLoginRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly ILogger<OAuth2Service> _logger;
@@ -23,6 +24,7 @@ namespace MarketingPlatform.Infrastructure.Services
             ApplicationDbContext context,
             IExternalAuthProviderRepository providerRepository,
             IUserExternalLoginRepository externalLoginRepository,
+            IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager,
             ITokenService tokenService,
             ILogger<OAuth2Service> logger,
@@ -31,6 +33,7 @@ namespace MarketingPlatform.Infrastructure.Services
             _context = context;
             _providerRepository = providerRepository;
             _externalLoginRepository = externalLoginRepository;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
             _tokenService = tokenService;
             _logger = logger;
@@ -279,7 +282,7 @@ namespace MarketingPlatform.Infrastructure.Services
         {
             provider.CreatedAt = DateTime.UtcNow;
             await _providerRepository.AddAsync(provider);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
             
             _logger.LogInformation("Created new OAuth2 provider: {ProviderName}", provider.Name);
             return provider;
@@ -308,7 +311,7 @@ namespace MarketingPlatform.Infrastructure.Services
             provider.ConfigurationJson = updatedProvider.ConfigurationJson;
             provider.UpdatedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
             
             _logger.LogInformation("Updated OAuth2 provider: {ProviderName} (ID: {ProviderId})", provider.Name, id);
             return provider;
@@ -331,8 +334,8 @@ namespace MarketingPlatform.Infrastructure.Services
                     "Cannot delete provider with linked user accounts. Disable it instead or unlink all accounts first.");
             }
 
-            _context.ExternalAuthProviders.Remove(provider);
-            await _context.SaveChangesAsync();
+            _providerRepository.Remove(provider);
+            await _unitOfWork.SaveChangesAsync();
             
             _logger.LogInformation("Deleted OAuth2 provider: {ProviderName} (ID: {ProviderId})", provider.Name, id);
             return true;
@@ -347,7 +350,7 @@ namespace MarketingPlatform.Infrastructure.Services
 
             provider.IsEnabled = isEnabled;
             provider.UpdatedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
             
             _logger.LogInformation("Toggled OAuth2 provider {ProviderName} status to {Status}", 
                 provider.Name, isEnabled ? "enabled" : "disabled");
