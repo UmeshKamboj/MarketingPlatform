@@ -15,5 +15,6 @@ namespace MarketingPlatform.Core.Entities
         public virtual ICollection<Contact> Contacts { get; set; } = new List<Contact>();
         public virtual ICollection<ContactGroup> ContactGroups { get; set; } = new List<ContactGroup>();
         public virtual ICollection<UserActivityLog> ActivityLogs { get; set; } = new List<UserActivityLog>();
+        public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

@@ -8,14 +8,95 @@ namespace MarketingPlatform.Infrastructure.Data
     {
         public static async Task SeedAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            // Seed Roles
-            string[] roles = { "Admin", "User", "Manager" };
-            foreach (var role in roles)
+            // Seed Identity Roles
+            string[] identityRoles = { "Admin", "User", "Manager", "SuperAdmin" };
+            foreach (var role in identityRoles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
                 {
                     await roleManager.CreateAsync(new IdentityRole(role));
                 }
+            }
+
+            // Seed Custom Roles with Permissions
+            if (!context.CustomRoles.Any())
+            {
+                var customRoles = new List<Role>
+                {
+                    new Role
+                    {
+                        Name = "SuperAdmin",
+                        Description = "Full system access with all permissions",
+                        Permissions = (long)Permission.All,
+                        IsSystemRole = true,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Role
+                    {
+                        Name = "Admin",
+                        Description = "Administrator with most permissions except user/role management",
+                        Permissions = (long)(Permission.ViewCampaigns | Permission.CreateCampaigns | 
+                            Permission.EditCampaigns | Permission.DeleteCampaigns |
+                            Permission.ViewContacts | Permission.CreateContacts | 
+                            Permission.EditContacts | Permission.DeleteContacts |
+                            Permission.ViewTemplates | Permission.CreateTemplates | 
+                            Permission.EditTemplates | Permission.DeleteTemplates |
+                            Permission.ViewAnalytics | Permission.ViewDetailedAnalytics | 
+                            Permission.ExportAnalytics |
+                            Permission.ViewWorkflows | Permission.CreateWorkflows | 
+                            Permission.EditWorkflows | Permission.DeleteWorkflows |
+                            Permission.ViewSettings | Permission.ManageSettings |
+                            Permission.ViewCompliance | Permission.ManageCompliance |
+                            Permission.ViewAuditLogs),
+                        IsSystemRole = true,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Role
+                    {
+                        Name = "Manager",
+                        Description = "Campaign and contact management with analytics access",
+                        Permissions = (long)(Permission.ViewCampaigns | Permission.CreateCampaigns | 
+                            Permission.EditCampaigns |
+                            Permission.ViewContacts | Permission.CreateContacts | 
+                            Permission.EditContacts |
+                            Permission.ViewTemplates | Permission.CreateTemplates | 
+                            Permission.EditTemplates |
+                            Permission.ViewAnalytics | Permission.ViewDetailedAnalytics |
+                            Permission.ViewWorkflows | Permission.CreateWorkflows | 
+                            Permission.EditWorkflows |
+                            Permission.ViewCompliance),
+                        IsSystemRole = true,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Role
+                    {
+                        Name = "Analyst",
+                        Description = "Read access with detailed analytics capabilities",
+                        Permissions = (long)(Permission.ViewCampaigns | Permission.ViewContacts | 
+                            Permission.ViewTemplates | Permission.ViewAnalytics | 
+                            Permission.ViewDetailedAnalytics | Permission.ExportAnalytics |
+                            Permission.ViewWorkflows | Permission.ViewCompliance),
+                        IsSystemRole = true,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Role
+                    {
+                        Name = "Viewer",
+                        Description = "Read-only access to campaigns and basic analytics",
+                        Permissions = (long)(Permission.ViewCampaigns | Permission.ViewContacts | 
+                            Permission.ViewTemplates | Permission.ViewAnalytics),
+                        IsSystemRole = true,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    }
+                };
+
+                context.CustomRoles.AddRange(customRoles);
+                await context.SaveChangesAsync();
             }
 
             // Seed Default Admin User
@@ -39,7 +120,22 @@ namespace MarketingPlatform.Infrastructure.Data
                 
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                    await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
+                    
+                    // Assign SuperAdmin custom role
+                    var superAdminRole = context.CustomRoles.FirstOrDefault(r => r.Name == "SuperAdmin");
+                    if (superAdminRole != null)
+                    {
+                        var userRole = new Core.Entities.UserRole
+                        {
+                            UserId = adminUser.Id,
+                            RoleId = superAdminRole.Id,
+                            AssignedAt = DateTime.UtcNow,
+                            AssignedBy = "System"
+                        };
+                        context.CustomUserRoles.Add(userRole);
+                        await context.SaveChangesAsync();
+                    }
                 }
             }
 

@@ -67,16 +67,33 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+// Authorization with Permission-based policies
+builder.Services.AddAuthorization(options =>
+{
+    // Register authorization handler
+    foreach (MarketingPlatform.Core.Enums.Permission permission in Enum.GetValues(typeof(MarketingPlatform.Core.Enums.Permission)))
+    {
+        if (permission != MarketingPlatform.Core.Enums.Permission.All)
+        {
+            options.AddPolicy($"Permission:{permission}", policy =>
+                policy.Requirements.Add(new MarketingPlatform.API.Authorization.PermissionRequirement(permission)));
+        }
+    }
+});
+
+builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, MarketingPlatform.API.Authorization.PermissionAuthorizationHandler>();
 
 // Repository Pattern
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 
 // Application Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IContactGroupService, ContactGroupService>();
 builder.Services.AddScoped<IDynamicGroupEvaluationService, DynamicGroupEvaluationService>();

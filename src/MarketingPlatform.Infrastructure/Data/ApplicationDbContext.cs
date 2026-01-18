@@ -49,6 +49,8 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<FrequencyControl> FrequencyControls => Set<FrequencyControl>();
         public DbSet<MessageDeliveryAttempt> MessageDeliveryAttempts => Set<MessageDeliveryAttempt>();
         public DbSet<ChannelRoutingConfig> ChannelRoutingConfigs => Set<ChannelRoutingConfig>();
+        public DbSet<Role> CustomRoles => Set<Role>();
+        public DbSet<Core.Entities.UserRole> CustomUserRoles => Set<Core.Entities.UserRole>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
