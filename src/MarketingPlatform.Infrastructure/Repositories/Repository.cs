@@ -92,5 +92,10 @@ namespace MarketingPlatform.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public IQueryable<T> GetQueryable()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

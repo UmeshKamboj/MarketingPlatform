@@ -4,6 +4,7 @@ using MarketingPlatform.Application.DTOs.Contact;
 using MarketingPlatform.Application.DTOs.ContactGroup;
 using MarketingPlatform.Application.DTOs.Campaign;
 using MarketingPlatform.Application.DTOs.Template;
+using MarketingPlatform.Application.DTOs.Message;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.Application.Mappings
@@ -37,6 +38,14 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<MessageTemplate, TemplateDto>();
             CreateMap<CreateTemplateDto, MessageTemplate>();
             CreateMap<UpdateTemplateDto, MessageTemplate>();
+            // Message mappings
+            CreateMap<CampaignMessage, MessageDto>()
+                .ForMember(dest => dest.CampaignName, opt => opt.MapFrom(src => src.Campaign.Name))
+                .ForMember(dest => dest.ContactName, opt => opt.MapFrom(src => 
+                    src.Contact.FirstName + " " + src.Contact.LastName))
+                .ForMember(dest => dest.MediaUrls, opt => opt.Ignore()); // Handled manually in service
+            CreateMap<CreateMessageDto, CampaignMessage>()
+                .ForMember(dest => dest.MediaUrls, opt => opt.Ignore()); // Handled manually in service
         }
     }
 }
