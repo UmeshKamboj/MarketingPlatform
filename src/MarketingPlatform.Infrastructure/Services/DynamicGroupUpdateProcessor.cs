@@ -1,6 +1,7 @@
 using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Interfaces.Repositories;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -11,14 +12,19 @@ namespace MarketingPlatform.Infrastructure.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<DynamicGroupUpdateProcessor> _logger;
-        private readonly TimeSpan _updateInterval = TimeSpan.FromMinutes(15); // Update every 15 minutes
+        private readonly TimeSpan _updateInterval;
 
         public DynamicGroupUpdateProcessor(
             IServiceProvider serviceProvider,
+            IConfiguration configuration,
             ILogger<DynamicGroupUpdateProcessor> logger)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
+            
+            // Read update interval from configuration, default to 15 minutes
+            var intervalMinutes = configuration.GetValue<int?>("DynamicGroupSettings:UpdateIntervalMinutes") ?? 15;
+            _updateInterval = TimeSpan.FromMinutes(intervalMinutes);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

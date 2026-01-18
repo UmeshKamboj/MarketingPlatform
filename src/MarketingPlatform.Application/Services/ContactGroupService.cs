@@ -501,8 +501,9 @@ namespace MarketingPlatform.Application.Services
             {
                 return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
             }
-            catch
+            catch (JsonException)
             {
+                // Invalid JSON format in custom attributes, return null
                 return null;
             }
         }
@@ -517,8 +518,9 @@ namespace MarketingPlatform.Application.Services
                 var criteria = JsonConvert.DeserializeObject<GroupRuleCriteria>(json);
                 return _mapper.Map<GroupRuleCriteriaDto>(criteria);
             }
-            catch
+            catch (JsonException)
             {
+                // Invalid JSON format in rule criteria, return null
                 return null;
             }
         }

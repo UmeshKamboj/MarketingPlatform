@@ -48,11 +48,24 @@ namespace MarketingPlatform.Application.Services
                 if (!contacts.Any())
                     return new List<int>();
 
+                // Pre-load engagement data and tag assignments to avoid N+1 queries
+                var contactIds = contacts.Select(c => c.Id).ToList();
+                var engagements = await _engagementRepository.FindAsync(e => 
+                    contactIds.Contains(e.ContactId) && !e.IsDeleted);
+                var tagAssignments = await _tagAssignmentRepository.FindAsync(ta => 
+                    contactIds.Contains(ta.ContactId) && !ta.IsDeleted);
+
+                // Create lookup dictionaries for faster access
+                var engagementLookup = engagements.ToDictionary(e => e.ContactId);
+                var tagAssignmentLookup = tagAssignments
+                    .GroupBy(ta => ta.ContactId)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
                 var matchingContactIds = new List<int>();
 
                 foreach (var contact in contacts)
                 {
-                    if (await EvaluateContactAgainstRules(contact, criteria))
+                    if (await EvaluateContactAgainstRules(contact, criteria, engagementLookup, tagAssignmentLookup))
                     {
                         matchingContactIds.Add(contact.Id);
                     }
@@ -171,7 +184,11 @@ namespace MarketingPlatform.Application.Services
             }
         }
 
-        private async Task<bool> EvaluateContactAgainstRules(Contact contact, GroupRuleCriteria criteria)
+        private async Task<bool> EvaluateContactAgainstRules(
+            Contact contact, 
+            GroupRuleCriteria criteria,
+            Dictionary<int, ContactEngagement> engagementLookup,
+            Dictionary<int, List<ContactTagAssignment>> tagAssignmentLookup)
         {
             if (!criteria.Rules.Any())
                 return false;
@@ -180,7 +197,7 @@ namespace MarketingPlatform.Application.Services
 
             foreach (var rule in criteria.Rules)
             {
-                var result = await EvaluateRule(contact, rule);
+                var result = await EvaluateRule(contact, rule, engagementLookup, tagAssignmentLookup);
                 results.Add(result);
             }
 
@@ -190,7 +207,11 @@ namespace MarketingPlatform.Application.Services
                 : results.Any(r => r);
         }
 
-        private async Task<bool> EvaluateRule(Contact contact, GroupRule rule)
+        private async Task<bool> EvaluateRule(
+            Contact contact, 
+            GroupRule rule,
+            Dictionary<int, ContactEngagement> engagementLookup,
+            Dictionary<int, List<ContactTagAssignment>> tagAssignmentLookup)
         {
             try
             {
@@ -221,7 +242,7 @@ namespace MarketingPlatform.Application.Services
                         return EvaluateBooleanField(contact.IsActive, rule.Operator, rule.Value);
                     
                     case RuleField.HasTag:
-                        return await EvaluateTagField(contact.Id, rule.Operator, rule.Value);
+                        return EvaluateTagField(contact.Id, rule.Operator, rule.Value, tagAssignmentLookup);
                     
                     case RuleField.CustomAttribute:
                         return EvaluateCustomAttributeField(contact.CustomAttributes, rule.AttributeName, 
@@ -232,7 +253,7 @@ namespace MarketingPlatform.Application.Services
                     case RuleField.TotalClicks:
                     case RuleField.EngagementScore:
                     case RuleField.LastEngagementDate:
-                        return await EvaluateEngagementField(contact.Id, rule.Field, rule.Operator, rule.Value);
+                        return EvaluateEngagementField(contact.Id, rule.Field, rule.Operator, rule.Value, engagementLookup);
                     
                     default:
                         _logger.LogWarning("Unknown rule field: {Field}", rule.Field);
@@ -353,12 +374,14 @@ namespace MarketingPlatform.Application.Services
             }
         }
 
-        private async Task<bool> EvaluateTagField(int contactId, RuleOperator op, string? ruleValue)
+        private bool EvaluateTagField(
+            int contactId, 
+            RuleOperator op, 
+            string? ruleValue,
+            Dictionary<int, List<ContactTagAssignment>> tagAssignmentLookup)
         {
-            var tagAssignments = await _tagAssignmentRepository.FindAsync(ta => 
-                ta.ContactId == contactId && !ta.IsDeleted);
-
-            var hasTag = tagAssignments.Any();
+            var hasTagAssignments = tagAssignmentLookup.TryGetValue(contactId, out var tagAssignments);
+            var hasTag = hasTagAssignments && tagAssignments != null && tagAssignments.Any();
 
             if (string.IsNullOrEmpty(ruleValue))
             {
@@ -368,7 +391,8 @@ namespace MarketingPlatform.Application.Services
             // Check if contact has a specific tag (by tag ID)
             if (int.TryParse(ruleValue, out int tagId))
             {
-                var hasSpecificTag = tagAssignments.Any(ta => ta.ContactTagId == tagId);
+                var hasSpecificTag = hasTagAssignments && tagAssignments != null && 
+                    tagAssignments.Any(ta => ta.ContactTagId == tagId);
                 return op == RuleOperator.Equals ? hasSpecificTag : !hasSpecificTag;
             }
 
@@ -389,8 +413,9 @@ namespace MarketingPlatform.Application.Services
                 {
                     attributes = JsonConvert.DeserializeObject<Dictionary<string, string>>(customAttributesJson);
                 }
-                catch
+                catch (JsonException)
                 {
+                    // Invalid JSON, treat as no attributes
                     return false;
                 }
             }
@@ -404,13 +429,14 @@ namespace MarketingPlatform.Application.Services
             return EvaluateStringField(attributeValue, op, ruleValue);
         }
 
-        private async Task<bool> EvaluateEngagementField(int contactId, RuleField field, 
-            RuleOperator op, string? ruleValue)
+        private bool EvaluateEngagementField(
+            int contactId, 
+            RuleField field, 
+            RuleOperator op, 
+            string? ruleValue,
+            Dictionary<int, ContactEngagement> engagementLookup)
         {
-            var engagement = await _engagementRepository.FirstOrDefaultAsync(e => 
-                e.ContactId == contactId && !e.IsDeleted);
-
-            if (engagement == null)
+            if (!engagementLookup.TryGetValue(contactId, out var engagement))
             {
                 return op == RuleOperator.IsNull;
             }
