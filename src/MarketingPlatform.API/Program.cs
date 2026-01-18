@@ -138,6 +138,7 @@ builder.Services.AddScoped<IContactTagService, ContactTagService>();
 builder.Services.AddScoped<IAudienceSegmentationService, AudienceSegmentationService>();
 builder.Services.AddScoped<IKeywordService, KeywordService>();
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
+builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
 builder.Services.AddScoped<IPlatformSettingService, PlatformSettingService>();
 builder.Services.AddScoped<IFeatureToggleService, FeatureToggleService>();

@@ -720,12 +720,12 @@ namespace MarketingPlatform.Application.Services
             var dto = _mapper.Map<KeywordReservationDto>(reservation);
 
             // Load user names
-            var requestedBy = await _userRepository.GetByIdAsync(reservation.RequestedByUserId);
+            var requestedBy = await _userRepository.FirstOrDefaultAsync(u => u.Id == reservation.RequestedByUserId);
             dto.RequestedByUserName = requestedBy?.UserName;
 
             if (reservation.ApprovedByUserId != null)
             {
-                var approvedBy = await _userRepository.GetByIdAsync(reservation.ApprovedByUserId);
+                var approvedBy = await _userRepository.FirstOrDefaultAsync(u => u.Id == reservation.ApprovedByUserId);
                 dto.ApprovedByUserName = approvedBy?.UserName;
             }
 
@@ -895,7 +895,7 @@ namespace MarketingPlatform.Application.Services
             var campaign = await _campaignRepository.GetByIdAsync(assignment.CampaignId);
             dto.CampaignName = campaign?.Name;
 
-            var assignedBy = await _userRepository.GetByIdAsync(assignment.AssignedByUserId);
+            var assignedBy = await _userRepository.FirstOrDefaultAsync(u => u.Id == assignment.AssignedByUserId);
             dto.AssignedByUserName = assignedBy?.UserName;
 
             return dto;
@@ -992,10 +992,10 @@ namespace MarketingPlatform.Application.Services
             {
                 var dto = _mapper.Map<KeywordConflictDto>(existingConflict);
                 
-                var requestingUser = await _userRepository.GetByIdAsync(existingConflict.RequestingUserId);
+                var requestingUser = await _userRepository.FirstOrDefaultAsync(u => u.Id == existingConflict.RequestingUserId);
                 dto.RequestingUserName = requestingUser?.UserName;
 
-                var existingUser = await _userRepository.GetByIdAsync(existingConflict.ExistingUserId);
+                var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Id == existingConflict.ExistingUserId);
                 dto.ExistingUserName = existingUser?.UserName;
 
                 return dto;
@@ -1025,15 +1025,15 @@ namespace MarketingPlatform.Application.Services
             {
                 var dto = _mapper.Map<KeywordConflictDto>(conflict);
                 
-                var requestingUser = await _userRepository.GetByIdAsync(conflict.RequestingUserId);
+                var requestingUser = await _userRepository.FirstOrDefaultAsync(u => u.Id == conflict.RequestingUserId);
                 dto.RequestingUserName = requestingUser?.UserName;
 
-                var existingUser = await _userRepository.GetByIdAsync(conflict.ExistingUserId);
+                var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Id == conflict.ExistingUserId);
                 dto.ExistingUserName = existingUser?.UserName;
 
                 if (conflict.ResolvedByUserId != null)
                 {
-                    var resolvedBy = await _userRepository.GetByIdAsync(conflict.ResolvedByUserId);
+                    var resolvedBy = await _userRepository.FirstOrDefaultAsync(u => u.Id == conflict.ResolvedByUserId);
                     dto.ResolvedByUserName = resolvedBy?.UserName;
                 }
 
