@@ -21,6 +21,7 @@ namespace MarketingPlatform.Application.Services
         private readonly ISMSProvider _smsProvider;
         private readonly IMMSProvider _mmsProvider;
         private readonly IEmailProvider _emailProvider;
+        private readonly IMessageRoutingService _routingService;
         private readonly ILogger<MessageService> _logger;
 
         public MessageService(
@@ -32,6 +33,7 @@ namespace MarketingPlatform.Application.Services
             ISMSProvider smsProvider,
             IMMSProvider mmsProvider,
             IEmailProvider emailProvider,
+            IMessageRoutingService routingService,
             ILogger<MessageService> logger)
         {
             _messageRepository = messageRepository;
@@ -42,6 +44,7 @@ namespace MarketingPlatform.Application.Services
             _smsProvider = smsProvider;
             _mmsProvider = mmsProvider;
             _emailProvider = emailProvider;
+            _routingService = routingService;
             _logger = logger;
         }
 
@@ -464,7 +467,6 @@ namespace MarketingPlatform.Application.Services
                 .Where(m => m.Status == MessageStatus.Queued && 
                            (m.ScheduledAt == null || m.ScheduledAt <= DateTime.UtcNow))
                 .Take(50) // Process max 50 messages per batch
-                .Select(m => new { m.Id, m.Channel, m.Recipient, m.Subject, m.MessageBody, m.HTMLContent, m.MediaUrls })
                 .ToListAsync();
 
             if (!messagesToProcess.Any())
@@ -479,38 +481,35 @@ namespace MarketingPlatform.Application.Services
                     // Update status to Sending in a separate transaction to release locks quickly
                     await UpdateMessageStatusToSendingAsync(msg.Id);
 
-                    // Send message (this happens outside the database transaction to avoid blocking)
-                    bool success;
-                    string? externalId;
-                    string? error;
-                    decimal? cost;
-
-                    switch (msg.Channel)
-                    {
-                        case ChannelType.SMS:
-                            (success, externalId, error, cost) = await _smsProvider.SendSMSAsync(
-                                msg.Recipient, msg.MessageBody ?? string.Empty);
-                            break;
-
-                        case ChannelType.MMS:
-                            var mediaUrls = !string.IsNullOrEmpty(msg.MediaUrls)
-                                ? JsonConvert.DeserializeObject<List<string>>(msg.MediaUrls) ?? new List<string>()
-                                : new List<string>();
-                            (success, externalId, error, cost) = await _mmsProvider.SendMMSAsync(
-                                msg.Recipient, msg.MessageBody ?? string.Empty, mediaUrls);
-                            break;
-
-                        case ChannelType.Email:
-                            (success, externalId, error, cost) = await _emailProvider.SendEmailAsync(
-                                msg.Recipient, msg.Subject ?? string.Empty, msg.MessageBody ?? string.Empty, msg.HTMLContent);
-                            break;
-
-                        default:
-                            throw new InvalidOperationException($"Unsupported channel type: {msg.Channel}");
-                    }
+                    // Use routing service for intelligent routing, fallback, and retry logic
+                    var (success, externalId, error, cost, attemptNumber) = await _routingService.RouteMessageAsync(msg);
 
                     // Update final status in another separate transaction
                     await UpdateMessageAfterSendAsync(msg.Id, success, externalId, error, cost);
+
+                    // If failed, check if should retry
+                    if (!success)
+                    {
+                        var (shouldRetry, delaySeconds) = await _routingService.ShouldRetryMessageAsync(msg);
+                        
+                        if (shouldRetry && delaySeconds > 0)
+                        {
+                            // Schedule retry
+                            var retryMessage = await _messageRepository.GetByIdAsync(msg.Id);
+                            if (retryMessage != null)
+                            {
+                                retryMessage.ScheduledAt = DateTime.UtcNow.AddSeconds(delaySeconds);
+                                retryMessage.Status = MessageStatus.Queued;
+                                retryMessage.RetryCount++;
+                                _messageRepository.Update(retryMessage);
+                                await _unitOfWork.SaveChangesAsync();
+
+                                _logger.LogInformation(
+                                    "Message {MessageId} scheduled for retry in {DelaySeconds}s (Attempt {AttemptNumber})",
+                                    msg.Id, delaySeconds, retryMessage.RetryCount + 1);
+                            }
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -591,7 +590,6 @@ namespace MarketingPlatform.Application.Services
             var message = await _messageRepository.GetQueryable()
                 .AsNoTracking()
                 .Where(m => m.Id == messageId)
-                .Select(m => new { m.Id, m.Channel, m.Recipient, m.Subject, m.MessageBody, m.HTMLContent, m.MediaUrls, m.Status })
                 .FirstOrDefaultAsync();
 
             if (message == null || message.Status != MessageStatus.Queued)
@@ -601,34 +599,8 @@ namespace MarketingPlatform.Application.Services
             {
                 await UpdateMessageStatusToSendingAsync(message.Id);
 
-                bool success;
-                string? externalId;
-                string? error;
-                decimal? cost;
-
-                switch (message.Channel)
-                {
-                    case ChannelType.SMS:
-                        (success, externalId, error, cost) = await _smsProvider.SendSMSAsync(
-                            message.Recipient, message.MessageBody ?? string.Empty);
-                        break;
-
-                    case ChannelType.MMS:
-                        var mediaUrls = !string.IsNullOrEmpty(message.MediaUrls)
-                            ? JsonConvert.DeserializeObject<List<string>>(message.MediaUrls) ?? new List<string>()
-                            : new List<string>();
-                        (success, externalId, error, cost) = await _mmsProvider.SendMMSAsync(
-                            message.Recipient, message.MessageBody ?? string.Empty, mediaUrls);
-                        break;
-
-                    case ChannelType.Email:
-                        (success, externalId, error, cost) = await _emailProvider.SendEmailAsync(
-                            message.Recipient, message.Subject ?? string.Empty, message.MessageBody ?? string.Empty, message.HTMLContent);
-                        break;
-
-                    default:
-                        throw new InvalidOperationException($"Unsupported channel type: {message.Channel}");
-                }
+                // Use routing service for intelligent routing
+                var (success, externalId, error, cost, attemptNumber) = await _routingService.RouteMessageAsync(message);
 
                 await UpdateMessageAfterSendAsync(message.Id, success, externalId, error, cost);
             }
