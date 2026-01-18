@@ -56,6 +56,7 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<ApiRateLimit> ApiRateLimits => Set<ApiRateLimit>();
         public DbSet<RateLimitLog> RateLimitLogs => Set<RateLimitLog>();
         public DbSet<ProviderRateLimit> ProviderRateLimits => Set<ProviderRateLimit>();
+        public DbSet<EncryptionAuditLog> EncryptionAuditLogs => Set<EncryptionAuditLog>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

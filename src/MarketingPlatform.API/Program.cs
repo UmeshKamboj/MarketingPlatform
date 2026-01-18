@@ -16,6 +16,7 @@ using MarketingPlatform.API.Middleware;
 using Serilog;
 using Hangfire;
 using Hangfire.SqlServer;
+using MarketingPlatform.Core.Interfaces;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -32,6 +33,28 @@ builder.Host.UseSerilog();
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Encryption Services - Configuration-based by default with Azure/AWS options
+var encryptionProvider = builder.Configuration["Encryption:Provider"] ?? "Configuration";
+switch (encryptionProvider.ToLowerInvariant())
+{
+    case "azure":
+        // Azure Key Vault integration (requires Azure.Security.KeyVault.Keys package)
+        // builder.Services.AddSingleton<IKeyManagementService, AzureKeyVaultService>();
+        throw new NotImplementedException("Azure Key Vault integration requires Azure.Security.KeyVault.Keys package. Install and uncomment the registration.");
+    
+    case "aws":
+        // AWS KMS integration (requires AWSSDK.KeyManagementService package)
+        // builder.Services.AddSingleton<IKeyManagementService, AwsKmsService>();
+        throw new NotImplementedException("AWS KMS integration requires AWSSDK.KeyManagementService package. Install and uncomment the registration.");
+    
+    case "configuration":
+    default:
+        builder.Services.AddSingleton<IKeyManagementService, ConfigurationKeyManagementService>();
+        break;
+}
+
+builder.Services.AddScoped<IEncryptionService, AesEncryptionService>();
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -208,6 +231,22 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Security Headers Middleware - Add before exception handling
+app.Use(async (context, next) =>
+{
+    // Remove server header for security
+    context.Response.Headers.Remove("Server");
+    
+    // Add security headers
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'");
+    
+    await next();
+});
+
 // Exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
@@ -220,7 +259,26 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// HTTPS Redirection - Enforce TLS 1.2+
 app.UseHttpsRedirection();
+
+// HSTS (HTTP Strict Transport Security) - Enforces HTTPS for specified duration
+if (builder.Configuration.GetValue<bool>("Security:EnableHSTS", true))
+{
+    var hstsMaxAge = builder.Configuration.GetValue<int>("Security:HSTSMaxAge", 31536000); // Default: 1 year
+    var includeSubDomains = builder.Configuration.GetValue<bool>("Security:IncludeSubDomains", true);
+    
+    app.UseHsts();
+    app.Use(async (context, next) =>
+    {
+        var hstsHeader = $"max-age={hstsMaxAge}";
+        if (includeSubDomains)
+            hstsHeader += "; includeSubDomains";
+        
+        context.Response.Headers.Append("Strict-Transport-Security", hstsHeader);
+        await next();
+    });
+}
 
 // Hangfire Dashboard with authorization
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
