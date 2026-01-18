@@ -961,6 +961,8 @@ This endpoint tracks the click and redirects to the original URL.
 
 ## Testing Campaign Management
 
+See also: [SMS_KEYWORD_API_DOCUMENTATION.md](SMS_KEYWORD_API_DOCUMENTATION.md) for SMS Keyword Management features.
+
 ### Create SMS Campaign
 ```bash
 POST /api/campaigns
@@ -1182,6 +1184,13 @@ Response:
   - ✅ Audience segmentation engine
   - ✅ Dynamic group rule processing
 - ✅ Task 2.5: Template Management - Reusable Message Templates with Variables
+- ✅ Task 2.6: SMS Keyword Management System:
+  - ✅ Keyword creation, update, and deletion
+  - ✅ Keyword campaign integration
+  - ✅ Keyword activity tracking
+  - ✅ Inbound SMS webhook processing
+  - ✅ Auto-response functionality
+  - ✅ Auto opt-in to contact groups
 - ✅ Task 4.1: Message Composition & Templates:
   - ✅ SMS, MMS, and Email editors with character count
   - ✅ Personalization tokens ({{Name}}, {{City}}, etc.)
@@ -1194,6 +1203,14 @@ Response:
 - ⏳ Super admin platform
 
 ## Project Status
+🚧 **In Development** - Task 2.6 Complete (SMS Keyword Management)
+
+## Documentation
+- [README.md](README.md) - Main documentation
+- [SMS_KEYWORD_API_DOCUMENTATION.md](SMS_KEYWORD_API_DOCUMENTATION.md) - SMS Keyword Management API documentation
+- [CAMPAIGN_LIFECYCLE_IMPLEMENTATION.md](CAMPAIGN_LIFECYCLE_IMPLEMENTATION.md) - Campaign lifecycle details
+- [DYNAMIC_CONTACT_GROUPS.md](DYNAMIC_CONTACT_GROUPS.md) - Dynamic contact groups implementation
+- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Implementation summary
 🚧 **In Development** - Task 4.1 Complete - Message Composition & Templates with Character Count and URL Tracking
 
 ## License

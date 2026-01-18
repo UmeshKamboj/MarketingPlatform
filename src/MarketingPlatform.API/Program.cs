@@ -83,6 +83,7 @@ builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<ISuppressionListService, SuppressionListService>();
 builder.Services.AddScoped<IContactTagService, ContactTagService>();
 builder.Services.AddScoped<IAudienceSegmentationService, AudienceSegmentationService>();
+builder.Services.AddScoped<IKeywordService, KeywordService>();
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
 
 // Message Service
