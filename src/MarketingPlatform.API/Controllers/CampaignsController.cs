@@ -208,6 +208,132 @@ namespace MarketingPlatform.API.Controllers
             }
         }
 
+        // A/B Testing endpoints
+        [HttpGet("{campaignId}/variants")]
+        public async Task<ActionResult<ApiResponse<List<CampaignVariantDto>>>> GetCampaignVariants(int campaignId, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var variants = await abTestingService.GetCampaignVariantsAsync(userId, campaignId);
+            return Ok(ApiResponse<List<CampaignVariantDto>>.SuccessResponse(variants));
+        }
+
+        [HttpGet("{campaignId}/variants/{variantId}")]
+        public async Task<ActionResult<ApiResponse<CampaignVariantDto>>> GetVariant(int campaignId, int variantId, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var variant = await abTestingService.GetVariantByIdAsync(userId, campaignId, variantId);
+            if (variant == null)
+                return NotFound(ApiResponse<CampaignVariantDto>.ErrorResponse("Variant not found"));
+
+            return Ok(ApiResponse<CampaignVariantDto>.SuccessResponse(variant));
+        }
+
+        [HttpPost("{campaignId}/variants")]
+        public async Task<ActionResult<ApiResponse<CampaignVariantDto>>> CreateVariant(int campaignId, [FromBody] CreateCampaignVariantDto dto, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var variant = await abTestingService.CreateVariantAsync(userId, campaignId, dto);
+                return Ok(ApiResponse<CampaignVariantDto>.SuccessResponse(variant, "Variant created successfully"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating variant");
+                return BadRequest(ApiResponse<CampaignVariantDto>.ErrorResponse("Failed to create variant", new List<string> { ex.Message }));
+            }
+        }
+
+        [HttpPut("{campaignId}/variants/{variantId}")]
+        public async Task<ActionResult<ApiResponse<bool>>> UpdateVariant(int campaignId, int variantId, [FromBody] UpdateCampaignVariantDto dto, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await abTestingService.UpdateVariantAsync(userId, campaignId, variantId, dto);
+            if (!result)
+                return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to update variant. Variant not found or campaign is not in Draft status."));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Variant updated successfully"));
+        }
+
+        [HttpDelete("{campaignId}/variants/{variantId}")]
+        public async Task<ActionResult<ApiResponse<bool>>> DeleteVariant(int campaignId, int variantId, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await abTestingService.DeleteVariantAsync(userId, campaignId, variantId);
+            if (!result)
+                return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to delete variant. Variant not found or campaign is not in Draft status."));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Variant deleted successfully"));
+        }
+
+        [HttpPost("{campaignId}/variants/{variantId}/activate")]
+        public async Task<ActionResult<ApiResponse<bool>>> ActivateVariant(int campaignId, int variantId, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await abTestingService.ActivateVariantAsync(userId, campaignId, variantId);
+            if (!result)
+                return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to activate variant."));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Variant activated successfully"));
+        }
+
+        [HttpPost("{campaignId}/variants/{variantId}/deactivate")]
+        public async Task<ActionResult<ApiResponse<bool>>> DeactivateVariant(int campaignId, int variantId, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await abTestingService.DeactivateVariantAsync(userId, campaignId, variantId);
+            if (!result)
+                return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to deactivate variant."));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Variant deactivated successfully"));
+        }
+
+        [HttpGet("{campaignId}/variants/comparison")]
+        public async Task<ActionResult<ApiResponse<VariantComparisonDto>>> CompareVariants(int campaignId, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var comparison = await abTestingService.CompareVariantsAsync(userId, campaignId);
+            return Ok(ApiResponse<VariantComparisonDto>.SuccessResponse(comparison));
+        }
+
+        [HttpPost("{campaignId}/variants/{variantId}/select-winner")]
+        public async Task<ActionResult<ApiResponse<bool>>> SelectWinningVariant(int campaignId, int variantId, [FromServices] ICampaignABTestingService abTestingService)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var result = await abTestingService.SelectWinningVariantAsync(userId, campaignId, variantId);
+            if (!result)
+                return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to select winning variant."));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Winning variant selected successfully"));
+        }
+
         [HttpPost("calculate-audience")]
         public async Task<ActionResult<ApiResponse<int>>> CalculateAudienceSize([FromBody] CampaignAudienceDto audience)
         {

@@ -39,6 +39,8 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<URLShortener> URLShorteners => Set<URLShortener>();
         public DbSet<URLClick> URLClicks => Set<URLClick>();
         public DbSet<CampaignAnalytics> CampaignAnalytics => Set<CampaignAnalytics>();
+        public DbSet<CampaignVariant> CampaignVariants => Set<CampaignVariant>();
+        public DbSet<CampaignVariantAnalytics> CampaignVariantAnalytics => Set<CampaignVariantAnalytics>();
         public DbSet<ContactEngagement> ContactEngagements => Set<ContactEngagement>();
         public DbSet<MessageProvider> MessageProviders => Set<MessageProvider>();
         public DbSet<ProviderLog> ProviderLogs => Set<ProviderLog>();
@@ -65,6 +67,7 @@ namespace MarketingPlatform.Infrastructure.Data
             // Global query filters for soft delete
             modelBuilder.Entity<Contact>().HasQueryFilter(c => !c.IsDeleted);
             modelBuilder.Entity<Campaign>().HasQueryFilter(c => !c.IsDeleted);
+            modelBuilder.Entity<CampaignVariant>().HasQueryFilter(v => !v.IsDeleted);
             modelBuilder.Entity<ContactGroup>().HasQueryFilter(c => !c.IsDeleted);
             modelBuilder.Entity<MessageTemplate>().HasQueryFilter(m => !m.IsDeleted);
             modelBuilder.Entity<Workflow>().HasQueryFilter(w => !w.IsDeleted);

@@ -23,6 +23,7 @@ namespace MarketingPlatform.Infrastructure.Data.Configurations
             builder.HasIndex(cm => cm.CampaignId);
             builder.HasIndex(cm => cm.ContactId);
             builder.HasIndex(cm => cm.Status);
+            builder.HasIndex(cm => cm.VariantId);
 
             // Relationships
             builder.HasOne(cm => cm.Campaign)
@@ -34,6 +35,11 @@ namespace MarketingPlatform.Infrastructure.Data.Configurations
                 .WithMany(c => c.CampaignMessages)
                 .HasForeignKey(cm => cm.ContactId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(cm => cm.Variant)
+                .WithMany(v => v.Messages)
+                .HasForeignKey(cm => cm.VariantId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

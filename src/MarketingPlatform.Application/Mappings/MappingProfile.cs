@@ -48,6 +48,12 @@ namespace MarketingPlatform.Application.Mappings
             CreateMap<CampaignContent, CampaignContentDto>();
             CreateMap<CampaignAudience, CampaignAudienceDto>();
             CreateMap<CampaignSchedule, CampaignScheduleDto>();
+            
+            // Campaign Variant mappings
+            CreateMap<CampaignVariant, CampaignVariantDto>();
+            CreateMap<CreateCampaignVariantDto, CampaignVariant>();
+            CreateMap<UpdateCampaignVariantDto, CampaignVariant>();
+            CreateMap<CampaignVariantAnalytics, CampaignVariantAnalyticsDto>();
 
             // Template mappings
             CreateMap<MessageTemplate, TemplateDto>();

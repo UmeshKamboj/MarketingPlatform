@@ -1,0 +1,359 @@
+@{
+    ViewData["Title"] = "Manage A/B Test Variants";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>A/B Test Variants</h2>
+            <p class="text-muted mb-0">Manage test variants for Campaign: <span id="campaignName"></span></p>
+        </div>
+        <div>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createVariantModal">
+                <i class="bi bi-plus-circle"></i> Add Variant
+            </button>
+            <a href="@Url.Action("Index", "Campaigns")" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Campaigns
+            </a>
+        </div>
+    </div>
+
+    <!-- Traffic Allocation Summary -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Traffic Allocation</h5>
+            <span id="totalTraffic" class="badge bg-info">0%</span>
+        </div>
+        <div class="card-body">
+            <div id="trafficChart"></div>
+        </div>
+    </div>
+
+    <!-- Variants List -->
+    <div class="row" id="variantsList">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Variant Comparison -->
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Performance Comparison</h5>
+            <button type="button" class="btn btn-sm btn-primary" onclick="loadComparison()">
+                <i class="bi bi-arrow-repeat"></i> Refresh
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="comparisonContent">
+                <p class="text-muted text-center">Click refresh to compare variant performance</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Variant Modal -->
+<div class="modal fade" id="createVariantModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Variant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createVariantForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="variantName" class="form-label">Variant Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="variantName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="variantTraffic" class="form-label">Traffic % <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="variantTraffic" min="0" max="100" step="1" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="variantDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="variantDescription" rows="2"></textarea>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="isControl">
+                        <label class="form-check-label" for="isControl">
+                            This is the control variant
+                        </label>
+                    </div>
+                    <hr>
+                    <h6>Content</h6>
+                    <div class="mb-3">
+                        <label for="variantSubject" class="form-label">Subject (for Email)</label>
+                        <input type="text" class="form-control" id="variantSubject">
+                    </div>
+                    <div class="mb-3">
+                        <label for="variantMessage" class="form-label">Message Body <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="variantMessage" rows="5" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createVariant()">Create Variant</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let campaignId = parseInt('@ViewBag.CampaignId') || 0;
+
+    function getAuthHeaders() {
+        return {
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Content-Type': 'application/json'
+        };
+    }
+
+    function showNotification(message, type = 'info') {
+        // Simple notification - can be replaced with toast library
+        const alertClass = type === 'error' ? 'danger' : type;
+        const alert = $(`<div class="alert alert-${alertClass} alert-dismissible fade show position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`);
+        $('body').append(alert);
+        setTimeout(() => alert.alert('close'), 5000);
+    }
+
+    $(document).ready(function() {
+        if (campaignId > 0) {
+            loadCampaignInfo();
+            loadVariants();
+        }
+    });
+
+    function loadCampaignInfo() {
+        $.ajax({
+            url: `/api/campaigns/${campaignId}`,
+            method: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success && response.data) {
+                    $('#campaignName').text(response.data.name);
+                }
+            }
+        });
+    }
+
+    function loadVariants() {
+        $.ajax({
+            url: `/api/campaigns/${campaignId}/variants`,
+            method: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success && response.data) {
+                    renderVariants(response.data);
+                    updateTrafficAllocation(response.data);
+                }
+            },
+            error: function() {
+                $('#variantsList').html('<div class="col-12"><div class="alert alert-danger">Failed to load variants</div></div>');
+            }
+        });
+    }
+
+    function renderVariants(variants) {
+        if (!variants || variants.length === 0) {
+            $('#variantsList').html('<div class="col-12"><div class="alert alert-info">No variants created yet. Click "Add Variant" to get started.</div></div>');
+            return;
+        }
+
+        let html = '';
+        variants.forEach(variant => {
+            html += `
+                <div class="col-md-6 mb-3">
+                    <div class="card ${variant.isControl ? 'border-primary' : ''}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">${variant.name}</h6>
+                                ${variant.isControl ? '<span class="badge bg-primary">Control</span>' : ''}
+                                ${variant.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                ${!variant.isControl ? `<button class="btn btn-outline-danger" onclick="deleteVariant(${variant.id})"><i class="bi bi-trash"></i></button>` : ''}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-2">${variant.description || 'No description'}</p>
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <strong>${variant.trafficPercentage}%</strong>
+                                    <br><small class="text-muted">Traffic</small>
+                                </div>
+                                <div class="col-4">
+                                    <strong>${variant.sentCount}</strong>
+                                    <br><small class="text-muted">Sent</small>
+                                </div>
+                                <div class="col-4">
+                                    <strong>${variant.deliveredCount}</strong>
+                                    <br><small class="text-muted">Delivered</small>
+                                </div>
+                            </div>
+                            ${variant.analytics ? `
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <strong>${variant.analytics.deliveryRate.toFixed(2)}%</strong>
+                                    <br><small class="text-muted">Delivery Rate</small>
+                                </div>
+                                <div class="col-4">
+                                    <strong>${variant.analytics.clickRate.toFixed(2)}%</strong>
+                                    <br><small class="text-muted">Click Rate</small>
+                                </div>
+                                <div class="col-4">
+                                    <strong>${variant.analytics.conversionRate.toFixed(2)}%</strong>
+                                    <br><small class="text-muted">Conversion Rate</small>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        $('#variantsList').html(html);
+    }
+
+    function updateTrafficAllocation(variants) {
+        const total = variants.reduce((sum, v) => sum + v.trafficPercentage, 0);
+        $('#totalTraffic').text(total.toFixed(0) + '%');
+        $('#totalTraffic').removeClass('bg-info bg-success bg-warning bg-danger');
+        if (total === 100) {
+            $('#totalTraffic').addClass('bg-success');
+        } else if (total > 100) {
+            $('#totalTraffic').addClass('bg-danger');
+        } else {
+            $('#totalTraffic').addClass('bg-warning');
+        }
+    }
+
+    function createVariant() {
+        const data = {
+            name: $('#variantName').val(),
+            description: $('#variantDescription').val(),
+            trafficPercentage: parseFloat($('#variantTraffic').val()),
+            isControl: $('#isControl').is(':checked'),
+            channel: 0, // Will be set by backend based on campaign type
+            subject: $('#variantSubject').val(),
+            messageBody: $('#variantMessage').val()
+        };
+
+        $.ajax({
+            url: `/api/campaigns/${campaignId}/variants`,
+            method: 'POST',
+            headers: getAuthHeaders(),
+            data: JSON.stringify(data),
+            success: function(response) {
+                if (response.success) {
+                    $('#createVariantModal').modal('hide');
+                    $('#createVariantForm')[0].reset();
+                    loadVariants();
+                    showNotification('Variant created successfully!', 'success');
+                }
+            },
+            error: function(xhr) {
+                showNotification('Error creating variant: ' + (xhr.responseJSON?.message || 'Unknown error'), 'error');
+            }
+        });
+    }
+
+    function deleteVariant(variantId) {
+        if (!confirm('Are you sure you want to delete this variant?')) return;
+
+        $.ajax({
+            url: `/api/campaigns/${campaignId}/variants/${variantId}`,
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success) {
+                    loadVariants();
+                    showNotification('Variant deleted successfully!', 'success');
+                }
+            },
+            error: function() {
+                showNotification('Error deleting variant', 'error');
+            }
+        });
+    }
+
+    function loadComparison() {
+        $.ajax({
+            url: `/api/campaigns/${campaignId}/variants/comparison`,
+            method: 'GET',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success && response.data) {
+                    renderComparison(response.data);
+                }
+            },
+            error: function() {
+                $('#comparisonContent').html('<div class="alert alert-danger">Failed to load comparison</div>');
+            }
+        });
+    }
+
+    function renderComparison(comparison) {
+        let html = '';
+        if (comparison.recommendedAction) {
+            html += `<div class="alert alert-info">${comparison.recommendedAction}</div>`;
+        }
+        
+        if (comparison.winningVariant) {
+            html += `<div class="alert alert-success">
+                <strong>Top Performer:</strong> ${comparison.winningVariant.name}
+                <br>Click Rate: ${comparison.winningVariant.analytics.clickRate.toFixed(2)}%
+                | Conversion Rate: ${comparison.winningVariant.analytics.conversionRate.toFixed(2)}%
+            </div>`;
+        }
+
+        if (comparison.variants && comparison.variants.length > 0) {
+            html += '<div class="table-responsive"><table class="table table-hover">';
+            html += '<thead><tr><th>Variant</th><th>Traffic</th><th>Sent</th><th>Delivery Rate</th><th>Click Rate</th><th>Conversion Rate</th><th>Action</th></tr></thead><tbody>';
+            
+            comparison.variants.forEach(v => {
+                html += `<tr>
+                    <td>${v.name} ${v.isControl ? '<span class="badge bg-primary">Control</span>' : ''}</td>
+                    <td>${v.trafficPercentage}%</td>
+                    <td>${v.sentCount}</td>
+                    <td>${v.analytics ? v.analytics.deliveryRate.toFixed(2) : '0'}%</td>
+                    <td>${v.analytics ? v.analytics.clickRate.toFixed(2) : '0'}%</td>
+                    <td>${v.analytics ? v.analytics.conversionRate.toFixed(2) : '0'}%</td>
+                    <td><button class="btn btn-sm btn-success" onclick="selectWinner(${v.id})">Select Winner</button></td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+        }
+
+        $('#comparisonContent').html(html);
+    }
+
+    function selectWinner(variantId) {
+        if (!confirm('Are you sure you want to select this variant as the winner?')) return;
+
+        $.ajax({
+            url: `/api/campaigns/${campaignId}/variants/${variantId}/select-winner`,
+            method: 'POST',
+            headers: getAuthHeaders(),
+            success: function(response) {
+                if (response.success) {
+                    showNotification('Winner selected successfully!', 'success');
+                    loadComparison();
+                }
+            },
+            error: function() {
+                showNotification('Error selecting winner', 'error');
+            }
+        });
+    }
+</script>
+}

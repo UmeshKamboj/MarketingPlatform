@@ -98,6 +98,7 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IContactGroupService, ContactGroupService>();
 builder.Services.AddScoped<IDynamicGroupEvaluationService, DynamicGroupEvaluationService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
+builder.Services.AddScoped<ICampaignABTestingService, CampaignABTestingService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<ISuppressionListService, SuppressionListService>();
 builder.Services.AddScoped<IContactTagService, ContactTagService>();
