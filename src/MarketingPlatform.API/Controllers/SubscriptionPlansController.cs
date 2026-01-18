@@ -54,6 +54,22 @@ namespace MarketingPlatform.API.Controllers
             }
         }
 
+        [HttpGet("landing")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ApiResponse<List<SubscriptionPlanDto>>>> GetLandingPagePlans()
+        {
+            try
+            {
+                var plans = await _subscriptionPlanService.GetLandingPagePlansAsync();
+                return Ok(ApiResponse<List<SubscriptionPlanDto>>.SuccessResponse(plans));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting landing page subscription plans");
+                return BadRequest(ApiResponse<List<SubscriptionPlanDto>>.ErrorResponse("Failed to retrieve landing page plans", new List<string> { ex.Message }));
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<SubscriptionPlanDto>>> GetById(int id)
         {
@@ -142,6 +158,34 @@ namespace MarketingPlatform.API.Controllers
             {
                 _logger.LogError(ex, "Error updating plan visibility for {PlanId}", id);
                 return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to update plan visibility", new List<string> { ex.Message }));
+            }
+        }
+
+        [HttpPut("{id}/show-on-landing")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult<ApiResponse<bool>>> SetShowOnLanding(int id, [FromBody] bool showOnLanding)
+        {
+            try
+            {
+                var plan = await _subscriptionPlanService.GetPlanByIdAsync(id);
+                if (plan == null)
+                    return NotFound(ApiResponse<bool>.ErrorResponse("Subscription plan not found"));
+
+                var updateDto = new UpdateSubscriptionPlanDto
+                {
+                    ShowOnLanding = showOnLanding
+                };
+
+                var result = await _subscriptionPlanService.UpdatePlanAsync(id, updateDto);
+                if (result == null)
+                    return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to update ShowOnLanding flag"));
+
+                return Ok(ApiResponse<bool>.SuccessResponse(true, $"Plan {(showOnLanding ? "will now" : "will no longer")} be displayed on the landing page"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating ShowOnLanding flag for {PlanId}", id);
+                return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to update ShowOnLanding flag", new List<string> { ex.Message }));
             }
         }
 

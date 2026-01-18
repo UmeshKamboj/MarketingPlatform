@@ -24,6 +24,7 @@ namespace MarketingPlatform.Core.Entities
         
         public bool IsActive { get; set; } = true;
         public bool IsVisible { get; set; } = true;
+        public bool ShowOnLanding { get; set; } = true; // Control whether plan appears on landing page
 
         // Navigation properties
         public virtual ICollection<UserSubscription> UserSubscriptions { get; set; } = new List<UserSubscription>();

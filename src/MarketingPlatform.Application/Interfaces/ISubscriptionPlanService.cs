@@ -8,6 +8,7 @@ namespace MarketingPlatform.Application.Interfaces
         Task<SubscriptionPlanDto?> GetPlanByIdAsync(int planId);
         Task<List<SubscriptionPlanDto>> GetAllPlansAsync(bool includeInactive = false);
         Task<List<SubscriptionPlanDto>> GetVisiblePlansAsync();
+        Task<List<SubscriptionPlanDto>> GetLandingPagePlansAsync();
         Task<SubscriptionPlanDto> CreatePlanAsync(CreateSubscriptionPlanDto dto);
         Task<SubscriptionPlanDto?> UpdatePlanAsync(int planId, UpdateSubscriptionPlanDto dto);
         Task<bool> DeletePlanAsync(int planId);

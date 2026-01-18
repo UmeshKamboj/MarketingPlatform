@@ -12,6 +12,8 @@ namespace MarketingPlatform.Application.DTOs.Subscription
         public int ContactLimit { get; set; }
         public Dictionary<string, object>? Features { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool IsVisible { get; set; } = true;
+        public bool ShowOnLanding { get; set; } = true;
         public bool CreateStripeProduct { get; set; } = true;
         public bool CreatePayPalProduct { get; set; } = false;
     }

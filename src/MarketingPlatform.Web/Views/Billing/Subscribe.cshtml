@@ -1,0 +1,258 @@
+@{
+    ViewData["Title"] = "Choose Your Plan";
+}
+
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1>Choose the Perfect Plan for Your Business</h1>
+            <p class="lead text-muted">Select a plan that fits your needs and scale as you grow</p>
+        </div>
+    </div>
+
+    <!-- Billing Toggle -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="billingCycle" id="monthly" value="monthly" checked>
+                <label class="btn btn-outline-primary" for="monthly">Monthly</label>
+
+                <input type="radio" class="btn-check" name="billingCycle" id="yearly" value="yearly">
+                <label class="btn btn-outline-primary" for="yearly">Yearly <span class="badge bg-success">Save 20%</span></label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Plans -->
+    <div class="row" id="subscriptionPlans">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading available plans...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complete Your Subscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Selected Plan</h6>
+                        <div id="selectedPlanDetails"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Payment Information</h6>
+                        <div id="paymentElement"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="processPayment()">
+                    <i class="bi bi-lock"></i> Pay Now
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+        const stripePublishableKey = '@ViewBag.StripePublishableKey';
+        const token = localStorage.getItem('token');
+        const stripe = Stripe(stripePublishableKey);
+
+        let selectedPlan = null;
+        let billingCycle = 'monthly';
+
+        // Load subscription plans
+        async function loadPlans() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/subscriptionplans/visible`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load plans');
+                }
+
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    displayPlans(result.data);
+                } else {
+                    displayError('No plans available');
+                }
+            } catch (error) {
+                console.error('Error loading plans:', error);
+                displayError('Failed to load subscription plans');
+            }
+        }
+
+        function displayPlans(plans) {
+            const container = document.getElementById('subscriptionPlans');
+            
+            if (plans.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                        <h5 class="mt-3">No Plans Available</h5>
+                        <p class="text-muted">Please check back later</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = plans.map((plan, index) => {
+                const features = plan.features ? JSON.parse(plan.features) : [];
+                const isPopular = index === 1; // Middle plan is popular
+                const monthlyPrice = plan.priceMonthly || 0;
+                const yearlyPrice = plan.priceYearly || (monthlyPrice * 12 * 0.8);
+
+                return `
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm ${isPopular ? 'border-primary' : ''}">
+                            ${isPopular ? '<div class="card-header bg-primary text-white text-center"><small><i class="bi bi-star-fill"></i> Most Popular</small></div>' : ''}
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="card-title">${plan.name}</h3>
+                                <p class="text-muted">${plan.description || ''}</p>
+                                
+                                <div class="mb-4">
+                                    <h2 class="mb-0">
+                                        <span class="price-monthly ${billingCycle === 'yearly' ? 'd-none' : ''}">
+                                            $${monthlyPrice.toFixed(2)}
+                                        </span>
+                                        <span class="price-yearly ${billingCycle === 'monthly' ? 'd-none' : ''}">
+                                            $${(yearlyPrice / 12).toFixed(2)}
+                                        </span>
+                                        <small class="text-muted">/month</small>
+                                    </h2>
+                                    <small class="text-muted yearly-note ${billingCycle === 'monthly' ? 'd-none' : ''}">
+                                        Billed yearly at $${yearlyPrice.toFixed(2)}
+                                    </small>
+                                </div>
+
+                                <ul class="list-unstyled mb-4 flex-grow-1">
+                                    ${features.map(feature => `
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle text-success"></i> ${feature}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+
+                                <button class="btn btn-${isPopular ? 'primary' : 'outline-primary'} w-100" 
+                                        onclick="selectPlan(${plan.id}, '${plan.name}', ${monthlyPrice}, ${yearlyPrice})">
+                                    <i class="bi bi-box-seam"></i> Select Plan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        function displayError(message) {
+            document.getElementById('subscriptionPlans').innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3">${message}</h5>
+                </div>
+            `;
+        }
+
+        function selectPlan(planId, planName, monthlyPrice, yearlyPrice) {
+            selectedPlan = {
+                id: planId,
+                name: planName,
+                price: billingCycle === 'monthly' ? monthlyPrice : yearlyPrice,
+                cycle: billingCycle
+            };
+
+            // Display selected plan details
+            document.getElementById('selectedPlanDetails').innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5>${planName}</h5>
+                        <p class="mb-0">
+                            <strong>$${selectedPlan.price.toFixed(2)}</strong>
+                            <span class="text-muted">/${billingCycle === 'monthly' ? 'month' : 'year'}</span>
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            // Show payment modal
+            const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            modal.show();
+        }
+
+        async function processPayment() {
+            if (!selectedPlan) {
+                alert('Please select a plan first');
+                return;
+            }
+
+            try {
+                // Create subscription
+                const response = await fetch(`${apiBaseUrl}/billing/subscribe`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        subscriptionPlanId: selectedPlan.id,
+                        billingCycle: selectedPlan.cycle,
+                        paymentMethodId: 'stripe' // Would be actual payment method ID from Stripe
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Subscription activated successfully!');
+                    window.location.href = '/Billing';
+                } else {
+                    alert('Failed to activate subscription: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error processing payment:', error);
+                alert('Failed to process payment');
+            }
+        }
+
+        // Handle billing cycle change
+        document.addEventListener('DOMContentLoaded', () => {
+            const billingRadios = document.querySelectorAll('input[name="billingCycle"]');
+            billingRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    billingCycle = e.target.value;
+                    
+                    // Toggle price display
+                    document.querySelectorAll('.price-monthly, .yearly-note').forEach(el => {
+                        el.classList.toggle('d-none', billingCycle === 'yearly');
+                    });
+                    document.querySelectorAll('.price-yearly').forEach(el => {
+                        el.classList.toggle('d-none', billingCycle === 'monthly');
+                    });
+                });
+            });
+
+            loadPlans();
+        });
+    </script>
+}

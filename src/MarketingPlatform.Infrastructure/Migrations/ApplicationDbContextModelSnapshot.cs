@@ -2443,7 +2443,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("MessageTemplates");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformConfiguration", b =>
             modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformSetting", b =>
                 {
                     b.Property<int>("Id")
@@ -4440,6 +4439,8 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("PricingModel");
+                });
+
             modelBuilder.Entity("MarketingPlatform.Core.Entities.SuperAdminRole", b =>
                 {
                     b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "AssignedByUser")
