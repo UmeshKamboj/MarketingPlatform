@@ -7,7 +7,7 @@ namespace MarketingPlatform.Core.Entities
         public int MaxMessagesPerDay { get; set; } = 5;
         public int MaxMessagesPerWeek { get; set; } = 20;
         public int MaxMessagesPerMonth { get; set; } = 50;
-        public DateTime LastMessageSentAt { get; set; }
+        public DateTime? LastMessageSentAt { get; set; }
         public int MessagesSentToday { get; set; } = 0;
         public int MessagesSentThisWeek { get; set; } = 0;
         public int MessagesSentThisMonth { get; set; } = 0;

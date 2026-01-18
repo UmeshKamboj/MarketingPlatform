@@ -168,7 +168,18 @@ namespace MarketingPlatform.Application.Services
         private async Task ResetCountersIfNeededAsync(FrequencyControl control)
         {
             var now = DateTime.UtcNow;
-            var lastSent = control.LastMessageSentAt;
+            
+            // Handle null LastMessageSentAt for new frequency controls
+            if (!control.LastMessageSentAt.HasValue)
+            {
+                control.LastMessageSentAt = now;
+                control.UpdatedAt = DateTime.UtcNow;
+                _frequencyControlRepository.Update(control);
+                await _unitOfWork.SaveChangesAsync();
+                return;
+            }
+            
+            var lastSent = control.LastMessageSentAt.Value;
             bool needsUpdate = false;
 
             // Reset daily counter if it's a new day
@@ -178,9 +189,9 @@ namespace MarketingPlatform.Application.Services
                 needsUpdate = true;
             }
 
-            // Reset weekly counter if it's a new week (week starts on Monday)
-            var lastSentWeekStart = lastSent.AddDays(-(int)lastSent.DayOfWeek + (int)DayOfWeek.Monday);
-            var nowWeekStart = now.AddDays(-(int)now.DayOfWeek + (int)DayOfWeek.Monday);
+            // Reset weekly counter if it's a new week (ISO 8601: week starts on Monday)
+            var lastSentWeekStart = GetMondayOfWeek(lastSent);
+            var nowWeekStart = GetMondayOfWeek(now);
             if (lastSentWeekStart.Date < nowWeekStart.Date)
             {
                 control.MessagesSentThisWeek = 0;
@@ -200,6 +211,13 @@ namespace MarketingPlatform.Application.Services
                 _frequencyControlRepository.Update(control);
                 await _unitOfWork.SaveChangesAsync();
             }
+        }
+        
+        private DateTime GetMondayOfWeek(DateTime date)
+        {
+            // Handle Sunday (0) as the last day of the week
+            int daysToSubtract = ((int)date.DayOfWeek + 6) % 7; // Convert Sunday to 6, Monday to 0, etc.
+            return date.AddDays(-daysToSubtract).Date;
         }
     }
 }

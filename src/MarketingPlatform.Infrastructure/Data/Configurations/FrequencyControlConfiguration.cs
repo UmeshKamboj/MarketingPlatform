@@ -42,7 +42,7 @@ namespace MarketingPlatform.Infrastructure.Data.Configurations
                 .HasDefaultValue(0);
 
             builder.Property(fc => fc.LastMessageSentAt)
-                .IsRequired();
+                .IsRequired(false); // Allow null for new frequency controls
 
             // Indexes for performance
             builder.HasIndex(fc => fc.ContactId);

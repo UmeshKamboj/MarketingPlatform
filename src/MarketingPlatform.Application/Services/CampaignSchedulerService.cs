@@ -94,8 +94,8 @@ namespace MarketingPlatform.Application.Services
                 try
                 {
                     var targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
-                    var localTime = TimeZoneInfo.ConvertTime(scheduledDateTime, targetTimeZone);
-                    executionTime = TimeZoneInfo.ConvertTimeToUtc(localTime, targetTimeZone);
+                    // Treat scheduledDateTime as local time in target timezone and convert to UTC
+                    executionTime = TimeZoneInfo.ConvertTimeToUtc(scheduledDateTime, targetTimeZone);
                 }
                 catch (TimeZoneNotFoundException ex)
                 {

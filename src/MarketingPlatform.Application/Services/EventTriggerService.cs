@@ -115,9 +115,6 @@ namespace MarketingPlatform.Application.Services
                             _logger.LogInformation("Queued workflow {WorkflowId} for inactive contact {ContactId}", workflow.Id, contact.Id);
                         }
                     }
-                    
-                    // Small delay between batches to reduce DB load
-                    await Task.Delay(100);
                 }
             }
         }

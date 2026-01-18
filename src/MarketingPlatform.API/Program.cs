@@ -258,9 +258,9 @@ public class HangfireDashboardAuthorizationFilter : Hangfire.Dashboard.IDashboar
 {
     public bool Authorize(Hangfire.Dashboard.DashboardContext context)
     {
-        // Allow access in development mode
-        // In production, implement proper authentication check
-        // Example: check if user is authenticated and has admin role
+        // Development: Allow all access for testing
+        // Production: Implement proper authentication
+        // TODO: Replace with proper auth check that validates user is authenticated and has admin role
         return true;
     }
 }
