@@ -32,7 +32,13 @@ namespace MarketingPlatform.API.Controllers
                 // Validate webhook signature if provided
                 if (!string.IsNullOrEmpty(signature))
                 {
-                    var webhookSecret = _configuration["WebhookSettings:Secret"] ?? "default-secret-key";
+                    var webhookSecret = _configuration["WebhookSettings:Secret"];
+                    if (string.IsNullOrEmpty(webhookSecret))
+                    {
+                        _logger.LogError("Webhook secret not configured");
+                        return StatusCode(500, new { success = false, error = "Webhook secret not configured" });
+                    }
+                    
                     var payload = System.Text.Json.JsonSerializer.Serialize(dto);
                     
                     if (!_webhookService.ValidateWebhookSignature(signature, payload, webhookSecret))
@@ -76,7 +82,13 @@ namespace MarketingPlatform.API.Controllers
                 // Validate webhook signature if provided
                 if (!string.IsNullOrEmpty(signature))
                 {
-                    var webhookSecret = _configuration["WebhookSettings:Secret"] ?? "default-secret-key";
+                    var webhookSecret = _configuration["WebhookSettings:Secret"];
+                    if (string.IsNullOrEmpty(webhookSecret))
+                    {
+                        _logger.LogError("Webhook secret not configured");
+                        return StatusCode(500, new { success = false, error = "Webhook secret not configured" });
+                    }
+                    
                     var payloadJson = System.Text.Json.JsonSerializer.Serialize(payload);
                     
                     if (!_webhookService.ValidateWebhookSignature(signature, payloadJson, webhookSecret))
@@ -123,7 +135,13 @@ namespace MarketingPlatform.API.Controllers
                 // Validate webhook signature if provided
                 if (!string.IsNullOrEmpty(signature))
                 {
-                    var webhookSecret = _configuration["WebhookSettings:Secret"] ?? "default-secret-key";
+                    var webhookSecret = _configuration["WebhookSettings:Secret"];
+                    if (string.IsNullOrEmpty(webhookSecret))
+                    {
+                        _logger.LogError("Webhook secret not configured");
+                        return StatusCode(500, new { success = false, error = "Webhook secret not configured" });
+                    }
+                    
                     var payloadJson = System.Text.Json.JsonSerializer.Serialize(payload);
                     
                     if (!_webhookService.ValidateWebhookSignature(signature, payloadJson, webhookSecret))
@@ -157,7 +175,13 @@ namespace MarketingPlatform.API.Controllers
                 // Validate webhook signature if provided
                 if (!string.IsNullOrEmpty(signature))
                 {
-                    var webhookSecret = _configuration["WebhookSettings:Secret"] ?? "default-secret-key";
+                    var webhookSecret = _configuration["WebhookSettings:Secret"];
+                    if (string.IsNullOrEmpty(webhookSecret))
+                    {
+                        _logger.LogError("Webhook secret not configured");
+                        return StatusCode(500, new { success = false, error = "Webhook secret not configured" });
+                    }
+                    
                     var payloadJson = System.Text.Json.JsonSerializer.Serialize(payload);
                     
                     if (!_webhookService.ValidateWebhookSignature(signature, payloadJson, webhookSecret))

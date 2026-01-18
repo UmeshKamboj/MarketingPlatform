@@ -135,8 +135,9 @@ namespace MarketingPlatform.Application.Services
                     {
                         var crmContact = MapContactToCRM(contact, config.FieldMappings);
                         
-                        // For now, all contacts are created fresh in CRM since we don't track ExternalCRMId
-                        // In production, you'd want to add ExternalCRMId field to Contact entity
+                        // NOTE: External CRM ID tracking not yet implemented in Contact entity
+                        // This means all contacts are created fresh in CRM on each sync
+                        // TODO: Add ExternalCRMId field to Contact entity to enable update operations
                         var externalId = await provider.CreateContactAsync(crmContact, config);
 
                         result.SuccessCount++;
@@ -191,8 +192,8 @@ namespace MarketingPlatform.Application.Services
                     var contact = await _contactRepository.GetByIdAsync(message.ContactId);
                     if (contact != null)
                     {
-                        // Note: In production, add ExternalCRMId field to Contact entity
-                        // For now, we'll skip this step as we don't have external CRM ID tracking
+                        // NOTE: External CRM ID tracking not yet implemented in Contact entity
+                        // TODO: Add ExternalCRMId field to Contact entity to enable engagement sync
                         _logger.LogDebug("Skipping engagement sync for contact {ContactId} - no CRM ID", contact.Id);
                     }
                 }
@@ -242,6 +243,8 @@ namespace MarketingPlatform.Application.Services
         private ICRMProvider GetCRMProvider(CRMSyncConfigDto config)
         {
             // Factory pattern to get appropriate CRM provider
+            // NOTE: These are placeholder implementations - should be moved to separate files
+            // TODO: Register providers in DI container and use factory service pattern
             return config.CRMType switch
             {
                 CRMType.Salesforce => new SalesforceCRMProvider(_logger),
@@ -281,7 +284,8 @@ namespace MarketingPlatform.Application.Services
         {
             return new CRMContactDto
             {
-                ExternalId = string.Empty, // No external CRM ID tracking yet
+                // NOTE: No external CRM ID tracking - see TODO above
+                ExternalId = string.Empty,
                 FirstName = contact.FirstName ?? string.Empty,
                 LastName = contact.LastName ?? string.Empty,
                 Email = contact.Email ?? string.Empty,
@@ -303,8 +307,10 @@ namespace MarketingPlatform.Application.Services
         Task<List<CRMFieldDto>> GetFieldsAsync(CRMSyncConfigDto config);
     }
 
-    // Placeholder implementations for different CRM providers
-    // These should be moved to separate files in production
+    // Placeholder CRM provider implementations
+    // NOTE: These should be moved to separate files in production (e.g., Infrastructure/Providers/CRM/)
+    // TODO: Implement actual API integration for each CRM system
+    // TODO: Consider using official SDKs (Salesforce SDK, HubSpot Client, etc.)
 
     internal class SalesforceCRMProvider : ICRMProvider
     {
