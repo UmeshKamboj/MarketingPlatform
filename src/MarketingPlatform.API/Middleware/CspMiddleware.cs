@@ -1,4 +1,6 @@
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MarketingPlatform.API.Middleware
 {
@@ -67,15 +69,17 @@ namespace MarketingPlatform.API.Middleware
         /// <summary>
         /// Builds a CSP header for development environment.
         /// More permissive to allow hot reload, browser-link, and WebSocket connections.
+        /// Uses specific port ranges for common development tools to maintain security.
         /// </summary>
         /// <param name="nonce">The nonce to include in the CSP</param>
         /// <returns>CSP header value</returns>
         private static string BuildDevelopmentCsp(string nonce)
         {
+            // Common development ports: 5000-5999 (Kestrel), 7000-7999 (HTTPS), 44300-44399 (IIS Express HTTPS), 60000-65535 (dynamic)
             return $"default-src 'self'; " +
                    $"script-src 'self' 'nonce-{nonce}' 'unsafe-eval'; " +
-                   $"style-src 'self' 'nonce-{nonce}' 'unsafe-inline'; " +
-                   $"connect-src 'self' ws: wss: http://localhost:* https://localhost:*; " +
+                   $"style-src 'self' 'nonce-{nonce}'; " +
+                   $"connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:*; " +
                    $"img-src 'self' data: https:; " +
                    $"font-src 'self'; " +
                    $"object-src 'none'; " +

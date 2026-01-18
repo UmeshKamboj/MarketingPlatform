@@ -20,8 +20,8 @@ The CSP middleware generates a unique cryptographically secure nonce for each HT
 ```
 default-src 'self';
 script-src 'self' 'nonce-{NONCE}' 'unsafe-eval';
-style-src 'self' 'nonce-{NONCE}' 'unsafe-inline';
-connect-src 'self' ws: wss: http://localhost:* https://localhost:*;
+style-src 'self' 'nonce-{NONCE}';
+connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:*;
 img-src 'self' data: https:;
 font-src 'self';
 object-src 'none';
@@ -92,15 +92,15 @@ Helper extension methods for accessing the CSP nonce in Razor views and controll
 
 The development CSP is more permissive to support:
 - **Hot Module Replacement (HMR)**: `'unsafe-eval'` in script-src
-- **Browser Link**: WebSocket connections via `ws:` and `wss:`
+- **Browser Link**: WebSocket connections via `ws://localhost:*` and `wss://localhost:*`
 - **Local Development**: `http://localhost:*` and `https://localhost:*` in connect-src
-- **Inline Styles**: `'unsafe-inline'` in style-src for easier debugging
+- **Inline Styles**: Nonce-based inline styles (removed `'unsafe-inline'` for better security)
 
 ### Production Environment
 
 The production CSP is strict and secure:
 - **No unsafe-eval**: Scripts must be external or use nonce
-- **No unsafe-inline for scripts**: All inline scripts must use nonce
+- **No unsafe-inline**: All inline scripts and styles must use nonce
 - **Limited connections**: Only 'self' allowed in connect-src
 - **Frame protection**: `frame-ancestors 'none'` prevents clickjacking
 - **Form protection**: `form-action 'self'` prevents form hijacking
