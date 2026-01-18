@@ -395,9 +395,9 @@ namespace MarketingPlatform.Application.Services
             return RenderContent(template.MessageBody, variables);
         }
 
-        public async Task<List<string>> ExtractVariablesFromContentAsync(string content)
+        public Task<List<string>> ExtractVariablesFromContentAsync(string content)
         {
-            return await Task.FromResult(ExtractVariablesFromContent(content));
+            return Task.FromResult(ExtractVariablesFromContent(content));
         }
 
         public async Task<TemplateUsageStatsDto> GetTemplateUsageStatsAsync(string userId, int templateId)
