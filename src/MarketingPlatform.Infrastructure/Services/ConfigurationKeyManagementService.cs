@@ -81,19 +81,21 @@ namespace MarketingPlatform.Infrastructure.Services
 
         /// <summary>
         /// Rotates the encryption key by creating a new version.
-        /// Note: In production with Azure Key Vault, this would create a new key version.
-        /// With configuration-based keys, this needs manual update.
+        /// Note: Configuration-based keys require manual rotation.
+        /// For automatic rotation, use Azure Key Vault or AWS KMS.
         /// </summary>
         public Task<string> RotateKeyAsync()
         {
-            throw new NotSupportedException(
+            // Configuration-based rotation requires manual intervention
+            // Return a task with informative exception rather than throwing synchronously
+            return Task.FromException<string>(new NotSupportedException(
                 "Key rotation with configuration-based storage requires manual intervention. " +
                 "In production, use Azure Key Vault or AWS KMS for automatic key rotation. " +
                 "To rotate keys manually: " +
                 "1. Generate a new 256-bit key using: Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)) " +
                 "2. Add the new key to configuration with a new version (e.g., v2) " +
                 "3. Update Encryption:CurrentKeyVersion to the new version " +
-                "4. Old keys must remain in configuration to decrypt existing data");
+                "4. Old keys must remain in configuration to decrypt existing data"));
         }
 
         /// <summary>

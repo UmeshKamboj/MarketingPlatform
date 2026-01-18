@@ -93,14 +93,32 @@ namespace MarketingPlatform.Infrastructure.Services
             {
                 var parts = encryptedText.Split(':');
                 if (parts.Length != 3)
-                    throw new CryptographicException("Invalid encrypted data format");
+                    throw new FormatException("Invalid encrypted data format. Expected format: version:IV:data");
 
                 var keyVersion = parts[0];
-                var iv = Convert.FromBase64String(parts[1]);
-                var encrypted = Convert.FromBase64String(parts[2]);
+                byte[] iv;
+                byte[] encrypted;
+
+                try
+                {
+                    iv = Convert.FromBase64String(parts[1]);
+                    encrypted = Convert.FromBase64String(parts[2]);
+                }
+                catch (FormatException ex)
+                {
+                    throw new FormatException("Invalid Base64 encoding in encrypted data", ex);
+                }
 
                 // Retrieve the appropriate key version for decryption
-                var key = await _keyManagementService.GetEncryptionKeyAsync(keyVersion);
+                byte[] key;
+                try
+                {
+                    key = await _keyManagementService.GetEncryptionKeyAsync(keyVersion);
+                }
+                catch (Exception ex)
+                {
+                    throw new CryptographicException($"Failed to retrieve encryption key version '{keyVersion}'", ex);
+                }
 
                 using var aes = Aes.Create();
                 aes.Key = key;
@@ -115,9 +133,19 @@ namespace MarketingPlatform.Infrastructure.Services
 
                 return srDecrypt.ReadToEnd();
             }
+            catch (CryptographicException)
+            {
+                // Re-throw cryptographic exceptions as-is for proper error handling
+                throw;
+            }
+            catch (FormatException)
+            {
+                // Re-throw format exceptions as-is
+                throw;
+            }
             catch (Exception ex)
             {
-                throw new CryptographicException("Failed to decrypt data", ex);
+                throw new CryptographicException("Unexpected error during decryption", ex);
             }
         }
     }

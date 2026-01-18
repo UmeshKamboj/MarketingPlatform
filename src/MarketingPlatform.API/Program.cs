@@ -36,20 +36,27 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Encryption Services - Configuration-based by default with Azure/AWS options
 var encryptionProvider = builder.Configuration["Encryption:Provider"] ?? "Configuration";
+Log.Information("Initializing encryption with provider: {Provider}", encryptionProvider);
+
 switch (encryptionProvider.ToLowerInvariant())
 {
     case "azure":
         // Azure Key Vault integration (requires Azure.Security.KeyVault.Keys package)
-        // builder.Services.AddSingleton<IKeyManagementService, AzureKeyVaultService>();
-        throw new NotImplementedException("Azure Key Vault integration requires Azure.Security.KeyVault.Keys package. Install and uncomment the registration.");
+        Log.Warning("Azure Key Vault provider selected but not implemented. Install Azure.Security.KeyVault.Keys package and implement AzureKeyVaultService.");
+        Log.Information("Falling back to Configuration-based key management.");
+        builder.Services.AddSingleton<IKeyManagementService, ConfigurationKeyManagementService>();
+        break;
     
     case "aws":
         // AWS KMS integration (requires AWSSDK.KeyManagementService package)
-        // builder.Services.AddSingleton<IKeyManagementService, AwsKmsService>();
-        throw new NotImplementedException("AWS KMS integration requires AWSSDK.KeyManagementService package. Install and uncomment the registration.");
+        Log.Warning("AWS KMS provider selected but not implemented. Install AWSSDK.KeyManagementService package and implement AwsKmsService.");
+        Log.Information("Falling back to Configuration-based key management.");
+        builder.Services.AddSingleton<IKeyManagementService, ConfigurationKeyManagementService>();
+        break;
     
     case "configuration":
     default:
+        Log.Information("Using Configuration-based key management. For production, consider Azure Key Vault or AWS KMS.");
         builder.Services.AddSingleton<IKeyManagementService, ConfigurationKeyManagementService>();
         break;
 }

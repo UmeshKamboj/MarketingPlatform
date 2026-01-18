@@ -2,6 +2,8 @@ using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Interfaces;
 using MarketingPlatform.Core.Interfaces.Repositories;
 
+using System.Security.Cryptography;
+
 namespace MarketingPlatform.Infrastructure.Repositories
 {
     /// <summary>
@@ -53,10 +55,17 @@ namespace MarketingPlatform.Infrastructure.Repositories
                 {
                     contact.Email = _encryptionService.Decrypt(contact.Email);
                 }
-                catch
+                catch (CryptographicException ex)
                 {
                     // If decryption fails, field might not be encrypted (legacy data)
-                    // Leave as is and log warning in production
+                    // Log warning for investigation but don't fail the entire operation
+                    System.Diagnostics.Debug.WriteLine($"Failed to decrypt email for contact {contact.Id}: {ex.Message}");
+                    // Leave as is - may be legacy unencrypted data
+                }
+                catch (FormatException ex)
+                {
+                    // Invalid base64 format - likely legacy data
+                    System.Diagnostics.Debug.WriteLine($"Invalid encrypted format for email in contact {contact.Id}: {ex.Message}");
                 }
             }
 
@@ -66,9 +75,13 @@ namespace MarketingPlatform.Infrastructure.Repositories
                 {
                     contact.PhoneNumber = _encryptionService.Decrypt(contact.PhoneNumber);
                 }
-                catch
+                catch (CryptographicException ex)
                 {
-                    // If decryption fails, field might not be encrypted (legacy data)
+                    System.Diagnostics.Debug.WriteLine($"Failed to decrypt phone for contact {contact.Id}: {ex.Message}");
+                }
+                catch (FormatException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Invalid encrypted format for phone in contact {contact.Id}: {ex.Message}");
                 }
             }
 
@@ -78,15 +91,20 @@ namespace MarketingPlatform.Infrastructure.Repositories
                 {
                     contact.CustomAttributes = _encryptionService.Decrypt(contact.CustomAttributes);
                 }
-                catch
+                catch (CryptographicException ex)
                 {
-                    // If decryption fails, field might not be encrypted (legacy data)
+                    System.Diagnostics.Debug.WriteLine($"Failed to decrypt custom attributes for contact {contact.Id}: {ex.Message}");
+                }
+                catch (FormatException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Invalid encrypted format for custom attributes in contact {contact.Id}: {ex.Message}");
                 }
             }
         }
 
         /// <summary>
         /// Checks if a value is already encrypted by looking for the version:IV:data format.
+        /// Validates the structure more thoroughly to avoid false positives.
         /// </summary>
         private bool IsEncrypted(string value)
         {
@@ -95,7 +113,24 @@ namespace MarketingPlatform.Infrastructure.Repositories
 
             // Check for encryption format: version:IV:encryptedData
             var parts = value.Split(':');
-            return parts.Length == 3 && parts[0].StartsWith("v");
+            if (parts.Length != 3)
+                return false;
+
+            // Version should start with 'v' (e.g., v1, v2)
+            if (!parts[0].StartsWith("v"))
+                return false;
+
+            // IV and encrypted data should be valid base64
+            try
+            {
+                Convert.FromBase64String(parts[1]); // IV
+                Convert.FromBase64String(parts[2]); // Encrypted data
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false; // Not valid base64, therefore not encrypted
+            }
         }
     }
 }
