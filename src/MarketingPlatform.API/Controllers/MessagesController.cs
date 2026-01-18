@@ -220,5 +220,75 @@ namespace MarketingPlatform.API.Controllers
                 return Forbid();
             }
         }
+
+        /// <summary>
+        /// Preview message content with variable substitution and device-specific rendering
+        /// </summary>
+        [HttpPost("preview")]
+        public async Task<ActionResult<ApiResponse<MessagePreviewDto>>> PreviewMessage([FromBody] MessagePreviewRequestDto request)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var preview = await _messageService.PreviewMessageAsync(userId, request);
+                return Ok(ApiResponse<MessagePreviewDto>.SuccessResponse(preview));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ApiResponse<MessagePreviewDto>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error previewing message");
+                return StatusCode(500, ApiResponse<MessagePreviewDto>.ErrorResponse("Failed to preview message"));
+            }
+        }
+
+        /// <summary>
+        /// Send test message to specified recipients
+        /// </summary>
+        [HttpPost("test-send")]
+        public async Task<ActionResult<ApiResponse<TestSendResultDto>>> SendTestMessage([FromBody] TestSendRequestDto request)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var result = await _messageService.SendTestMessageAsync(userId, request);
+                
+                if (result.IsSuccess)
+                {
+                    return Ok(ApiResponse<TestSendResultDto>.SuccessResponse(result, 
+                        $"Test message sent successfully to {result.SuccessCount} recipient(s)"));
+                }
+                else
+                {
+                    return Ok(ApiResponse<TestSendResultDto>.SuccessResponse(result,
+                        $"Test send completed with {result.SuccessCount} success(es) and {result.FailureCount} failure(s)"));
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ApiResponse<TestSendResultDto>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending test message");
+                return StatusCode(500, ApiResponse<TestSendResultDto>.ErrorResponse("Failed to send test message"));
+            }
+        }
     }
 }

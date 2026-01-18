@@ -610,5 +610,435 @@ namespace MarketingPlatform.Application.Services
                 await UpdateMessageAfterSendAsync(message.Id, false, null, ex.Message, null);
             }
         }
+
+        public async Task<MessagePreviewDto> PreviewMessageAsync(string userId, MessagePreviewRequestDto request)
+        {
+            // Validate campaign access if provided
+            if (request.CampaignId.HasValue)
+            {
+                var campaign = await _campaignRepository.GetByIdAsync(request.CampaignId.Value);
+                if (campaign == null || campaign.UserId != userId)
+                {
+                    throw new UnauthorizedAccessException("Campaign not found or access denied");
+                }
+            }
+
+            // Build variable dictionary
+            var variables = new Dictionary<string, string>(request.VariableValues, StringComparer.OrdinalIgnoreCase);
+
+            // Load contact data if ContactId provided
+            if (request.ContactId.HasValue)
+            {
+                var contact = await _contactRepository.GetByIdAsync(request.ContactId.Value);
+                if (contact != null && contact.UserId == userId && !contact.IsDeleted)
+                {
+                    var contactVars = LoadContactVariables(contact);
+                    foreach (var kvp in contactVars)
+                    {
+                        if (!variables.ContainsKey(kvp.Key))
+                        {
+                            variables[kvp.Key] = kvp.Value;
+                        }
+                    }
+                }
+            }
+
+            // Render content
+            var renderedSubject = !string.IsNullOrWhiteSpace(request.Subject)
+                ? RenderContent(request.Subject, variables)
+                : null;
+            var renderedBody = RenderContent(request.MessageBody, variables);
+            var renderedHtml = !string.IsNullOrWhiteSpace(request.HTMLContent)
+                ? RenderContent(request.HTMLContent, variables)
+                : null;
+
+            var preview = new MessagePreviewDto
+            {
+                Channel = request.Channel,
+                Subject = renderedSubject,
+                MessageBody = renderedBody,
+                HTMLContent = renderedHtml,
+                MediaUrls = request.MediaUrls,
+                CharacterCount = renderedBody.Length
+            };
+
+            // Find missing variables
+            preview.MissingVariables = FindMissingVariables(request.MessageBody, variables);
+            if (!string.IsNullOrWhiteSpace(request.Subject))
+            {
+                preview.MissingVariables.AddRange(FindMissingVariables(request.Subject, variables));
+            }
+            if (!string.IsNullOrWhiteSpace(request.HTMLContent))
+            {
+                preview.MissingVariables.AddRange(FindMissingVariables(request.HTMLContent, variables));
+            }
+            preview.MissingVariables = preview.MissingVariables.Distinct().ToList();
+
+            // Calculate SMS segments if applicable
+            if (request.Channel == ChannelType.SMS || request.Channel == ChannelType.MMS)
+            {
+                preview.SmsSegments = CalculateSmsSegments(renderedBody);
+            }
+
+            // Validate content
+            ValidateMessageContent(preview, request.Channel);
+
+            // Generate device-specific previews
+            preview.DevicePreviews = GenerateDevicePreviews(renderedSubject, renderedBody, renderedHtml, request.Channel);
+
+            return preview;
+        }
+
+        public async Task<TestSendResultDto> SendTestMessageAsync(string userId, TestSendRequestDto request)
+        {
+            // Validate campaign access if provided
+            if (request.CampaignId.HasValue)
+            {
+                var campaign = await _campaignRepository.GetByIdAsync(request.CampaignId.Value);
+                if (campaign == null || campaign.UserId != userId)
+                {
+                    throw new UnauthorizedAccessException("Campaign not found or access denied");
+                }
+            }
+
+            if (request.Recipients == null || !request.Recipients.Any())
+            {
+                throw new ArgumentException("At least one recipient is required for test send");
+            }
+
+            var result = new TestSendResultDto();
+
+            // Build variable dictionary
+            var variables = new Dictionary<string, string>(request.VariableValues, StringComparer.OrdinalIgnoreCase);
+
+            // Load contact data if ContactId provided
+            if (request.ContactId.HasValue)
+            {
+                var contact = await _contactRepository.GetByIdAsync(request.ContactId.Value);
+                if (contact != null && contact.UserId == userId && !contact.IsDeleted)
+                {
+                    var contactVars = LoadContactVariables(contact);
+                    foreach (var kvp in contactVars)
+                    {
+                        if (!variables.ContainsKey(kvp.Key))
+                        {
+                            variables[kvp.Key] = kvp.Value;
+                        }
+                    }
+                }
+            }
+
+            // Render content
+            var renderedSubject = !string.IsNullOrWhiteSpace(request.Subject)
+                ? RenderContent(request.Subject, variables)
+                : null;
+            var renderedBody = RenderContent(request.MessageBody, variables);
+            var renderedHtml = !string.IsNullOrWhiteSpace(request.HTMLContent)
+                ? RenderContent(request.HTMLContent, variables)
+                : null;
+
+            // Send test message to each recipient
+            foreach (var recipient in request.Recipients)
+            {
+                var recipientResult = new TestSendRecipientResultDto
+                {
+                    Recipient = recipient
+                };
+
+                try
+                {
+                    string? externalId = null;
+                    bool success = false;
+                    string? errorMessage = null;
+
+                    // Add [TEST] prefix to subject/body to indicate test message
+                    var testSubject = renderedSubject != null ? $"[TEST] {renderedSubject}" : null;
+                    var testBody = $"[TEST MESSAGE]\n\n{renderedBody}";
+
+                    switch (request.Channel)
+                    {
+                        case ChannelType.SMS:
+                            var smsResult = await _smsProvider.SendSMSAsync(recipient, testBody);
+                            success = smsResult.Success;
+                            externalId = smsResult.ExternalId;
+                            errorMessage = smsResult.Error;
+                            break;
+
+                        case ChannelType.MMS:
+                            var mmsResult = await _mmsProvider.SendMMSAsync(
+                                recipient, 
+                                testBody, 
+                                request.MediaUrls?.ToList() ?? new List<string>());
+                            success = mmsResult.Success;
+                            externalId = mmsResult.ExternalId;
+                            errorMessage = mmsResult.Error;
+                            break;
+
+                        case ChannelType.Email:
+                            var emailResult = await _emailProvider.SendEmailAsync(
+                                recipient,
+                                testSubject ?? "[TEST]",
+                                testBody,
+                                renderedHtml);
+                            success = emailResult.Success;
+                            externalId = emailResult.ExternalId;
+                            errorMessage = emailResult.Error;
+                            break;
+                    }
+
+                    recipientResult.Success = success;
+                    recipientResult.ExternalMessageId = externalId;
+                    recipientResult.ErrorMessage = errorMessage;
+
+                    if (success)
+                    {
+                        result.SuccessCount++;
+                        _logger.LogInformation(
+                            "Test message sent successfully to {Recipient} via {Channel}. ExternalId: {ExternalId}",
+                            recipient, request.Channel, externalId);
+                    }
+                    else
+                    {
+                        result.FailureCount++;
+                        _logger.LogWarning(
+                            "Test message failed to send to {Recipient} via {Channel}. Error: {Error}",
+                            recipient, request.Channel, errorMessage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    recipientResult.Success = false;
+                    recipientResult.ErrorMessage = ex.Message;
+                    result.FailureCount++;
+                    _logger.LogError(ex, 
+                        "Exception sending test message to {Recipient} via {Channel}",
+                        recipient, request.Channel);
+                }
+
+                result.Recipients.Add(recipientResult);
+            }
+
+            return result;
+        }
+
+        // Private helper methods for preview and test send
+        private Dictionary<string, string> LoadContactVariables(Contact contact)
+        {
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "FirstName", contact.FirstName ?? "" },
+                { "LastName", contact.LastName ?? "" },
+                { "Email", contact.Email ?? "" },
+                { "Phone", contact.PhoneNumber ?? "" },
+                { "PhoneNumber", contact.PhoneNumber ?? "" }
+            };
+        }
+
+        private string RenderContent(string content, Dictionary<string, string> variables)
+        {
+            var result = content;
+
+            foreach (var kvp in variables)
+            {
+                var placeholder = $"{{{{{kvp.Key}}}}}";
+                var index = 0;
+                while ((index = result.IndexOf(placeholder, index, StringComparison.OrdinalIgnoreCase)) != -1)
+                {
+                    result = result.Remove(index, placeholder.Length).Insert(index, kvp.Value);
+                    index += kvp.Value.Length;
+                }
+            }
+
+            return result;
+        }
+
+        private List<string> FindMissingVariables(string content, Dictionary<string, string> providedVariables)
+        {
+            var allVariables = ExtractVariablesFromContent(content);
+            return allVariables.Where(v => !providedVariables.ContainsKey(v)).ToList();
+        }
+
+        private List<string> ExtractVariablesFromContent(string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+                return new List<string>();
+
+            var regex = new System.Text.RegularExpressions.Regex(@"\{\{([^}]+)\}\}");
+            var matches = regex.Matches(content);
+
+            return matches
+                .Select(m => m.Groups[1].Value.Trim())
+                .Distinct()
+                .ToList();
+        }
+
+        private int CalculateSmsSegments(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+                return 0;
+
+            var charCount = content.Length;
+            var containsUnicode = ContainsUnicodeCharacters(content);
+
+            // SMS character limits
+            const int SmsGsm7SingleSegment = 160;
+            const int SmsGsm7ConcatenatedSegment = 153;
+            const int SmsUnicodeSingleSegment = 70;
+            const int SmsUnicodeConcatenatedSegment = 67;
+
+            if (containsUnicode)
+            {
+                return charCount <= SmsUnicodeSingleSegment
+                    ? 1
+                    : (int)Math.Ceiling((double)charCount / SmsUnicodeConcatenatedSegment);
+            }
+            else
+            {
+                return charCount <= SmsGsm7SingleSegment
+                    ? 1
+                    : (int)Math.Ceiling((double)charCount / SmsGsm7ConcatenatedSegment);
+            }
+        }
+
+        private bool ContainsUnicodeCharacters(string text)
+        {
+            var unicodeSpecialChars = new[] { '€', '[', ']', '{', '}', '\\', '^', '~', '|' };
+            foreach (char c in text)
+            {
+                if (c > 127 || unicodeSpecialChars.Contains(c))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void ValidateMessageContent(MessagePreviewDto preview, ChannelType channel)
+        {
+            // Validate based on channel type
+            switch (channel)
+            {
+                case ChannelType.SMS:
+                    if (preview.CharacterCount > 1600)
+                    {
+                        preview.ValidationWarnings.Add("Message exceeds 10 SMS segments (1600 characters). Consider shortening.");
+                    }
+                    if (preview.SmsSegments > 1)
+                    {
+                        preview.ValidationWarnings.Add($"Message will be sent as {preview.SmsSegments} SMS segments.");
+                    }
+                    break;
+
+                case ChannelType.MMS:
+                    if (preview.CharacterCount > 1600)
+                    {
+                        preview.ValidationWarnings.Add("Message exceeds recommended length for MMS.");
+                    }
+                    if (preview.MediaUrls == null || !preview.MediaUrls.Any())
+                    {
+                        preview.ValidationWarnings.Add("MMS message has no media attachments.");
+                    }
+                    break;
+
+                case ChannelType.Email:
+                    if (!string.IsNullOrEmpty(preview.Subject) && preview.Subject.Length > 100)
+                    {
+                        preview.ValidationWarnings.Add("Subject line exceeds 100 characters. May be truncated in some email clients.");
+                    }
+                    if (string.IsNullOrEmpty(preview.Subject))
+                    {
+                        preview.ValidationWarnings.Add("Email has no subject line.");
+                    }
+                    if (string.IsNullOrEmpty(preview.HTMLContent) && preview.CharacterCount > 100000)
+                    {
+                        preview.ValidationWarnings.Add("Email body is very large. Consider using HTML format.");
+                    }
+                    break;
+            }
+
+            // Check for missing variables
+            if (preview.MissingVariables.Any())
+            {
+                preview.ValidationWarnings.Add($"Missing variable values: {string.Join(", ", preview.MissingVariables)}");
+            }
+        }
+
+        private List<DevicePreviewDto> GenerateDevicePreviews(
+            string? subject, 
+            string body, 
+            string? htmlContent, 
+            ChannelType channel)
+        {
+            var previews = new List<DevicePreviewDto>();
+
+            if (channel == ChannelType.Email)
+            {
+                // Desktop preview
+                previews.Add(new DevicePreviewDto
+                {
+                    DeviceType = "Desktop",
+                    Subject = subject,
+                    MessageBody = body,
+                    HTMLContent = htmlContent,
+                    CharacterCount = body.Length,
+                    IsTruncated = false,
+                    Warnings = new List<string>()
+                });
+
+                // Mobile preview - truncate subject if too long
+                var mobileSubject = subject;
+                var mobileWarnings = new List<string>();
+                if (!string.IsNullOrEmpty(subject) && subject.Length > 40)
+                {
+                    mobileWarnings.Add("Subject may be truncated on mobile devices (typically shows ~40 characters)");
+                }
+
+                previews.Add(new DevicePreviewDto
+                {
+                    DeviceType = "Mobile",
+                    Subject = mobileSubject,
+                    MessageBody = body,
+                    HTMLContent = htmlContent,
+                    CharacterCount = body.Length,
+                    IsTruncated = !string.IsNullOrEmpty(subject) && subject.Length > 40,
+                    Warnings = mobileWarnings
+                });
+
+                // Tablet preview
+                previews.Add(new DevicePreviewDto
+                {
+                    DeviceType = "Tablet",
+                    Subject = subject,
+                    MessageBody = body,
+                    HTMLContent = htmlContent,
+                    CharacterCount = body.Length,
+                    IsTruncated = false,
+                    Warnings = new List<string>()
+                });
+            }
+            else // SMS/MMS
+            {
+                // Mobile is the primary device for SMS/MMS
+                var warnings = new List<string>();
+                var segments = CalculateSmsSegments(body);
+                if (segments > 1)
+                {
+                    warnings.Add($"Message will be sent as {segments} segments");
+                }
+
+                previews.Add(new DevicePreviewDto
+                {
+                    DeviceType = "Mobile",
+                    Subject = null,
+                    MessageBody = body,
+                    HTMLContent = null,
+                    CharacterCount = body.Length,
+                    IsTruncated = false,
+                    Warnings = warnings
+                });
+            }
+
+            return previews;
+        }
     }
 }

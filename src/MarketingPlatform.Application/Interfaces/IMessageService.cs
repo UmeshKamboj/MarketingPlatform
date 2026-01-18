@@ -19,5 +19,7 @@ namespace MarketingPlatform.Application.Interfaces
         Task<MessageDeliveryReportDto> GetDeliveryReportAsync(string userId, int campaignId);
         Task ProcessMessageQueueAsync();
         Task<bool> SendMessageNowAsync(string userId, int messageId);
+        Task<MessagePreviewDto> PreviewMessageAsync(string userId, MessagePreviewRequestDto request);
+        Task<TestSendResultDto> SendTestMessageAsync(string userId, TestSendRequestDto request);
     }
 }
