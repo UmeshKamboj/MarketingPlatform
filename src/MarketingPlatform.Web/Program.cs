@@ -7,6 +7,7 @@ using MarketingPlatform.Infrastructure.Services;
 using MarketingPlatform.Application.Services;
 using MarketingPlatform.Core.Interfaces.Repositories;
 using MarketingPlatform.Infrastructure.Repositories;
+using MarketingPlatform.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,5 +65,19 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Seed initial page content
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        await DatabaseSeeder.SeedPageContentAsync(scope.ServiceProvider);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding page content.");
+    }
+}
 
 app.Run();
