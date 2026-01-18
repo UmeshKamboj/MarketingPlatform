@@ -1,4 +1,43 @@
+using Microsoft.EntityFrameworkCore;
+using MarketingPlatform.Infrastructure.Data;
+using MarketingPlatform.Core.Entities;
+using Microsoft.AspNetCore.Identity;
+using MarketingPlatform.Application.Interfaces;
+using MarketingPlatform.Infrastructure.Services;
+using MarketingPlatform.Application.Services;
+using MarketingPlatform.Core.Interfaces.Repositories;
+using MarketingPlatform.Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// Repository Pattern
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IPageContentRepository, PageContentRepository>();
+
+// Application Services
+builder.Services.AddScoped<IPageContentService, PageContentService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+// File Storage Providers
+builder.Services.AddScoped<IFileStorageProvider, MarketingPlatform.Infrastructure.Services.FileStorageProviders.LocalFileStorageProvider>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -19,6 +58,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

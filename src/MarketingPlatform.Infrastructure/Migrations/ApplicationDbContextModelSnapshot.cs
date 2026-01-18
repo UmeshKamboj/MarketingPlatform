@@ -2625,14 +2625,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("EntityType", "EntityId");
 
                     b.ToTable("PrivilegedActionLogs");
-                    b.HasIndex("Key")
-                        .IsUnique();
-
-                    b.HasIndex("Scope");
-
-                    b.HasIndex("IsDeleted", "Category");
-
-                    b.ToTable("PlatformSettings");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.PricingModel", b =>

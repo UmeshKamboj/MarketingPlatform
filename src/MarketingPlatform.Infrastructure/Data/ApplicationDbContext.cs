@@ -75,6 +75,7 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<RegionPricing> RegionPricings => Set<RegionPricing>();
         public DbSet<UsagePricing> UsagePricings => Set<UsagePricing>();
         public DbSet<TaxConfiguration> TaxConfigurations => Set<TaxConfiguration>();
+        public DbSet<PageContent> PageContents => Set<PageContent>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +94,7 @@ namespace MarketingPlatform.Infrastructure.Data
             modelBuilder.Entity<PlatformSetting>().HasQueryFilter(s => !s.IsDeleted);
             modelBuilder.Entity<FeatureToggle>().HasQueryFilter(f => !f.IsDeleted);
             modelBuilder.Entity<ComplianceRule>().HasQueryFilter(r => !r.IsDeleted);
+            modelBuilder.Entity<PageContent>().HasQueryFilter(p => !p.IsDeleted);
             // Note: ComplianceRuleAudit does not have soft delete - audit records are permanent
         }
     }
