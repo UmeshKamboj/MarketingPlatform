@@ -1,0 +1,262 @@
+@{
+    ViewData["Title"] = "Messages";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-envelope"></i> Messages</h2>
+        <a href="@Url.Action("Compose", "Messages")" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Compose Message
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#all">All</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#sent">Sent</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#pending">Pending</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#failed">Failed</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search messages...">
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <select class="form-select d-inline-block w-auto" id="channelFilter">
+                        <option value="">All Channels</option>
+                        <option value="SMS">SMS</option>
+                        <option value="MMS">MMS</option>
+                        <option value="Email">Email</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="messages-list">
+                <div class="text-center py-5">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+        let currentStatus = 'all';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMessages();
+            
+            document.getElementById('searchInput').addEventListener('input', loadMessages);
+            document.getElementById('channelFilter').addEventListener('change', loadMessages);
+        });
+
+        async function loadMessages() {
+            const listContainer = document.getElementById('messages-list');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const channelFilter = document.getElementById('channelFilter').value;
+            
+            try {
+                const mockMessages = [
+                    {
+                        id: 1,
+                        subject: 'Welcome to Our Platform',
+                        channel: 'Email',
+                        status: 'Sent',
+                        recipients: 1250,
+                        delivered: 1245,
+                        opened: 892,
+                        clicked: 234,
+                        sentAt: '2024-03-20 10:30:00',
+                        campaignName: 'Welcome Series'
+                    },
+                    {
+                        id: 2,
+                        subject: 'Flash Sale Alert',
+                        channel: 'SMS',
+                        status: 'Sent',
+                        recipients: 5230,
+                        delivered: 5227,
+                        opened: null,
+                        clicked: 1456,
+                        sentAt: '2024-03-20 09:15:00',
+                        campaignName: 'Flash Deals'
+                    },
+                    {
+                        id: 3,
+                        subject: 'Product Launch Announcement',
+                        channel: 'MMS',
+                        status: 'Pending',
+                        recipients: 3450,
+                        delivered: 2100,
+                        opened: null,
+                        clicked: 456,
+                        sentAt: '2024-03-20 11:00:00',
+                        campaignName: 'Product Launch'
+                    },
+                    {
+                        id: 4,
+                        subject: 'Weekly Newsletter',
+                        channel: 'Email',
+                        status: 'Sent',
+                        recipients: 8900,
+                        delivered: 8850,
+                        opened: 4234,
+                        clicked: 1289,
+                        sentAt: '2024-03-19 08:00:00',
+                        campaignName: 'Newsletter'
+                    },
+                    {
+                        id: 5,
+                        subject: 'Order Confirmation',
+                        channel: 'SMS',
+                        status: 'Failed',
+                        recipients: 150,
+                        delivered: 0,
+                        opened: null,
+                        clicked: 0,
+                        sentAt: '2024-03-20 14:22:00',
+                        campaignName: 'Transactional'
+                    },
+                    {
+                        id: 6,
+                        subject: 'Survey Request',
+                        channel: 'Email',
+                        status: 'Sent',
+                        recipients: 2500,
+                        delivered: 2487,
+                        opened: 1234,
+                        clicked: 567,
+                        sentAt: '2024-03-18 15:30:00',
+                        campaignName: 'Customer Feedback'
+                    }
+                ];
+                
+                let filtered = mockMessages;
+                
+                if (currentStatus !== 'all') {
+                    filtered = filtered.filter(m => m.status.toLowerCase() === currentStatus);
+                }
+                
+                if (channelFilter) {
+                    filtered = filtered.filter(m => m.channel === channelFilter);
+                }
+                
+                if (searchTerm) {
+                    filtered = filtered.filter(m => 
+                        m.subject.toLowerCase().includes(searchTerm) ||
+                        m.campaignName.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                renderMessages(filtered);
+            } catch (error) {
+                listContainer.innerHTML = `<div class="alert alert-danger">Error loading messages: ${error.message}</div>`;
+            }
+        }
+
+        function renderMessages(messages) {
+            const listContainer = document.getElementById('messages-list');
+            
+            if (!messages || messages.length === 0) {
+                listContainer.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No messages found.</div>';
+                return;
+            }
+
+            let html = '<div class="table-responsive"><table class="table table-hover">';
+            html += '<thead><tr>';
+            html += '<th>Subject</th>';
+            html += '<th>Channel</th>';
+            html += '<th>Status</th>';
+            html += '<th>Recipients</th>';
+            html += '<th>Delivered</th>';
+            html += '<th>Engagement</th>';
+            html += '<th>Sent</th>';
+            html += '<th>Actions</th>';
+            html += '</tr></thead><tbody>';
+
+            messages.forEach(message => {
+                const channelColors = { SMS: 'success', MMS: 'info', Email: 'primary' };
+                const statusColors = { Sent: 'success', Pending: 'warning', Failed: 'danger' };
+                const deliveryRate = ((message.delivered / message.recipients) * 100).toFixed(1);
+                
+                html += '<tr>';
+                html += `<td><strong>${escapeHtml(message.subject)}</strong><br/><small class="text-muted">${escapeHtml(message.campaignName)}</small></td>`;
+                html += `<td><span class="badge bg-${channelColors[message.channel]}">${message.channel}</span></td>`;
+                html += `<td><span class="badge bg-${statusColors[message.status]}">${message.status}</span></td>`;
+                html += `<td>${message.recipients.toLocaleString()}</td>`;
+                html += `<td>${message.delivered.toLocaleString()}<br/><small class="text-muted">${deliveryRate}%</small></td>`;
+                
+                if (message.channel === 'Email') {
+                    const openRate = ((message.opened / message.delivered) * 100).toFixed(1);
+                    const clickRate = ((message.clicked / message.opened) * 100).toFixed(1);
+                    html += `<td>
+                        <small>Opened: ${message.opened.toLocaleString()} (${openRate}%)</small><br/>
+                        <small>Clicked: ${message.clicked.toLocaleString()} (${clickRate}%)</small>
+                    </td>`;
+                } else {
+                    html += `<td><small>Clicked: ${message.clicked ? message.clicked.toLocaleString() : 'N/A'}</small></td>`;
+                }
+                
+                html += `<td><small>${message.sentAt}</small></td>`;
+                html += `<td>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" onclick="viewDetails(${message.id})" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="duplicateMessage(${message.id})" title="Duplicate">
+                            <i class="bi bi-files"></i>
+                        </button>
+                    </div>
+                </td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            listContainer.innerHTML = html;
+        }
+
+        function viewDetails(id) {
+            window.location.href = `/Messages/Details/${id}`;
+        }
+
+        function duplicateMessage(id) {
+            if (confirm('Create a copy of this message?')) {
+                alert('Message duplicated! (Demo)');
+                loadMessages();
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function(e) {
+                const target = e.target.getAttribute('href').substring(1);
+                currentStatus = target;
+                loadMessages();
+            });
+        });
+    </script>
+}

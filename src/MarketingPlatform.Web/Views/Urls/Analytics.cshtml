@@ -1,0 +1,236 @@
+@{
+    ViewData["Title"] = "URL Analytics";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-graph-up"></i> URL Analytics</h2>
+        <a href="@Url.Action("Index", "Urls")" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to URLs
+        </a>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 id="shortUrl" class="mb-1">Loading...</h5>
+                    <p class="text-muted mb-0" id="originalUrl"></p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-sm btn-outline-primary" onclick="copyUrl()">
+                        <i class="bi bi-clipboard"></i> Copy Short URL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 id="totalClicks" class="text-primary">-</h3>
+                    <p class="text-muted mb-0">Total Clicks</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 id="uniqueClicks" class="text-success">-</h3>
+                    <p class="text-muted mb-0">Unique Clicks</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 id="clickRate" class="text-info">-</h3>
+                    <p class="text-muted mb-0">Click Rate</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 id="avgPerDay" class="text-warning">-</h3>
+                    <p class="text-muted mb-0">Avg Per Day</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Clicks Over Time</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="clicksChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Referrers</h5>
+                </div>
+                <div class="card-body">
+                    <div id="referrersList">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Devices</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="devicesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Locations</h5>
+                </div>
+                <div class="card-body">
+                    <div id="locationsList">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+        const urlId = window.location.pathname.split('/').pop();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnalytics();
+        });
+
+        async function loadAnalytics() {
+            try {
+                const mockData = {
+                    shortCode: 'abc123',
+                    shortUrl: window.location.origin + '/s/abc123',
+                    originalUrl: 'https://example.com/summer-sale-2024',
+                    totalClicks: 1245,
+                    uniqueClicks: 892,
+                    clickRate: 71.6,
+                    avgPerDay: 89,
+                    clicksOverTime: [
+                        { date: '2024-03-14', clicks: 85 },
+                        { date: '2024-03-15', clicks: 120 },
+                        { date: '2024-03-16', clicks: 145 },
+                        { date: '2024-03-17', clicks: 132 },
+                        { date: '2024-03-18', clicks: 156 },
+                        { date: '2024-03-19', clicks: 178 },
+                        { date: '2024-03-20', clicks: 192 }
+                    ],
+                    referrers: [
+                        { source: 'Email Campaign', clicks: 456 },
+                        { source: 'Facebook', clicks: 234 },
+                        { source: 'Twitter', clicks: 189 },
+                        { source: 'Direct', clicks: 156 }
+                    ],
+                    devices: { Desktop: 567, Mobile: 556, Tablet: 122 },
+                    locations: [
+                        { country: 'United States', clicks: 456 },
+                        { country: 'United Kingdom', clicks: 234 },
+                        { country: 'Canada', clicks: 189 },
+                        { country: 'Australia', clicks: 123 }
+                    ]
+                };
+                
+                populateData(mockData);
+                createCharts(mockData);
+            } catch (error) {
+                alert('Error loading analytics: ' + error.message);
+            }
+        }
+
+        function populateData(data) {
+            document.getElementById('shortUrl').textContent = data.shortUrl;
+            document.getElementById('originalUrl').textContent = data.originalUrl;
+            document.getElementById('totalClicks').textContent = data.totalClicks.toLocaleString();
+            document.getElementById('uniqueClicks').textContent = data.uniqueClicks.toLocaleString();
+            document.getElementById('clickRate').textContent = data.clickRate.toFixed(1) + '%';
+            document.getElementById('avgPerDay').textContent = data.avgPerDay;
+            
+            let refHtml = '<div class="list-group list-group-flush">';
+            data.referrers.forEach(ref => {
+                refHtml += `<div class="list-group-item px-0 d-flex justify-content-between">
+                    <span>${ref.source}</span>
+                    <strong>${ref.clicks}</strong>
+                </div>`;
+            });
+            refHtml += '</div>';
+            document.getElementById('referrersList').innerHTML = refHtml;
+            
+            let locHtml = '<div class="list-group list-group-flush">';
+            data.locations.forEach(loc => {
+                locHtml += `<div class="list-group-item px-0 d-flex justify-content-between">
+                    <span>${loc.country}</span>
+                    <strong>${loc.clicks}</strong>
+                </div>`;
+            });
+            locHtml += '</div>';
+            document.getElementById('locationsList').innerHTML = locHtml;
+        }
+
+        function createCharts(data) {
+            const clicksCtx = document.getElementById('clicksChart').getContext('2d');
+            new Chart(clicksCtx, {
+                type: 'line',
+                data: {
+                    labels: data.clicksOverTime.map(d => d.date),
+                    datasets: [{
+                        label: 'Clicks',
+                        data: data.clicksOverTime.map(d => d.clicks),
+                        borderColor: 'rgb(13, 110, 253)',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const devicesCtx = document.getElementById('devicesChart').getContext('2d');
+            new Chart(devicesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(data.devices),
+                    datasets: [{
+                        data: Object.values(data.devices),
+                        backgroundColor: ['#0d6efd', '#198754', '#ffc107']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function copyUrl() {
+            const url = document.getElementById('shortUrl').textContent;
+            navigator.clipboard.writeText(url);
+            alert('URL copied to clipboard!');
+        }
+    </script>
+}
