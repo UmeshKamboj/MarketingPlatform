@@ -135,7 +135,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         const apiBaseUrl = '@ViewBag.ApiBaseUrl';
         
         document.addEventListener('DOMContentLoaded', function() {

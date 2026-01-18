@@ -201,7 +201,7 @@
 </section>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         const apiBaseUrl = '@ViewBag.ApiBaseUrl';
 
         // Load pricing plans on page load

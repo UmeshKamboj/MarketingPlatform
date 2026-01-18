@@ -72,7 +72,7 @@ another@example.com,Spam</pre>
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         document.getElementById('importForm').addEventListener('submit', function(e) {
             e.preventDefault();
             alert('Import started! (Demo)');

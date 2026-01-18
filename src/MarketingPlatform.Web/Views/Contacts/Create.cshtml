@@ -101,7 +101,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         const apiBaseUrl = '@ViewBag.ApiBaseUrl';
         
         document.getElementById('contactForm').addEventListener('submit', async function(e) {

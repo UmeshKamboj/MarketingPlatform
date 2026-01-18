@@ -86,7 +86,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function generateReport(type) {
             alert(`Generating ${type} report... (Demo)`);
         }

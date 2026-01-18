@@ -91,7 +91,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function addFeature() {
             const featuresDiv = document.getElementById('features');
             const newFeature = document.createElement('div');

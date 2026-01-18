@@ -47,7 +47,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         const providerId = window.location.pathname.split('/').pop();
         
         document.addEventListener('DOMContentLoaded', function() {
