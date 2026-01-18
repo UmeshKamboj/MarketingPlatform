@@ -469,6 +469,120 @@ namespace MarketingPlatform.Application.Services
             return await _keywordActivityRepository.CountAsync(ka => ka.KeywordId == keywordId);
         }
 
+        public async Task<KeywordAnalyticsDto?> GetKeywordAnalyticsAsync(int keywordId, string userId)
+        {
+            // First verify the keyword belongs to the user
+            var keyword = await _keywordRepository.FirstOrDefaultAsync(k =>
+                k.Id == keywordId && k.UserId == userId && !k.IsDeleted);
+
+            if (keyword == null)
+            {
+                _logger.LogWarning("Keyword {KeywordId} not found for user {UserId}", keywordId, userId);
+                return null;
+            }
+
+            // Get all activities for this keyword
+            var activities = await _keywordActivityRepository.FindAsync(ka => ka.KeywordId == keywordId);
+            var activitiesList = activities.ToList();
+
+            // Calculate time-based metrics
+            var now = DateTime.UtcNow;
+            var last24Hours = now.AddHours(-24);
+            var last7Days = now.AddDays(-7);
+            var last30Days = now.AddDays(-30);
+
+            // Basic usage statistics
+            var totalResponses = activitiesList.Count;
+            var uniquePhoneNumbers = activitiesList.Select(a => a.PhoneNumber).Distinct().ToList();
+            var uniqueContacts = uniquePhoneNumbers.Count;
+            var repeatUsageCount = totalResponses - uniqueContacts;
+
+            // Response statistics
+            var responsesSent = activitiesList.Count(a => !string.IsNullOrWhiteSpace(a.ResponseSent));
+            var responsesFailed = totalResponses - responsesSent;
+            var responseSuccessRate = totalResponses > 0 
+                ? Math.Round((decimal)responsesSent / totalResponses * 100, 2) 
+                : 0;
+
+            // Opt-in statistics
+            int totalOptIns = 0;
+            int successfulOptIns = 0;
+            int failedOptIns = 0;
+
+            if (keyword.OptInGroupId.HasValue)
+            {
+                // Count how many unique contacts from activities are in the opt-in group
+                var contactsWithPhones = await _contactRepository.FindAsync(c => 
+                    uniquePhoneNumbers.Contains(c.PhoneNumber) && 
+                    c.UserId == userId && 
+                    !c.IsDeleted);
+
+                var contactIds = contactsWithPhones.Select(c => c.Id).ToList();
+                totalOptIns = contactIds.Count;
+
+                if (totalOptIns > 0)
+                {
+                    var groupMembers = await _groupMemberRepository.FindAsync(gm =>
+                        gm.ContactGroupId == keyword.OptInGroupId.Value &&
+                        contactIds.Contains(gm.ContactId) &&
+                        !gm.IsDeleted);
+
+                    successfulOptIns = groupMembers.Count();
+                    failedOptIns = totalOptIns - successfulOptIns;
+                }
+            }
+
+            var optInConversionRate = totalResponses > 0 
+                ? Math.Round((decimal)successfulOptIns / totalResponses * 100, 2) 
+                : 0;
+
+            // Time-based analytics
+            var firstUsedAt = activitiesList.Any() 
+                ? activitiesList.Min(a => a.ReceivedAt) 
+                : (DateTime?)null;
+            var lastUsedAt = activitiesList.Any() 
+                ? activitiesList.Max(a => a.ReceivedAt) 
+                : (DateTime?)null;
+            var activitiesLast24Hours = activitiesList.Count(a => a.ReceivedAt >= last24Hours);
+            var activitiesLast7Days = activitiesList.Count(a => a.ReceivedAt >= last7Days);
+            var activitiesLast30Days = activitiesList.Count(a => a.ReceivedAt >= last30Days);
+
+            // Campaign statistics
+            var campaignRelatedActivities = keyword.LinkedCampaignId.HasValue ? totalResponses : 0;
+            string? linkedCampaignName = null;
+
+            if (keyword.LinkedCampaignId.HasValue)
+            {
+                var campaign = await _campaignRepository.FirstOrDefaultAsync(c =>
+                    c.Id == keyword.LinkedCampaignId.Value && !c.IsDeleted);
+                linkedCampaignName = campaign?.Name;
+            }
+
+            return new KeywordAnalyticsDto
+            {
+                KeywordId = keyword.Id,
+                KeywordText = keyword.KeywordText,
+                TotalResponses = totalResponses,
+                UniqueContacts = uniqueContacts,
+                RepeatUsageCount = repeatUsageCount,
+                TotalOptIns = totalOptIns,
+                SuccessfulOptIns = successfulOptIns,
+                FailedOptIns = failedOptIns,
+                OptInConversionRate = optInConversionRate,
+                ResponsesSent = responsesSent,
+                ResponsesFailed = responsesFailed,
+                ResponseSuccessRate = responseSuccessRate,
+                LinkedCampaignId = keyword.LinkedCampaignId,
+                LinkedCampaignName = linkedCampaignName,
+                CampaignRelatedActivities = campaignRelatedActivities,
+                FirstUsedAt = firstUsedAt,
+                LastUsedAt = lastUsedAt,
+                ActivitiesLast24Hours = activitiesLast24Hours,
+                ActivitiesLast7Days = activitiesLast7Days,
+                ActivitiesLast30Days = activitiesLast30Days
+            };
+        }
+
         private async Task<KeywordDto> MapToKeywordDtoAsync(Keyword keyword)
         {
             var dto = _mapper.Map<KeywordDto>(keyword);

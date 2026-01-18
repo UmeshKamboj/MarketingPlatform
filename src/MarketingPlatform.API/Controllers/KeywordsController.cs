@@ -161,6 +161,20 @@ namespace MarketingPlatform.API.Controllers
             }
         }
 
+        [HttpGet("{id}/analytics")]
+        public async Task<ActionResult<ApiResponse<KeywordAnalyticsDto>>> GetKeywordAnalytics(int id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var analytics = await _keywordService.GetKeywordAnalyticsAsync(id, userId);
+            if (analytics == null)
+                return NotFound(ApiResponse<KeywordAnalyticsDto>.ErrorResponse("Keyword not found"));
+
+            return Ok(ApiResponse<KeywordAnalyticsDto>.SuccessResponse(analytics));
+        }
+
         [HttpPost("process-inbound")]
         [AllowAnonymous] // This endpoint should be called by SMS provider webhooks
         // TODO: Add webhook signature validation for production use
