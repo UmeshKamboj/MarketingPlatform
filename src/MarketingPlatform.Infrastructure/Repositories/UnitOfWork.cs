@@ -9,6 +9,7 @@ namespace MarketingPlatform.Infrastructure.Repositories
         private readonly ApplicationDbContext _context;
         private readonly Dictionary<Type, object> _repositories;
         private IDbContextTransaction? _transaction;
+        private bool _disposed = false;
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -58,10 +59,23 @@ namespace MarketingPlatform.Infrastructure.Repositories
             }
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _transaction?.Dispose();
+                    _context.Dispose();
+                }
+                _disposed = true;
+            }
+        }
+
         public void Dispose()
         {
-            _transaction?.Dispose();
-            _context.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

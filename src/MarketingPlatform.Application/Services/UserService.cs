@@ -20,13 +20,10 @@ namespace MarketingPlatform.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<UserDto?> GetUserByIdAsync(string userId)
+        private async Task<UserDto> MapToUserDtoAsync(ApplicationUser user)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return null;
-
             var roles = await _userManager.GetRolesAsync(user);
-
+            
             return new UserDto
             {
                 Id = user.Id,
@@ -41,25 +38,20 @@ namespace MarketingPlatform.Application.Services
             };
         }
 
+        public async Task<UserDto?> GetUserByIdAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return null;
+
+            return await MapToUserDtoAsync(user);
+        }
+
         public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null) return null;
 
-            var roles = await _userManager.GetRolesAsync(user);
-
-            return new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email!,
-                FirstName = user.FirstName ?? string.Empty,
-                LastName = user.LastName ?? string.Empty,
-                PhoneNumber = user.PhoneNumber,
-                IsActive = user.IsActive,
-                CreatedAt = user.CreatedAt,
-                LastLoginAt = user.LastLoginAt,
-                Roles = roles.ToList()
-            };
+            return await MapToUserDtoAsync(user);
         }
 
         public async Task<PaginatedResult<UserDto>> GetUsersAsync(PagedRequest request)
@@ -85,19 +77,7 @@ namespace MarketingPlatform.Application.Services
             var userDtos = new List<UserDto>();
             foreach (var user in users)
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(new UserDto
-                {
-                    Id = user.Id,
-                    Email = user.Email!,
-                    FirstName = user.FirstName ?? string.Empty,
-                    LastName = user.LastName ?? string.Empty,
-                    PhoneNumber = user.PhoneNumber,
-                    IsActive = user.IsActive,
-                    CreatedAt = user.CreatedAt,
-                    LastLoginAt = user.LastLoginAt,
-                    Roles = roles.ToList()
-                });
+                userDtos.Add(await MapToUserDtoAsync(user));
             }
 
             return new PaginatedResult<UserDto>
@@ -170,7 +150,7 @@ namespace MarketingPlatform.Application.Services
                 TotalContacts = totalContacts,
                 TotalMessagesSent = totalMessages,
                 ActiveCampaigns = activeCampaigns,
-                TotalSpent = 0, // Implement billing calculation later
+                TotalSpent = 0, // TODO: Implement billing calculation - track invoice totals when billing system is added
                 SubscriptionPlan = planName
             };
         }
