@@ -51,7 +51,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                 table: "MessageTemplates",
                 type: "bit",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "LastUsedAt",

@@ -339,7 +339,7 @@ namespace MarketingPlatform.Application.Services
                 t.Id == request.TemplateId && t.UserId == userId && !t.IsDeleted);
 
             if (template == null)
-                throw new Exception("Template not found");
+                throw new KeyNotFoundException("Template not found");
 
             var variables = new Dictionary<string, string>(request.VariableValues, StringComparer.OrdinalIgnoreCase);
 
@@ -390,23 +390,14 @@ namespace MarketingPlatform.Application.Services
         {
             var template = await _templateRepository.GetByIdAsync(templateId);
             if (template == null || template.IsDeleted)
-                throw new Exception("Template not found");
+                throw new KeyNotFoundException("Template not found");
 
             return RenderContent(template.MessageBody, variables);
         }
 
         public async Task<List<string>> ExtractVariablesFromContentAsync(string content)
         {
-            if (string.IsNullOrWhiteSpace(content))
-                return new List<string>();
-
-            var regex = new Regex(@"\{\{([^}]+)\}\}");
-            var matches = regex.Matches(content);
-
-            return await Task.FromResult(matches
-                .Select(m => m.Groups[1].Value.Trim())
-                .Distinct()
-                .ToList());
+            return await Task.FromResult(ExtractVariablesFromContent(content));
         }
 
         public async Task<TemplateUsageStatsDto> GetTemplateUsageStatsAsync(string userId, int templateId)
@@ -415,7 +406,7 @@ namespace MarketingPlatform.Application.Services
                 t.Id == templateId && t.UserId == userId && !t.IsDeleted);
 
             if (template == null)
-                throw new Exception("Template not found");
+                throw new KeyNotFoundException("Template not found");
 
             // Get campaign contents using this template
             var campaignContents = await _campaignContentRepository.FindAsync(cc =>
@@ -474,7 +465,14 @@ namespace MarketingPlatform.Application.Services
             foreach (var kvp in variables)
             {
                 var placeholder = $"{{{{{kvp.Key}}}}}";
-                result = Regex.Replace(result, Regex.Escape(placeholder), kvp.Value, RegexOptions.IgnoreCase);
+                // Use simple string replacement with case-insensitive comparison
+                // More efficient than Regex for simple placeholder replacement
+                var index = 0;
+                while ((index = result.IndexOf(placeholder, index, StringComparison.OrdinalIgnoreCase)) != -1)
+                {
+                    result = result.Remove(index, placeholder.Length).Insert(index, kvp.Value);
+                    index += kvp.Value.Length;
+                }
             }
 
             return result;
@@ -482,8 +480,22 @@ namespace MarketingPlatform.Application.Services
 
         private List<string> FindMissingVariables(string content, Dictionary<string, string> providedVariables)
         {
-            var allVariables = ExtractVariablesFromContentAsync(content).Result;
+            var allVariables = ExtractVariablesFromContent(content);
             return allVariables.Where(v => !providedVariables.ContainsKey(v)).ToList();
+        }
+
+        private List<string> ExtractVariablesFromContent(string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+                return new List<string>();
+
+            var regex = new Regex(@"\{\{([^}]+)\}\}");
+            var matches = regex.Matches(content);
+
+            return matches
+                .Select(m => m.Groups[1].Value.Trim())
+                .Distinct()
+                .ToList();
         }
 
         private async Task<Dictionary<string, string>> LoadContactVariablesAsync(int contactId)
