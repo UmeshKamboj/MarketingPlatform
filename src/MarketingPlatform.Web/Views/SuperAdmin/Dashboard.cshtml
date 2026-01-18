@@ -1,0 +1,139 @@
+@{
+    ViewData["Title"] = "Super Admin Dashboard";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="bi bi-shield-check"></i> Super Admin Dashboard</h2>
+
+    <!-- System Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Tenants</h6>
+                    <h2 class="mb-0" id="totalTenants">0</h2>
+                    <small class="text-success"><i class="bi bi-arrow-up"></i> 12% this month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-success">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Active Users</h6>
+                    <h2 class="mb-0" id="activeUsers">0</h2>
+                    <small class="text-success"><i class="bi bi-arrow-up"></i> 8% this month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">System Health</h6>
+                    <h2 class="mb-0 text-success">98.5%</h2>
+                    <small class="text-muted">Uptime</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">API Calls</h6>
+                    <h2 class="mb-0" id="apiCalls">0</h2>
+                    <small class="text-info">Last 24h</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-lightning"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="@Url.Action("Users", "SuperAdmin")" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-people"></i><br>Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="@Url.Action("PlatformConfig", "SuperAdmin")" class="btn btn-outline-success w-100">
+                                <i class="bi bi-gear"></i><br>Platform Config
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="@Url.Action("AuditLogs", "SuperAdmin")" class="btn btn-outline-warning w-100">
+                                <i class="bi bi-journal-text"></i><br>Audit Logs
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-danger w-100" onclick="clearCache()">
+                                <i class="bi bi-trash"></i><br>Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-activity"></i> System Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div id="systemActivity">Loading...</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-exclamation-triangle"></i> System Alerts</h5>
+                </div>
+                <div class="card-body">
+                    <div id="systemAlerts">
+                        <div class="alert alert-success">All systems operational</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+        });
+
+        async function loadDashboard() {
+            document.getElementById('totalTenants').textContent = '45';
+            document.getElementById('activeUsers').textContent = '2,347';
+            document.getElementById('apiCalls').textContent = '1.2M';
+            
+            const activityHtml = `
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item"><small class="text-muted">10:45 AM</small> New tenant registered</div>
+                    <div class="list-group-item"><small class="text-muted">10:30 AM</small> System backup completed</div>
+                    <div class="list-group-item"><small class="text-muted">10:15 AM</small> User login from new location</div>
+                </div>
+            `;
+            document.getElementById('systemActivity').innerHTML = activityHtml;
+        }
+
+        function clearCache() {
+            if (confirm('Are you sure you want to clear the system cache?')) {
+                alert('Cache cleared successfully! (Demo)');
+            }
+        }
+    </script>
+}

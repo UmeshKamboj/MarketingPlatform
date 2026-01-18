@@ -1,0 +1,119 @@
+@{
+    ViewData["Title"] = "Platform Configuration";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-gear"></i> Platform Configuration</h2>
+        <button class="btn btn-primary" onclick="saveConfig()">
+            <i class="bi bi-save"></i> Save Configuration
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>General Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Platform Name</label>
+                            <input type="text" class="form-control" value="Marketing Platform">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Support Email</label>
+                            <input type="email" class="form-control" value="support@platform.com">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="maintenanceMode">
+                            <label class="form-check-label" for="maintenanceMode">
+                                Maintenance Mode
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Email Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">SMTP Server</label>
+                            <input type="text" class="form-control" value="smtp.example.com">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Port</label>
+                            <input type="number" class="form-control" value="587">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Use SSL</label>
+                            <select class="form-select">
+                                <option>Yes</option>
+                                <option>No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>SMS Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">SMS Provider</label>
+                        <select class="form-select">
+                            <option>Twilio</option>
+                            <option>Nexmo</option>
+                            <option>AWS SNS</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">API Key</label>
+                        <input type="password" class="form-control" value="********">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>Rate Limits</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Requests per Minute</label>
+                            <input type="number" class="form-control" value="60">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Requests per Hour</label>
+                            <input type="number" class="form-control" value="1000">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Requests per Day</label>
+                            <input type="number" class="form-control" value="10000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
+        
+        function saveConfig() {
+            alert('Configuration saved successfully! (Demo)');
+        }
+    </script>
+}
