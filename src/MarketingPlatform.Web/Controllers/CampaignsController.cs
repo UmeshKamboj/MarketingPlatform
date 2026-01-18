@@ -24,4 +24,11 @@ public class CampaignsController : Controller
         ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
         return View();
     }
+
+    public IActionResult Variants(int id)
+    {
+        ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
+        ViewBag.CampaignId = id;
+        return View();
+    }
 }
