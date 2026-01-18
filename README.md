@@ -1202,17 +1202,24 @@ Response:
   - ✅ Retry & failure handling with multiple strategies
   - ✅ Fallback messaging on channel failure
   - ✅ Detailed status tracking for each message
-- ⏳ Keyword campaigns
-- ⏳ Automation & workflows
+- ✅ Task 13.3: Contact Journey Mapping (Workflow Designer):
+  - ✅ Visual workflow/journey designer support
+  - ✅ Branch logic and conditional workflows
+  - ✅ Node positioning for visual canvas
+  - ✅ Multiple trigger types (Event, Schedule, Keyword, Manual)
+  - ✅ Journey execution monitoring and analytics
+  - ✅ Pause/Resume/Cancel execution control
+  - ✅ Integration with campaigns, messages, and automation engine
 - ⏳ Analytics & reporting
 - ⏳ Billing & subscriptions
 - ⏳ Super admin platform
 
 ## Project Status
-🚧 **In Development** - Task 6.1 Complete (Messaging Engine: Delivery & Routing)
+🚧 **In Development** - Task 13.3 Complete (Contact Journey Mapping - Workflow Designer)
 
 ## Documentation
 - [README.md](README.md) - Main documentation
+- [JOURNEY_MAPPING_API_DOCUMENTATION.md](JOURNEY_MAPPING_API_DOCUMENTATION.md) - Journey Mapping / Workflow Designer API documentation
 - [SMS_KEYWORD_API_DOCUMENTATION.md](SMS_KEYWORD_API_DOCUMENTATION.md) - SMS Keyword Management API documentation
 - [CAMPAIGN_LIFECYCLE_IMPLEMENTATION.md](CAMPAIGN_LIFECYCLE_IMPLEMENTATION.md) - Campaign lifecycle details
 - [DYNAMIC_CONTACT_GROUPS.md](DYNAMIC_CONTACT_GROUPS.md) - Dynamic contact groups implementation

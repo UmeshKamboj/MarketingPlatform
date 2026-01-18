@@ -1,4 +1,6 @@
 using Hangfire;
+using MarketingPlatform.Application.DTOs.Common;
+using MarketingPlatform.Application.DTOs.Journey;
 using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Enums;
@@ -41,6 +43,369 @@ namespace MarketingPlatform.Application.Services
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
+
+        // Journey/Workflow Management (CRUD)
+        
+        public async Task<JourneyDto> CreateJourneyAsync(string userId, CreateJourneyDto dto)
+        {
+            var workflow = new Workflow
+            {
+                UserId = userId,
+                Name = dto.Name,
+                Description = dto.Description,
+                TriggerType = dto.TriggerType,
+                TriggerCriteria = dto.TriggerCriteria,
+                IsActive = dto.IsActive
+            };
+
+            await _workflowRepository.AddAsync(workflow);
+            await _unitOfWork.SaveChangesAsync();
+
+            // Create workflow steps
+            foreach (var nodeDto in dto.Nodes)
+            {
+                var step = new WorkflowStep
+                {
+                    WorkflowId = workflow.Id,
+                    StepOrder = nodeDto.StepOrder,
+                    ActionType = nodeDto.ActionType,
+                    ActionConfiguration = nodeDto.ActionConfiguration,
+                    DelayMinutes = nodeDto.DelayMinutes,
+                    PositionX = nodeDto.PositionX,
+                    PositionY = nodeDto.PositionY,
+                    NodeLabel = nodeDto.NodeLabel,
+                    BranchCondition = nodeDto.BranchCondition,
+                    NextNodeOnTrue = nodeDto.NextNodeOnTrue,
+                    NextNodeOnFalse = nodeDto.NextNodeOnFalse
+                };
+
+                await _stepRepository.AddAsync(step);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Created journey {JourneyId} for user {UserId}", workflow.Id, userId);
+
+            return await GetJourneyByIdAsync(userId, workflow.Id) 
+                ?? throw new InvalidOperationException("Failed to retrieve created journey");
+        }
+
+        public async Task<JourneyDto?> GetJourneyByIdAsync(string userId, int journeyId)
+        {
+            var workflow = await _workflowRepository.FirstOrDefaultAsync(w => 
+                w.Id == journeyId && w.UserId == userId && !w.IsDeleted);
+
+            if (workflow == null)
+                return null;
+
+            var steps = await _stepRepository.FindAsync(s => 
+                s.WorkflowId == journeyId && !s.IsDeleted);
+
+            var executions = await _executionRepository.FindAsync(e => 
+                e.WorkflowId == journeyId && !e.IsDeleted);
+
+            return new JourneyDto
+            {
+                Id = workflow.Id,
+                Name = workflow.Name,
+                Description = workflow.Description,
+                TriggerType = workflow.TriggerType,
+                TriggerCriteria = workflow.TriggerCriteria,
+                IsActive = workflow.IsActive,
+                CreatedAt = workflow.CreatedAt,
+                UpdatedAt = workflow.UpdatedAt,
+                Nodes = steps.Select(s => new JourneyNodeDto
+                {
+                    Id = s.Id,
+                    StepOrder = s.StepOrder,
+                    ActionType = s.ActionType,
+                    ActionConfiguration = s.ActionConfiguration,
+                    DelayMinutes = s.DelayMinutes,
+                    PositionX = s.PositionX,
+                    PositionY = s.PositionY,
+                    NodeLabel = s.NodeLabel,
+                    BranchCondition = s.BranchCondition,
+                    NextNodeOnTrue = s.NextNodeOnTrue,
+                    NextNodeOnFalse = s.NextNodeOnFalse
+                }).ToList(),
+                TotalExecutions = executions.Count(),
+                ActiveExecutions = executions.Count(e => e.Status == WorkflowExecutionStatus.Running),
+                CompletedExecutions = executions.Count(e => e.Status == WorkflowExecutionStatus.Completed),
+                FailedExecutions = executions.Count(e => e.Status == WorkflowExecutionStatus.Failed)
+            };
+        }
+
+        public async Task<PaginatedResult<JourneyDto>> GetJourneysAsync(string userId, PagedRequest request)
+        {
+            var query = await _workflowRepository.FindAsync(w => 
+                w.UserId == userId && !w.IsDeleted);
+
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                query = query.Where(w => 
+                    w.Name.Contains(request.SearchTerm) || 
+                    (w.Description != null && w.Description.Contains(request.SearchTerm)));
+            }
+
+            var totalCount = query.Count();
+            var items = query
+                .OrderByDescending(w => w.CreatedAt)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var journeyDtos = new List<JourneyDto>();
+            foreach (var workflow in items)
+            {
+                var dto = await GetJourneyByIdAsync(userId, workflow.Id);
+                if (dto != null)
+                    journeyDtos.Add(dto);
+            }
+
+            return new PaginatedResult<JourneyDto>
+            {
+                Items = journeyDtos,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        public async Task<bool> UpdateJourneyAsync(string userId, int journeyId, UpdateJourneyDto dto)
+        {
+            var workflow = await _workflowRepository.FirstOrDefaultAsync(w => 
+                w.Id == journeyId && w.UserId == userId && !w.IsDeleted);
+
+            if (workflow == null)
+                return false;
+
+            workflow.Name = dto.Name;
+            workflow.Description = dto.Description;
+            workflow.TriggerType = dto.TriggerType;
+            workflow.TriggerCriteria = dto.TriggerCriteria;
+            workflow.IsActive = dto.IsActive;
+            workflow.UpdatedAt = DateTime.UtcNow;
+
+            _workflowRepository.Update(workflow);
+
+            // Delete existing steps
+            var existingSteps = await _stepRepository.FindAsync(s => 
+                s.WorkflowId == journeyId && !s.IsDeleted);
+            
+            foreach (var step in existingSteps)
+            {
+                step.IsDeleted = true;
+                step.UpdatedAt = DateTime.UtcNow;
+                _stepRepository.Update(step);
+            }
+
+            // Create new steps
+            foreach (var nodeDto in dto.Nodes)
+            {
+                var step = new WorkflowStep
+                {
+                    WorkflowId = workflow.Id,
+                    StepOrder = nodeDto.StepOrder,
+                    ActionType = nodeDto.ActionType,
+                    ActionConfiguration = nodeDto.ActionConfiguration,
+                    DelayMinutes = nodeDto.DelayMinutes,
+                    PositionX = nodeDto.PositionX,
+                    PositionY = nodeDto.PositionY,
+                    NodeLabel = nodeDto.NodeLabel,
+                    BranchCondition = nodeDto.BranchCondition,
+                    NextNodeOnTrue = nodeDto.NextNodeOnTrue,
+                    NextNodeOnFalse = nodeDto.NextNodeOnFalse
+                };
+
+                await _stepRepository.AddAsync(step);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Updated journey {JourneyId} for user {UserId}", journeyId, userId);
+
+            return true;
+        }
+
+        public async Task<bool> DeleteJourneyAsync(string userId, int journeyId)
+        {
+            var workflow = await _workflowRepository.FirstOrDefaultAsync(w => 
+                w.Id == journeyId && w.UserId == userId && !w.IsDeleted);
+
+            if (workflow == null)
+                return false;
+
+            // Check for active executions
+            var activeExecutions = await _executionRepository.FirstOrDefaultAsync(e => 
+                e.WorkflowId == journeyId && 
+                e.Status == WorkflowExecutionStatus.Running && 
+                !e.IsDeleted);
+
+            if (activeExecutions != null)
+            {
+                _logger.LogWarning("Cannot delete journey {JourneyId} with active executions", journeyId);
+                throw new InvalidOperationException("Cannot delete journey with active executions. Please stop all running executions first.");
+            }
+
+            workflow.IsDeleted = true;
+            workflow.UpdatedAt = DateTime.UtcNow;
+            _workflowRepository.Update(workflow);
+
+            // Soft delete steps
+            var steps = await _stepRepository.FindAsync(s => 
+                s.WorkflowId == journeyId && !s.IsDeleted);
+            
+            foreach (var step in steps)
+            {
+                step.IsDeleted = true;
+                step.UpdatedAt = DateTime.UtcNow;
+                _stepRepository.Update(step);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Deleted journey {JourneyId} for user {UserId}", journeyId, userId);
+
+            return true;
+        }
+
+        public async Task<JourneyDto> DuplicateJourneyAsync(string userId, int journeyId)
+        {
+            var originalJourney = await GetJourneyByIdAsync(userId, journeyId);
+            if (originalJourney == null)
+                throw new InvalidOperationException($"Journey {journeyId} not found");
+
+            var createDto = new CreateJourneyDto
+            {
+                Name = $"{originalJourney.Name} (Copy)",
+                Description = originalJourney.Description,
+                TriggerType = originalJourney.TriggerType,
+                TriggerCriteria = originalJourney.TriggerCriteria,
+                IsActive = false, // New copy starts as inactive
+                Nodes = originalJourney.Nodes.Select(n => new CreateJourneyNodeDto
+                {
+                    StepOrder = n.StepOrder,
+                    ActionType = n.ActionType,
+                    ActionConfiguration = n.ActionConfiguration,
+                    DelayMinutes = n.DelayMinutes,
+                    PositionX = n.PositionX,
+                    PositionY = n.PositionY,
+                    NodeLabel = n.NodeLabel,
+                    BranchCondition = n.BranchCondition,
+                    NextNodeOnTrue = n.NextNodeOnTrue,
+                    NextNodeOnFalse = n.NextNodeOnFalse
+                }).ToList()
+            };
+
+            return await CreateJourneyAsync(userId, createDto);
+        }
+
+        public async Task<JourneyStatsDto> GetJourneyStatsAsync(string userId, int journeyId)
+        {
+            var workflow = await _workflowRepository.FirstOrDefaultAsync(w => 
+                w.Id == journeyId && w.UserId == userId && !w.IsDeleted);
+
+            if (workflow == null)
+                throw new InvalidOperationException($"Journey {journeyId} not found");
+
+            var executions = await _executionRepository.FindAsync(e => 
+                e.WorkflowId == journeyId && !e.IsDeleted);
+
+            var executionsList = executions.ToList();
+            var totalExecutions = executionsList.Count;
+            var completedExecutions = executionsList.Count(e => e.Status == WorkflowExecutionStatus.Completed);
+            var failedExecutions = executionsList.Count(e => e.Status == WorkflowExecutionStatus.Failed);
+
+            var completionRate = totalExecutions > 0 
+                ? (double)completedExecutions / totalExecutions * 100 
+                : 0;
+            
+            var failureRate = totalExecutions > 0 
+                ? (double)failedExecutions / totalExecutions * 100 
+                : 0;
+
+            var completedWithTimes = executionsList
+                .Where(e => e.Status == WorkflowExecutionStatus.Completed && 
+                           e.StartedAt.HasValue && 
+                           e.CompletedAt.HasValue)
+                .ToList();
+
+            var avgExecutionTime = completedWithTimes.Any()
+                ? completedWithTimes.Average(e => (e.CompletedAt!.Value - e.StartedAt!.Value).TotalMinutes)
+                : 0;
+
+            return new JourneyStatsDto
+            {
+                JourneyId = journeyId,
+                JourneyName = workflow.Name,
+                TotalExecutions = totalExecutions,
+                ActiveExecutions = executionsList.Count(e => e.Status == WorkflowExecutionStatus.Running),
+                CompletedExecutions = completedExecutions,
+                FailedExecutions = failedExecutions,
+                PausedExecutions = executionsList.Count(e => e.Status == WorkflowExecutionStatus.Paused),
+                CompletionRate = completionRate,
+                FailureRate = failureRate,
+                AverageExecutionTimeMinutes = avgExecutionTime
+            };
+        }
+
+        public async Task<PaginatedResult<JourneyExecutionDto>> GetJourneyExecutionsAsync(
+            string userId, int journeyId, PagedRequest request)
+        {
+            var workflow = await _workflowRepository.FirstOrDefaultAsync(w => 
+                w.Id == journeyId && w.UserId == userId && !w.IsDeleted);
+
+            if (workflow == null)
+                throw new InvalidOperationException($"Journey {journeyId} not found");
+
+            var query = await _executionRepository.FindAsync(e => 
+                e.WorkflowId == journeyId && !e.IsDeleted);
+
+            var totalCount = query.Count();
+            var items = query
+                .OrderByDescending(e => e.StartedAt ?? e.CreatedAt)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            var executionDtos = new List<JourneyExecutionDto>();
+            foreach (var execution in items)
+            {
+                var contact = await _contactRepository.FirstOrDefaultAsync(c => 
+                    c.Id == execution.ContactId && !c.IsDeleted);
+
+                var currentStep = await _stepRepository.FirstOrDefaultAsync(s => 
+                    s.WorkflowId == journeyId && 
+                    s.StepOrder == execution.CurrentStepOrder && 
+                    !s.IsDeleted);
+
+                executionDtos.Add(new JourneyExecutionDto
+                {
+                    Id = execution.Id,
+                    JourneyId = journeyId,
+                    JourneyName = workflow.Name,
+                    ContactId = execution.ContactId,
+                    ContactName = contact != null ? $"{contact.FirstName} {contact.LastName}".Trim() : null,
+                    ContactEmail = contact?.Email,
+                    Status = execution.Status,
+                    CurrentStepOrder = execution.CurrentStepOrder,
+                    CurrentStepName = currentStep?.NodeLabel ?? $"Step {execution.CurrentStepOrder}",
+                    StartedAt = execution.StartedAt,
+                    CompletedAt = execution.CompletedAt,
+                    ErrorMessage = execution.ErrorMessage
+                });
+            }
+
+            return new PaginatedResult<JourneyExecutionDto>
+            {
+                Items = executionDtos,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        // Journey Execution (existing methods)
 
         public async Task ExecuteWorkflowAsync(int workflowId, int contactId)
         {
