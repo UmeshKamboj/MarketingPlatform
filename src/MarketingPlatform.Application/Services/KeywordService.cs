@@ -362,7 +362,7 @@ namespace MarketingPlatform.Application.Services
             {
                 var searchLower = request.SearchTerm.ToLower();
                 query = query.Where(a =>
-                    a.PhoneNumber.Contains(request.SearchTerm) ||
+                    a.PhoneNumber.ToLower().Contains(searchLower) ||
                     a.IncomingMessage.ToLower().Contains(searchLower));
             }
 
