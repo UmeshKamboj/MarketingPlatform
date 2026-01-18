@@ -8,6 +8,11 @@ using MarketingPlatform.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Infrastructure.Services;
+using MarketingPlatform.Application.Services;
+using MarketingPlatform.Core.Interfaces.Repositories;
+using MarketingPlatform.Infrastructure.Repositories;
+using MarketingPlatform.Application.Mappings;
+using MarketingPlatform.API.Middleware;
 using Serilog;
 
 // Configure Serilog
@@ -62,9 +67,17 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Register services
+// Repository Pattern
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Application Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -104,6 +117,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+// Exception handling middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
