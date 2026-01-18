@@ -498,7 +498,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceAuditLog", b =>
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelRoutingConfig", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -514,17 +513,9 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     b.Property<int?>("CampaignId")
                         .HasColumnType("int");
-                    b.Property<string>("AdditionalSettings")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.Property<int>("Channel")
-                        .HasColumnType("int");
 
                     b.Property<int?>("ContactId")
                         .HasColumnType("int");
-                    b.Property<decimal?>("CostThreshold")
-                        .HasColumnType("decimal(18,6)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -560,6 +551,29 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ComplianceAuditLogs");
+                });
+
+            modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelRoutingConfig", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdditionalSettings")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<int>("Channel")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("CostThreshold")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("EnableFallback")
                         .HasColumnType("bit");
 

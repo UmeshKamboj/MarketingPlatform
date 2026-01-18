@@ -99,6 +99,10 @@ builder.Services.AddScoped<IRateLimitService, RateLimitService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IMessageRoutingService, MessageRoutingService>();
 
+// Analytics & Reporting Services
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IReportExportService, ReportExportService>();
+
 // Provider Services (Mock implementations)
 builder.Services.AddScoped<ISMSProvider, MockSMSProvider>();
 builder.Services.AddScoped<IMMSProvider, MockMMSProvider>();
