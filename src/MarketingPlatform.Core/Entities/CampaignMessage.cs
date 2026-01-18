@@ -23,9 +23,13 @@ namespace MarketingPlatform.Core.Entities
         public decimal CostAmount { get; set; } = 0.00m;
         public int RetryCount { get; set; } = 0;
         public int MaxRetries { get; set; } = 3;
+        
+        // A/B Testing
+        public int? VariantId { get; set; }
 
         // Navigation properties
         public virtual Campaign Campaign { get; set; } = null!;
         public virtual Contact Contact { get; set; } = null!;
+        public virtual CampaignVariant? Variant { get; set; }
     }
 }

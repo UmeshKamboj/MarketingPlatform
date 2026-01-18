@@ -16,8 +16,12 @@ namespace MarketingPlatform.Application.DTOs.Campaign
         public int SuccessCount { get; set; }
         public int FailureCount { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsABTest { get; set; }
+        public int? WinningVariantId { get; set; }
+        public DateTime? ABTestEndDate { get; set; }
         public CampaignContentDto? Content { get; set; }
         public CampaignAudienceDto? Audience { get; set; }
         public CampaignScheduleDto? Schedule { get; set; }
+        public List<CampaignVariantDto>? Variants { get; set; }
     }
 }

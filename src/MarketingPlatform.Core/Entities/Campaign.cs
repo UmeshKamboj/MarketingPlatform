@@ -15,6 +15,11 @@ namespace MarketingPlatform.Core.Entities
         public int TotalRecipients { get; set; } = 0;
         public int SuccessCount { get; set; } = 0;
         public int FailureCount { get; set; } = 0;
+        
+        // A/B Testing properties
+        public bool IsABTest { get; set; } = false;
+        public int? WinningVariantId { get; set; }
+        public DateTime? ABTestEndDate { get; set; }
 
         // Navigation properties
         public virtual ApplicationUser User { get; set; } = null!;
@@ -24,5 +29,6 @@ namespace MarketingPlatform.Core.Entities
         public virtual ICollection<CampaignMessage> Messages { get; set; } = new List<CampaignMessage>();
         public virtual CampaignAnalytics? Analytics { get; set; }
         public virtual ICollection<URLShortener> URLShorteners { get; set; } = new List<URLShortener>();
+        public virtual ICollection<CampaignVariant> Variants { get; set; } = new List<CampaignVariant>();
     }
 }
