@@ -206,6 +206,9 @@ var app = builder.Build();
 // Exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// Rate limiting middleware (before authentication)
+app.UseMiddleware<RateLimitingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
