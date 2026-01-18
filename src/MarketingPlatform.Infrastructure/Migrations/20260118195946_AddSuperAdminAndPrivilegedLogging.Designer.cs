@@ -4,6 +4,7 @@ using MarketingPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260118195946_AddSuperAdminAndPrivilegedLogging")]
+    partial class AddSuperAdminAndPrivilegedLogging
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -874,145 +877,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("ComplianceAuditLogs");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceRule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicableRegions")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("ApplicableServices")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Configuration")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<DateTime>("EffectiveFrom")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("EffectiveTo")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsMandatory")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RuleType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Priority");
-
-                    b.HasIndex("RuleType");
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("IsDeleted", "Status");
-
-                    b.HasIndex("Status", "EffectiveFrom", "EffectiveTo");
-
-                    b.ToTable("ComplianceRules");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceRuleAudit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Action")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ComplianceRuleId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IpAddress")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Metadata")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NewState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PerformedBy")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("PreviousState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reason")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Action");
-
-                    b.HasIndex("ComplianceRuleId");
-
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("ComplianceRuleId", "CreatedAt");
-
-                    b.ToTable("ComplianceRuleAudits");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceSettings", b =>
                 {
                     b.Property<int>("Id")
@@ -1639,79 +1503,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.ToTable("ExternalAuthProviders");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.FeatureToggle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Category")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("DisableAfter")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime?>("EnableAfter")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EnabledForRoles")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("EnabledForUsers")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Category");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("IsDeleted", "IsEnabled");
-
-                    b.ToTable("FeatureToggles");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.FileStorageSettings", b =>
                 {
                     b.Property<int>("Id")
@@ -2214,7 +2005,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformConfiguration", b =>
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.PlatformSetting", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2224,9 +2014,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     b.Property<int>("Category")
                         .HasColumnType("int");
-                    b.Property<string>("Category")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -2244,24 +2031,10 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("DataType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DefaultValue")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsEncrypted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsReadOnly")
                         .HasColumnType("bit");
 
                     b.Property<string>("Key")
@@ -2275,13 +2048,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Scope")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -2396,14 +2162,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("EntityType", "EntityId");
 
                     b.ToTable("PrivilegedActionLogs");
-                    b.HasIndex("Key")
-                        .IsUnique();
-
-                    b.HasIndex("Scope");
-
-                    b.HasIndex("IsDeleted", "Category");
-
-                    b.ToTable("PlatformSettings");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ProviderLog", b =>
@@ -3629,17 +3387,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceRuleAudit", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.ComplianceRule", "ComplianceRule")
-                        .WithMany("AuditTrail")
-                        .HasForeignKey("ComplianceRuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ComplianceRule");
-                });
-
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceSettings", b =>
                 {
                     b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "User")
@@ -4160,11 +3907,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("Analytics");
 
                     b.Navigation("Messages");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceRule", b =>
-                {
-                    b.Navigation("AuditTrail");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.Contact", b =>

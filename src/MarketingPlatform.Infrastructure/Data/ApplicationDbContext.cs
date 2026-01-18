@@ -62,6 +62,10 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<ExternalAuthProvider> ExternalAuthProviders => Set<ExternalAuthProvider>();
         public DbSet<FeatureToggle> FeatureToggles => Set<FeatureToggle>();
         public DbSet<FileStorageSettings> FileStorageSettings => Set<FileStorageSettings>();
+        public DbSet<EncryptionAuditLog> EncryptionAuditLogs => Set<EncryptionAuditLog>();
+        public DbSet<SuperAdminRole> SuperAdminRoles => Set<SuperAdminRole>();
+        public DbSet<PrivilegedActionLog> PrivilegedActionLogs => Set<PrivilegedActionLog>();
+        public DbSet<PlatformConfiguration> PlatformConfigurations => Set<PlatformConfiguration>();
         public DbSet<PlatformSetting> PlatformSettings => Set<PlatformSetting>();
         public DbSet<UserExternalLogin> UserExternalLogins => Set<UserExternalLogin>();
 
