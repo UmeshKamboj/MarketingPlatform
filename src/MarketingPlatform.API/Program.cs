@@ -295,21 +295,11 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Security Headers Middleware - Add before exception handling
-app.Use(async (context, next) =>
-{
-    // Remove server header for security
-    context.Response.Headers.Remove("Server");
-    
-    // Add security headers
-    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-    context.Response.Headers.Append("X-Frame-Options", "DENY");
-    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
-    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
-    context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'");
-    
-    await next();
-});
+// Content Security Policy Middleware with nonce-based inline script/style support
+// This middleware generates a unique nonce per request and sets CSP headers
+// Development: Permissive CSP to allow hot reload, browser-link, WebSockets
+// Production: Strict nonce-based CSP for security
+app.UseMiddleware<CspMiddleware>();
 
 // Exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
