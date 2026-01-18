@@ -99,6 +99,7 @@ builder.Services.AddScoped<IEmailProvider, MockEmailProvider>();
 
 // Background Services
 builder.Services.AddHostedService<MessageQueueProcessor>();
+builder.Services.AddHostedService<DynamicGroupUpdateProcessor>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
