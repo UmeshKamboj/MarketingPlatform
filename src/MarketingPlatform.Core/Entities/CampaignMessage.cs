@@ -13,6 +13,7 @@ namespace MarketingPlatform.Core.Entities
         public DateTime? DeliveredAt { get; set; }
         public string? ProviderMessageId { get; set; }
         public string? ErrorMessage { get; set; }
+        public decimal CostAmount { get; set; } = 0.00m;
 
         // Navigation properties
         public virtual Campaign Campaign { get; set; } = null!;

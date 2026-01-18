@@ -384,14 +384,223 @@ GET /api/contactgroups/{id}/contacts?pageNumber=1&pageSize=20
 Authorization: Bearer {token}
 ```
 
+## Testing Campaign Management
+
+### Create SMS Campaign
+```bash
+POST /api/campaigns
+Authorization: Bearer {token}
+Content-Type: application/json
+{
+  "name": "Summer Sale 2026",
+  "description": "Promotional SMS campaign",
+  "type": 0,
+  "content": {
+    "channel": 0,
+    "messageBody": "Get 50% off all summer items! Use code SUMMER50",
+    "personalizationTokens": {
+      "FirstName": "Customer",
+      "DiscountCode": "SUMMER50"
+    }
+  },
+  "audience": {
+    "targetType": 1,
+    "groupIds": [1, 2, 3]
+  },
+  "schedule": {
+    "scheduleType": 0,
+    "scheduledDate": "2026-07-01T10:00:00Z",
+    "timeZoneAware": true,
+    "preferredTimeZone": "America/New_York"
+  }
+}
+```
+
+### Create Email Campaign
+```bash
+POST /api/campaigns
+Authorization: Bearer {token}
+{
+  "name": "Newsletter - July 2026",
+  "type": 2,
+  "content": {
+    "channel": 2,
+    "subject": "Your Monthly Newsletter",
+    "messageBody": "Plain text version",
+    "htmlContent": "<html><body><h1>Hello!</h1></body></html>"
+  },
+  "audience": {
+    "targetType": 0
+  }
+}
+```
+
+### List All Campaigns
+```bash
+GET /api/campaigns?pageNumber=1&pageSize=20&searchTerm=Summer
+Authorization: Bearer {token}
+```
+
+### Get Single Campaign
+```bash
+GET /api/campaigns/{id}
+Authorization: Bearer {token}
+```
+
+### Get Campaigns by Status
+```bash
+GET /api/campaigns/status/1
+Authorization: Bearer {token}
+```
+
+Status values:
+- 0 = Draft
+- 1 = Scheduled
+- 2 = Running
+- 3 = Paused
+- 4 = Completed
+- 5 = Failed
+
+### Update Campaign (Draft only)
+```bash
+PUT /api/campaigns/{id}
+Authorization: Bearer {token}
+{
+  "name": "Updated Campaign Name",
+  "description": "Updated description",
+  "content": {
+    "channel": 0,
+    "messageBody": "Updated message content"
+  }
+}
+```
+
+### Delete Campaign
+```bash
+DELETE /api/campaigns/{id}
+Authorization: Bearer {token}
+```
+
+Note: Cannot delete Running campaigns
+
+### Duplicate Campaign
+```bash
+POST /api/campaigns/{id}/duplicate
+Authorization: Bearer {token}
+```
+
+### Schedule Campaign
+```bash
+POST /api/campaigns/{id}/schedule
+Authorization: Bearer {token}
+Content-Type: application/json
+"2026-07-01T10:00:00Z"
+```
+
+### Start Campaign Immediately
+```bash
+POST /api/campaigns/{id}/start
+Authorization: Bearer {token}
+```
+
+### Pause Running Campaign
+```bash
+POST /api/campaigns/{id}/pause
+Authorization: Bearer {token}
+```
+
+### Resume Paused Campaign
+```bash
+POST /api/campaigns/{id}/resume
+Authorization: Bearer {token}
+```
+
+### Cancel Campaign
+```bash
+POST /api/campaigns/{id}/cancel
+Authorization: Bearer {token}
+```
+
+### Get Campaign Statistics
+```bash
+GET /api/campaigns/{id}/stats
+Authorization: Bearer {token}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "totalSent": 1500,
+    "delivered": 1450,
+    "failed": 30,
+    "bounced": 20,
+    "deliveryRate": 96.67,
+    "failureRate": 2.00,
+    "estimatedCost": 75.50
+  }
+}
+```
+
+### Calculate Audience Size
+```bash
+POST /api/campaigns/calculate-audience
+Authorization: Bearer {token}
+{
+  "targetType": 1,
+  "groupIds": [1, 2, 3, 4, 5]
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": 2584,
+  "message": "Success"
+}
+```
+
+### Campaign Enum Reference
+
+**CampaignType:**
+- 0 = SMS
+- 1 = MMS
+- 2 = Email
+- 3 = Multi
+
+**CampaignStatus:**
+- 0 = Draft
+- 1 = Scheduled
+- 2 = Running
+- 3 = Paused
+- 4 = Completed
+- 5 = Failed
+
+**ChannelType:**
+- 0 = SMS
+- 1 = MMS
+- 2 = Email
+
+**TargetType:**
+- 0 = All
+- 1 = Groups
+- 2 = Segments
+
+**ScheduleType:**
+- 0 = OneTime
+- 1 = Recurring
+- 2 = Drip
+
 ## Features (Planned)
 
 - ✅ Task 1.1: Solution structure and core projects
 - ✅ Task 1.2: Database foundation
 - ✅ Task 1.3: Authentication & Authorization Core
 - ✅ Task 2.1: API Foundation - Repository Pattern & Core Services
-- ✅ Task 2.2: Contact Management - Full CRUD with Import/Export ← **Current**
-- ⏳ Campaign management
+- ✅ Task 2.2: Contact Management - Full CRUD with Import/Export
+- ✅ Task 2.3: Campaign Management - Core Campaign CRUD & Scheduling ← **Current**
 - ⏳ Template management
 - ⏳ Keyword campaigns
 - ⏳ Automation & workflows
@@ -400,7 +609,7 @@ Authorization: Bearer {token}
 - ⏳ Super admin platform
 
 ## Project Status
-🚧 **In Development** - Task 2.2 Complete
+🚧 **In Development** - Task 2.3 Complete
 
 ## License
 MIT License
