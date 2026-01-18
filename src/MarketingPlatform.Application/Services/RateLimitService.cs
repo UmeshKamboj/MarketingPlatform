@@ -437,9 +437,11 @@ namespace MarketingPlatform.Application.Services
 
         public async Task<List<RateLimitLogDto>> GetRateLimitLogsAsync(string? userId, DateTime? startDate, DateTime? endDate, int pageSize = 100)
         {
-            var allLogs = await _rateLimitLogRepository.GetAllAsync();
+            // Get logs with base filter
+            var logs = await _rateLimitLogRepository.FindAsync(log => !log.IsDeleted);
             
-            var filteredLogs = allLogs.AsQueryable();
+            // Apply additional filters in memory (acceptable for paginated results)
+            var filteredLogs = logs.AsEnumerable();
 
             if (!string.IsNullOrEmpty(userId))
                 filteredLogs = filteredLogs.Where(log => log.UserId == userId);
@@ -450,12 +452,12 @@ namespace MarketingPlatform.Application.Services
             if (endDate.HasValue)
                 filteredLogs = filteredLogs.Where(log => log.TriggeredAt <= endDate.Value);
 
-            var logs = filteredLogs
+            var resultLogs = filteredLogs
                 .OrderByDescending(log => log.TriggeredAt)
                 .Take(pageSize)
                 .ToList();
 
-            return logs.Select(log => new RateLimitLogDto
+            return resultLogs.Select(log => new RateLimitLogDto
             {
                 Id = log.Id,
                 UserId = log.UserId,
@@ -529,11 +531,24 @@ namespace MarketingPlatform.Application.Services
             var applicableLimits = allLimits
                 .Where(arl =>
                 {
-                    // Check if endpoint matches pattern (simple wildcard matching)
-                    var pattern = arl.EndpointPattern.Replace("*", ".*");
-                    var regex = new System.Text.RegularExpressions.Regex($"^{pattern}$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                    if (!regex.IsMatch(endpoint))
+                    // Check if endpoint matches pattern (simple wildcard matching with escaping)
+                    try
+                    {
+                        // Escape the pattern except for wildcards
+                        var escapedPattern = System.Text.RegularExpressions.Regex.Escape(arl.EndpointPattern).Replace("\\*", ".*");
+                        var regex = new System.Text.RegularExpressions.Regex(
+                            $"^{escapedPattern}$",
+                            System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled,
+                            TimeSpan.FromMilliseconds(100)); // Timeout to prevent ReDoS
+                        
+                        if (!regex.IsMatch(endpoint))
+                            return false;
+                    }
+                    catch (System.Text.RegularExpressions.RegexMatchTimeoutException)
+                    {
+                        _logger.LogWarning("Regex timeout for pattern {Pattern}", arl.EndpointPattern);
                         return false;
+                    }
 
                     // Match user-specific limits
                     if (!string.IsNullOrEmpty(arl.UserId) && arl.UserId == userId)

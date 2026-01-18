@@ -45,14 +45,12 @@ namespace MarketingPlatform.API.Middleware
                 // Check rate limit
                 var rateLimitStatus = await rateLimitService.CheckApiRateLimitAsync(userId, tenantId, endpoint, httpMethod);
 
-                // Add rate limit headers to response
-                context.Response.Headers["X-RateLimit-Limit"] = rateLimitStatus.MaxRequests.ToString();
-                context.Response.Headers["X-RateLimit-Remaining"] = rateLimitStatus.RemainingRequests.ToString();
-                context.Response.Headers["X-RateLimit-Reset"] = new DateTimeOffset(rateLimitStatus.WindowResetTime).ToUnixTimeSeconds().ToString();
-
                 if (rateLimitStatus.IsLimited)
                 {
-                    // Rate limit exceeded
+                    // Rate limit exceeded - add headers before setting status code
+                    context.Response.Headers["X-RateLimit-Limit"] = rateLimitStatus.MaxRequests.ToString();
+                    context.Response.Headers["X-RateLimit-Remaining"] = "0";
+                    context.Response.Headers["X-RateLimit-Reset"] = new DateTimeOffset(rateLimitStatus.WindowResetTime).ToUnixTimeSeconds().ToString();
                     context.Response.Headers["Retry-After"] = rateLimitStatus.RetryAfterSeconds?.ToString() ?? "60";
                     context.Response.StatusCode = 429; // Too Many Requests
                     context.Response.ContentType = "application/json";
@@ -86,6 +84,15 @@ namespace MarketingPlatform.API.Middleware
 
                 // Record the request
                 await rateLimitService.RecordApiRequestAsync(userId, tenantId, endpoint, httpMethod);
+
+                // Add rate limit headers to successful requests
+                context.Response.OnStarting(() =>
+                {
+                    context.Response.Headers["X-RateLimit-Limit"] = rateLimitStatus.MaxRequests.ToString();
+                    context.Response.Headers["X-RateLimit-Remaining"] = rateLimitStatus.RemainingRequests.ToString();
+                    context.Response.Headers["X-RateLimit-Reset"] = new DateTimeOffset(rateLimitStatus.WindowResetTime).ToUnixTimeSeconds().ToString();
+                    return Task.CompletedTask;
+                });
 
                 // Continue to next middleware
                 await _next(context);
