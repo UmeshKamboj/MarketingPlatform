@@ -26,6 +26,13 @@ function initializeForm() {
         radio.addEventListener('change', handleScheduleTypeChange);
     });
 
+    // Initialize channel radio handlers
+    document.querySelectorAll('input[name="channel"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateContentFieldsByChannel(this.value);
+        });
+    });
+
     // Timezone aware checkbox
     document.getElementById('timeZoneAware').addEventListener('change', function() {
         document.getElementById('timezoneGroup').style.display = this.checked ? 'block' : 'none';
@@ -106,13 +113,7 @@ function updateContentFieldsByChannel(channelType) {
 }
 
 // Add event listener for channel radio buttons
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('input[name="channel"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            updateContentFieldsByChannel(this.value);
-        });
-    });
-});
+// This is now handled in initializeForm()
 
 function updateCharacterCount() {
     const messageBody = document.getElementById('messageBody');
@@ -248,7 +249,7 @@ function validateStep(step) {
     }
     
     if (!isValid) {
-        alert('Validation errors:\n' + errorMessages.join('\n'));
+        showNotification('Validation errors:\n' + errorMessages.join('\n'), 'error');
     }
     
     return isValid;
@@ -266,7 +267,7 @@ function handleSubmit(e) {
     console.log('Campaign Data:', campaignData);
     
     // In production, this would call the API
-    alert('Campaign creation functionality is ready!\n\nTo complete this feature:\n1. Implement authentication\n2. Connect to API at: ' + (window.apiBaseUrl || '/api') + '/campaigns\n3. Send the campaign data\n\nCampaign data has been logged to console.');
+    showNotification('Campaign creation functionality is ready!\n\nTo complete this feature:\n1. Implement authentication\n2. Connect to API at: ' + (window.apiBaseUrl || '/api') + '/campaigns\n3. Send the campaign data\n\nCampaign data has been logged to console.', 'info');
 }
 
 function saveDraft() {
@@ -274,7 +275,7 @@ function saveDraft() {
     campaignData.status = 0; // Draft status
     
     console.log('Saving draft:', campaignData);
-    alert('Draft saved! (In production, this would call the API)');
+    showNotification('Draft saved successfully!', 'success');
 }
 
 function buildCampaignData() {
@@ -458,4 +459,24 @@ function addCustomToken() {
     `;
     
     customTokensDiv.appendChild(tokenGroup);
+}
+
+// Notification helper function for better UX
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+    notification.innerHTML = `
+        ${message.replace(/\n/g, '<br>')}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 150);
+    }, 5000);
 }
