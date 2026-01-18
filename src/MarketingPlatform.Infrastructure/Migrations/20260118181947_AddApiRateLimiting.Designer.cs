@@ -4,6 +4,7 @@ using MarketingPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260118181947_AddApiRateLimiting")]
+    partial class AddApiRateLimiting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,9 +237,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("ABTestEndDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("datetime2");
 
@@ -249,9 +249,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     b.Property<int>("FailureCount")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsABTest")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -286,9 +283,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("WinningVariantId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -524,9 +518,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("VariantId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CampaignId");
@@ -534,8 +525,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasIndex("ContactId");
 
                     b.HasIndex("Status");
-
-                    b.HasIndex("VariantId");
 
                     b.ToTable("CampaignMessages");
                 });
@@ -582,168 +571,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("CampaignSchedules");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.CampaignVariant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Channel")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DeliveredCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int>("FailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("HTMLContent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsControl")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MediaUrls")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MessageBody")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("MessageTemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("PersonalizationTokens")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RecipientCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SentCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Subject")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("TrafficPercentage")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CampaignId");
-
-                    b.HasIndex("MessageTemplateId");
-
-                    b.HasIndex("CampaignId", "IsControl");
-
-                    b.ToTable("CampaignVariants");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.CampaignVariantAnalytics", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("BounceRate")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<int>("CampaignVariantId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ClickRate")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("ConfidenceLevel")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal>("ConversionRate")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("DeliveryRate")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsStatisticallySignificant")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("OpenRate")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal>("OptOutRate")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<int>("TotalBounces")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalClicks")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalConversions")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalDelivered")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalFailed")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalOpens")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalOptOuts")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalReplies")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalSent")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CampaignVariantId")
-                        .IsUnique();
-
-                    b.ToTable("CampaignVariantAnalytics");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ChannelRoutingConfig", b =>
@@ -2806,16 +2633,9 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MarketingPlatform.Core.Entities.CampaignVariant", "Variant")
-                        .WithMany("Messages")
-                        .HasForeignKey("VariantId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Campaign");
 
                     b.Navigation("Contact");
-
-                    b.Navigation("Variant");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.CampaignSchedule", b =>
@@ -2827,35 +2647,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Campaign");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.CampaignVariant", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.Campaign", "Campaign")
-                        .WithMany("Variants")
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MarketingPlatform.Core.Entities.MessageTemplate", "MessageTemplate")
-                        .WithMany()
-                        .HasForeignKey("MessageTemplateId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("MessageTemplate");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.CampaignVariantAnalytics", b =>
-                {
-                    b.HasOne("MarketingPlatform.Core.Entities.CampaignVariant", "CampaignVariant")
-                        .WithOne("Analytics")
-                        .HasForeignKey("MarketingPlatform.Core.Entities.CampaignVariantAnalytics", "CampaignVariantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CampaignVariant");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.ComplianceAuditLog", b =>
@@ -3327,15 +3118,6 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.Navigation("Schedule");
 
                     b.Navigation("URLShorteners");
-
-                    b.Navigation("Variants");
-                });
-
-            modelBuilder.Entity("MarketingPlatform.Core.Entities.CampaignVariant", b =>
-                {
-                    b.Navigation("Analytics");
-
-                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("MarketingPlatform.Core.Entities.Contact", b =>

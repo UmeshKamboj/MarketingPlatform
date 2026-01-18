@@ -53,6 +53,9 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<ChannelRoutingConfig> ChannelRoutingConfigs => Set<ChannelRoutingConfig>();
         public DbSet<Role> CustomRoles => Set<Role>();
         public DbSet<Core.Entities.UserRole> CustomUserRoles => Set<Core.Entities.UserRole>();
+        public DbSet<ApiRateLimit> ApiRateLimits => Set<ApiRateLimit>();
+        public DbSet<RateLimitLog> RateLimitLogs => Set<RateLimitLog>();
+        public DbSet<ProviderRateLimit> ProviderRateLimits => Set<ProviderRateLimit>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
