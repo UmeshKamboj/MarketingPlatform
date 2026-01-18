@@ -139,6 +139,9 @@ builder.Services.AddScoped<IAudienceSegmentationService, AudienceSegmentationSer
 builder.Services.AddScoped<IKeywordService, KeywordService>();
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
+builder.Services.AddScoped<IPlatformSettingService, PlatformSettingService>();
+builder.Services.AddScoped<IFeatureToggleService, FeatureToggleService>();
+builder.Services.AddScoped<IComplianceRuleService, ComplianceRuleService>();
 
 // Scheduling & Automation Services
 builder.Services.AddScoped<ICampaignSchedulerService, CampaignSchedulerService>();
