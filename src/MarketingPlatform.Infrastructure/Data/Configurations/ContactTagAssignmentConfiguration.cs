@@ -21,10 +21,13 @@ namespace MarketingPlatform.Infrastructure.Data.Configurations
                 .HasForeignKey(cta => cta.ContactId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Use Restrict to avoid multiple cascade paths from ApplicationUser
+            // Path 1: ApplicationUser -> Contact -> ContactTagAssignment (Cascade)
+            // Path 2: ApplicationUser -> ContactTag -> ContactTagAssignment (Restrict breaks the cycle)
             builder.HasOne(cta => cta.ContactTag)
                 .WithMany(ct => ct.TagAssignments)
                 .HasForeignKey(cta => cta.ContactTagId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

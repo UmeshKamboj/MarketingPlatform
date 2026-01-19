@@ -72,10 +72,13 @@ namespace MarketingPlatform.Infrastructure.Data.Configurations
                 .HasForeignKey(ka => ka.KeywordId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Use Restrict on Campaign to avoid multiple cascade paths from ApplicationUser
+            // Path 1: ApplicationUser -> Keyword -> KeywordAssignment (Cascade)
+            // Path 2: ApplicationUser -> Campaign -> KeywordAssignment (Restrict breaks the cycle)
             builder.HasOne(ka => ka.Campaign)
                 .WithMany()
                 .HasForeignKey(ka => ka.CampaignId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(ka => ka.AssignedBy)
                 .WithMany()
