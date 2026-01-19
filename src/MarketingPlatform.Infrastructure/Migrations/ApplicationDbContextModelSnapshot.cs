@@ -4290,7 +4290,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.ContactGroup", "ContactGroup")
                         .WithMany("Members")
                         .HasForeignKey("ContactGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MarketingPlatform.Core.Entities.Contact", "Contact")
@@ -4326,7 +4326,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.ContactTag", "ContactTag")
                         .WithMany("TagAssignments")
                         .HasForeignKey("ContactTagId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Contact");
@@ -4418,7 +4418,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.Campaign", "Campaign")
                         .WithMany()
                         .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MarketingPlatform.Core.Entities.Keyword", "Keyword")

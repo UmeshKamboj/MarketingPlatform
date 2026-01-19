@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260119075626_TestCascadeFix")]
-    partial class TestCascadeFix
+    [Migration("20260119075924_FixCascadeConstraints")]
+    partial class FixCascadeConstraints
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -4293,7 +4293,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.ContactGroup", "ContactGroup")
                         .WithMany("Members")
                         .HasForeignKey("ContactGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MarketingPlatform.Core.Entities.Contact", "Contact")
@@ -4329,7 +4329,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.ContactTag", "ContactTag")
                         .WithMany("TagAssignments")
                         .HasForeignKey("ContactTagId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Contact");
@@ -4421,7 +4421,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.Campaign", "Campaign")
                         .WithMany()
                         .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MarketingPlatform.Core.Entities.Keyword", "Keyword")
