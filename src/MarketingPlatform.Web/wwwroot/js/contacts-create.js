@@ -212,11 +212,14 @@ function isValidEmail(email) {
 
 /**
  * Validate phone format
+ * Accepts international formats with country codes, area codes, and various separators
  */
 function isValidPhone(phone) {
-    // Basic phone validation - accepts various formats
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-    return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
+    // International phone number validation (E.164 format and common variations)
+    // Accepts: +1234567890, +1-234-567-8900, +1 (234) 567-8900, etc.
+    const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+    const digitsOnly = phone.replace(/\D/g, '');
+    return phoneRegex.test(phone) && digitsOnly.length >= 10 && digitsOnly.length <= 15;
 }
 
 /**

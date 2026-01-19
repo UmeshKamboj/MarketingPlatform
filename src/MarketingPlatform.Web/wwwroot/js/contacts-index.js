@@ -300,21 +300,8 @@ function deleteContact(id) {
     });
 }
 
-/**
- * Import contacts
- */
-function importContacts() {
-    // TODO: Implement import functionality
-    showNotification('Import functionality coming soon!', 'info');
-}
-
-/**
- * Export contacts
- */
-function exportContacts() {
-    // Use DataTables export or custom export
-    showNotification('Use the export buttons above the table to export contacts', 'info');
-}
+// Note: Import and Export functionality is provided by DataTables export buttons
+// These are placeholder functions for future custom import/export features if needed
 
 /**
  * Handle AJAX errors

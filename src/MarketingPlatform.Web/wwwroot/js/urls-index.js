@@ -229,36 +229,50 @@ function initUrlsTable() {
 // ============================================================================
 
 /**
- * Copy URL to clipboard
+ * Copy URL to clipboard with modern API and legacy fallback
  */
 function copyUrl(url) {
+    // Modern Clipboard API (preferred)
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(function() {
             showNotification('URL copied to clipboard!', 'success', 2000);
         }).catch(function(err) {
             console.error('Failed to copy: ', err);
-            showNotification('Failed to copy URL', 'error');
+            // Fallback on error
+            legacyCopyToClipboard(url);
         });
     } else {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = url;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        try {
-            document.execCommand('copy');
-            showNotification('URL copied to clipboard!', 'success', 2000);
-        } catch (err) {
-            console.error('Failed to copy: ', err);
-            showNotification('Failed to copy URL', 'error');
-        }
-        
-        document.body.removeChild(textArea);
+        // Legacy fallback for older browsers
+        legacyCopyToClipboard(url);
     }
+}
+
+/**
+ * Legacy clipboard copy method
+ */
+function legacyCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.top = '-999999px';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showNotification('URL copied to clipboard!', 'success', 2000);
+        } else {
+            showNotification('Failed to copy URL. Please copy manually.', 'error');
+        }
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+        showNotification('Failed to copy URL. Please copy manually.', 'error');
+    }
+    
+    document.body.removeChild(textArea);
 }
 
 /**

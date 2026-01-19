@@ -62,7 +62,7 @@ function initRolesTable() {
                             'User': 'secondary'
                         };
                         const color = roleColors[data] || 'primary';
-                        return `<strong>${escapeHtml(data)}</strong> ${createBadge(data, color)}`;
+                        return createBadge(data, color);
                     }
                     return data;
                 }
