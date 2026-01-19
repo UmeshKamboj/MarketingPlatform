@@ -76,6 +76,8 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<UsagePricing> UsagePricings => Set<UsagePricing>();
         public DbSet<TaxConfiguration> TaxConfigurations => Set<TaxConfiguration>();
         public DbSet<PageContent> PageContents => Set<PageContent>();
+        public DbSet<ChatRoom> ChatRooms => Set<ChatRoom>();
+        public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
