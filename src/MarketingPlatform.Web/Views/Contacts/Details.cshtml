@@ -130,9 +130,5 @@
 </div>
 
 @section Scripts {
-    <script nonce="@Context.GetCspNonce()">
-        function editContact() {
-            window.location.href = '/Contacts/Edit/1';
-        }
-    </script>
+    <script src="~/js/contacts-details.js" asp-append-version="true"></script>
 }

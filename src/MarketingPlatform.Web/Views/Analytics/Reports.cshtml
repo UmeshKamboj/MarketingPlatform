@@ -11,7 +11,7 @@
                 <div class="card-body">
                     <h5 class="card-title"><i class="bi bi-file-text"></i> Campaign Summary Report</h5>
                     <p class="card-text">Comprehensive overview of all campaigns</p>
-                    <button class="btn btn-primary" onclick="generateReport('campaign-summary')">
+                    <button class="btn btn-primary" data-action="generate-report" data-report-type="campaign-summary">
                         <i class="bi bi-download"></i> Generate
                     </button>
                 </div>
@@ -22,7 +22,7 @@
                 <div class="card-body">
                     <h5 class="card-title"><i class="bi bi-people"></i> Contact Engagement Report</h5>
                     <p class="card-text">Contact activity and engagement metrics</p>
-                    <button class="btn btn-primary" onclick="generateReport('contact-engagement')">
+                    <button class="btn btn-primary" data-action="generate-report" data-report-type="contact-engagement">
                         <i class="bi bi-download"></i> Generate
                     </button>
                 </div>
@@ -33,7 +33,7 @@
                 <div class="card-body">
                     <h5 class="card-title"><i class="bi bi-cash-coin"></i> Revenue Report</h5>
                     <p class="card-text">Financial performance and ROI analysis</p>
-                    <button class="btn btn-primary" onclick="generateReport('revenue')">
+                    <button class="btn btn-primary" data-action="generate-report" data-report-type="revenue">
                         <i class="bi bi-download"></i> Generate
                     </button>
                 </div>
@@ -86,9 +86,5 @@
 </div>
 
 @section Scripts {
-    <script nonce="@Context.GetCspNonce()">
-        function generateReport(type) {
-            alert(`Generating ${type} report... (Demo)`);
-        }
-    </script>
+    <script src="~/js/analytics-reports.js" asp-append-version="true"></script>
 }
