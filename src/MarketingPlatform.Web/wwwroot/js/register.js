@@ -30,7 +30,7 @@ async function loadRecaptchaConfig() {
 
 function renderRecaptcha(siteKey) {
     const recaptchaContainer = document.querySelector('.g-recaptcha');
-    if (recaptchaContainer && siteKey && siteKey !== 'YOUR_RECAPTCHA_SITE_KEY') {
+    if (recaptchaContainer && siteKey ) {
         recaptchaContainer.setAttribute('data-sitekey', siteKey);
     }
 }

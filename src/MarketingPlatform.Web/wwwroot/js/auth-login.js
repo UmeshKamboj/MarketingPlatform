@@ -39,7 +39,7 @@ async function loadRecaptchaConfig() {
  */
 function renderRecaptcha(siteKey) {
     const recaptchaContainer = document.querySelector('.g-recaptcha');
-    if (recaptchaContainer && siteKey && siteKey !== 'YOUR_RECAPTCHA_SITE_KEY') {
+    if (recaptchaContainer && siteKey) {
         recaptchaContainer.setAttribute('data-sitekey', siteKey);
     }
 }
@@ -98,8 +98,8 @@ function initializeLoginForm() {
         }
         
         // Clear previous messages
-        errorDiv.classList.add('d-none');
-        successDiv.classList.add('d-none');
+        if (errorDiv) errorDiv.classList.add('d-none');
+        if (successDiv) successDiv.classList.add('d-none');
         
         // Disable button and show loading state
         loginBtn.disabled = true;

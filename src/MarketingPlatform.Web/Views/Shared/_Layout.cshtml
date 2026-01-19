@@ -1,9 +1,24 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Marketing Platform</title>
+    <script>
+        window.appConfig = {
+            apiBaseUrl: '@(Configuration["ApiSettings:BaseUrl"])',
+            recaptchaSiteKey: '@(Configuration["ReCaptcha:SiteKey"])',
+            stripePublishableKey: '@(Configuration["Stripe:PublishableKey"])',
+
+        };
+         window.authConfig = {
+            apiBaseUrl: '@(Configuration["ApiSettings:BaseUrl"])',
+            recaptchaSiteKey: '@(Configuration["ReCaptcha:SiteKey"])',
+            stripePublishableKey: '@(Configuration["Stripe:PublishableKey"])',
+
+        }; 
+    </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
