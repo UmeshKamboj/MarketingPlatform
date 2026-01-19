@@ -136,7 +136,7 @@ const AppUrls = {
         index: '/providers/index',
         create: '/providers/create',
         edit: (id) => `/providers/edit/${id}`,
-        health: '/providers/health',
+        health: (id) => `/providers/health/${id}`,
         routing: '/providers/routing',
         delete: (id) => `/providers/delete/${id}`,
         test: (id) => `/providers/test/${id}`,

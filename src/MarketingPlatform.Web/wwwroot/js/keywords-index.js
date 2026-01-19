@@ -245,7 +245,7 @@ function setupFilters() {
  * View keyword details
  */
 function viewKeyword(id) {
-    window.location.href = AppUrls.keywords.details ? AppUrls.keywords.details(id) : `/Keywords/Details/${id}`;
+    window.location.href = AppUrls.keywords?.details ? AppUrls.keywords.details(id) : `/Keywords/Details/${id}`;
 }
 
 /**

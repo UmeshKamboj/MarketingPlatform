@@ -219,14 +219,14 @@ function initRolesTable() {
  * Create new role
  */
 function createRole() {
-    window.location.href = AppUrls.roles.create;
+    window.location.href = AppUrls.roles?.create || '/Roles/Create';
 }
 
 /**
  * View role details
  */
 function viewRole(id) {
-    window.location.href = AppUrls.roles.details ? AppUrls.roles.details(id) : `/Roles/Details/${id}`;
+    window.location.href = AppUrls.roles?.details ? AppUrls.roles.details(id) : `/Roles/Details/${id}`;
 }
 
 /**

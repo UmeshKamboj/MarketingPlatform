@@ -246,7 +246,7 @@ function setupFilters() {
  * View user details
  */
 function viewUser(id) {
-    window.location.href = AppUrls.users.details ? AppUrls.users.details(id) : `/Users/Details/${id}`;
+    window.location.href = AppUrls.users?.details ? AppUrls.users.details(id) : `/Users/Details/${id}`;
 }
 
 /**
