@@ -45,6 +45,13 @@ builder.Services.AddScoped<IFileStorageProvider, MarketingPlatform.Infrastructur
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 
+// Configure routing to use lowercase URLs with kebab-case
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
+
 var app = builder.Build();
 
 // Content Security Policy Middleware with nonce-based inline script/style support

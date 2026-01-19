@@ -10,7 +10,7 @@ let apiBaseUrl = '';
  * Initialize the create page
  */
 function initKeywordCreate() {
-    apiBaseUrl = window.keywordsConfig?.apiBaseUrl || '/api';
+    apiBaseUrl = AppUrls.getApiBaseUrl();
     
     setupEventListeners();
     setupFormValidation();
@@ -75,13 +75,15 @@ async function checkKeywordAvailability() {
     }
 
     try {
-        const response = await fetch(
-            `${apiBaseUrl}/keywords/check-availability?keywordText=${encodeURIComponent(keyword)}`,
-            {
-                method: 'GET',
-                headers: getAjaxHeaders()
-            }
+        const url = AppUrls.buildUrl(
+            `${apiBaseUrl}/keywords/check-availability`,
+            { keywordText: keyword }
         );
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: getAjaxHeaders()
+        });
 
         if (response.ok) {
             const result = await response.json();
@@ -264,7 +266,7 @@ async function createKeyword(data) {
             
             // Redirect after short delay
             setTimeout(() => {
-                window.location.href = '/Keywords/Index';
+                window.location.href = AppUrls.keywords.index;
             }, 1500);
         } else {
             // Handle validation errors
@@ -323,7 +325,12 @@ function displayValidationErrors(errors) {
  */
 async function loadExistingKeywords() {
     try {
-        const response = await fetch(`${apiBaseUrl}/keywords?pageNumber=1&pageSize=100`, {
+        const url = AppUrls.buildUrl(`${apiBaseUrl}/keywords`, {
+            pageNumber: 1,
+            pageSize: 100
+        });
+        
+        const response = await fetch(url, {
             method: 'GET',
             headers: getAjaxHeaders()
         });

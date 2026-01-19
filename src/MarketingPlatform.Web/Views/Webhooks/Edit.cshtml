@@ -35,7 +35,7 @@
                 <div class="d-flex justify-content-between">
                     <button type="button" class="btn btn-outline-danger" onclick="deleteWebhook()"><i class="bi bi-trash"></i> Delete</button>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-secondary" onclick="window.location.href='/Webhooks/Index'">Cancel</button>
+                        <a href="@Url.Action("Index", "Webhooks")" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save Changes</button>
                     </div>
                 </div>

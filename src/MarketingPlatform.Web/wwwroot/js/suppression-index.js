@@ -140,8 +140,8 @@ function setupTypeFilter() {
     });
 }
 
-function viewEntries(id) { window.location.href = `/Suppression/Entries/${id}`; }
-function editList(id) { window.location.href = `/Suppression/Edit/${id}`; }
+function viewEntries(id) { window.location.href = AppUrls.suppression.entries(id); }
+function editList(id) { window.location.href = AppUrls.suppression?.edit ? AppUrls.suppression.edit(id) : `/Suppression/Edit/${id}`; }
 
 function exportList(id) {
     showNotification('Exporting suppression list...', 'info');

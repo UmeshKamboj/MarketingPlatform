@@ -134,8 +134,8 @@ function setupTabHandlers() {
     });
 }
 
-function previewTemplate(id) { window.location.href = `/Templates/Preview/${id}`; }
-function editTemplate(id) { window.location.href = `/Templates/Edit/${id}`; }
+function previewTemplate(id) { window.location.href = AppUrls.templates.preview ? AppUrls.templates.preview(id) : `/Templates/Preview/${id}`; }
+function editTemplate(id) { window.location.href = AppUrls.templates.edit(id); }
 
 function duplicateTemplate(id) {
     confirmAction('Duplicate this template?', function() {

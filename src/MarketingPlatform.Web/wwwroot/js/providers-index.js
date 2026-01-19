@@ -141,7 +141,7 @@ function setupTabHandlers() {
 }
 
 function viewHealth(id) { window.location.href = `/Providers/Health/${id}`; }
-function editProvider(id) { window.location.href = `/Providers/Edit/${id}`; }
+function editProvider(id) { window.location.href = AppUrls.providers?.edit ? AppUrls.providers.edit(id) : `/Providers/Edit/${id}`; }
 
 function testProvider(id) {
     confirmAction('Send a test message through this provider?', function() {
