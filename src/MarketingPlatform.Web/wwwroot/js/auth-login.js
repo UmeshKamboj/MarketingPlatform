@@ -72,6 +72,13 @@ function initializeLoginForm() {
     const loginForm = document.getElementById('loginForm');
     if (!loginForm) return;
 
+    // Check if server-side authentication is enabled
+    // If so, don't intercept - let the form submit naturally
+    if (window.authConfig && window.authConfig.useServerSideAuth === true) {
+        console.log('Server-side authentication enabled - form will submit to server');
+        return; // Don't add event listener, allow normal form submission
+    }
+
     loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
