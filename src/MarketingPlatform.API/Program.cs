@@ -312,10 +312,14 @@ app.UseStaticFiles();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
-
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Marketing Platform API");
+});
 // HTTPS Redirection - Enforce TLS 1.2+
 app.UseHttpsRedirection();
 
