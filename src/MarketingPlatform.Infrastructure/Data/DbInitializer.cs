@@ -94,7 +94,7 @@ namespace MarketingPlatform.Infrastructure.Data
                     new Role
                     {
                         Name = "Admin",
-                        Description = "Administrator with most permissions except user/role management",
+                        Description = "Administrator with most permissions including user/role management",
                         Permissions = (long)(Permission.ViewCampaigns | Permission.CreateCampaigns | 
                             Permission.EditCampaigns | Permission.DeleteCampaigns |
                             Permission.ViewContacts | Permission.CreateContacts | 
@@ -107,7 +107,9 @@ namespace MarketingPlatform.Infrastructure.Data
                             Permission.EditWorkflows | Permission.DeleteWorkflows |
                             Permission.ViewSettings | Permission.ManageSettings |
                             Permission.ViewCompliance | Permission.ManageCompliance |
-                            Permission.ViewAuditLogs),
+                            Permission.ViewAuditLogs |
+                            Permission.ViewUsers | Permission.CreateUsers | 
+                            Permission.EditUsers | Permission.ViewRoles),
                         IsSystemRole = true,
                         IsActive = true,
                         CreatedAt = DateTime.UtcNow
@@ -125,7 +127,19 @@ namespace MarketingPlatform.Infrastructure.Data
                             Permission.ViewAnalytics | Permission.ViewDetailedAnalytics |
                             Permission.ViewWorkflows | Permission.CreateWorkflows | 
                             Permission.EditWorkflows |
-                            Permission.ViewCompliance),
+                            Permission.ViewCompliance |
+                            Permission.ViewUsers),
+                        IsSystemRole = true,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Role
+                    {
+                        Name = "User",
+                        Description = "Standard user with basic campaign and contact management",
+                        Permissions = (long)(Permission.ViewCampaigns | Permission.CreateCampaigns |
+                            Permission.ViewContacts | Permission.CreateContacts | 
+                            Permission.ViewTemplates | Permission.ViewAnalytics),
                         IsSystemRole = true,
                         IsActive = true,
                         CreatedAt = DateTime.UtcNow
