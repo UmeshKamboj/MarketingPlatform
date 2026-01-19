@@ -54,3 +54,5 @@ appsettings.Production.json
 *.dll
 *.exe
 *.pdb
+/src/MarketingPlatform.API/appsettings.json
+/src/MarketingPlatform.Web/appsettings.json
