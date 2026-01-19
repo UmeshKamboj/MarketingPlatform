@@ -75,7 +75,6 @@ namespace MarketingPlatform.Infrastructure.Data
 
             try
             {
-
                 // Seed Custom Roles with Permissions
                 if (!await context.CustomRoles.AnyAsync())
                 {
@@ -191,7 +190,6 @@ namespace MarketingPlatform.Infrastructure.Data
 
             try
             {
-
                 // Seed Default Admin User
                 var adminEmail = "admin@marketingplatform.com";
                 var adminUser = await userManager.FindByEmailAsync(adminEmail);
@@ -322,7 +320,6 @@ namespace MarketingPlatform.Infrastructure.Data
 
             try
             {
-
                 // Seed Subscription Plans
                 if (!await context.SubscriptionPlans.AnyAsync())
                 {
@@ -402,7 +399,6 @@ namespace MarketingPlatform.Infrastructure.Data
 
             try
             {
-
                 // Seed Message Providers
                 if (!await context.MessageProviders.AnyAsync())
                 {
@@ -452,7 +448,6 @@ namespace MarketingPlatform.Infrastructure.Data
 
             try
             {
-
                 // Seed Channel Routing Configurations
                 if (!await context.ChannelRoutingConfigs.AnyAsync())
                 {
@@ -529,7 +524,6 @@ namespace MarketingPlatform.Infrastructure.Data
 
             try
             {
-
                 // Seed Pricing Models for Landing Page
                 if (!await context.PricingModels.AnyAsync())
                 {
@@ -600,7 +594,6 @@ namespace MarketingPlatform.Infrastructure.Data
 
             try
             {
-
                 // Seed Landing Page Configuration Settings
                 if (!await context.PlatformSettings.AnyAsync(s => s.Category == "LandingPage"))
                 {
