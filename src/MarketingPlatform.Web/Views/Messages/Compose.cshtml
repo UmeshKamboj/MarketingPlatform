@@ -74,10 +74,10 @@
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label for="messageBody" class="form-label mb-0">Message Content <span class="text-danger">*</span></label>
                                 <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="loadTemplate()">
+                                    <button type="button" class="btn btn-outline-secondary" data-action="load-template">
                                         <i class="bi bi-file-earmark-text"></i> Load Template
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="insertToken()">
+                                    <button type="button" class="btn btn-outline-secondary" data-action="insert-token">
                                         <i class="bi bi-code-square"></i> Insert Token
                                     </button>
                                 </div>
@@ -93,10 +93,10 @@
                             <div class="mb-3">
                                 <label class="form-label">HTML Content (Optional)</label>
                                 <div class="btn-group btn-group-sm mb-2" role="group">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="toggleEditor('text')">
+                                    <button type="button" class="btn btn-outline-secondary" data-editor-mode="text">
                                         <i class="bi bi-type"></i> Text
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary active" onclick="toggleEditor('html')">
+                                    <button type="button" class="btn btn-outline-secondary active" data-editor-mode="html">
                                         <i class="bi bi-code-slash"></i> HTML
                                     </button>
                                 </div>
@@ -132,10 +132,10 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                            <button type="button" class="btn btn-secondary" data-action="save-draft">
                                 <i class="bi bi-save"></i> Save Draft
                             </button>
-                            <button type="button" class="btn btn-outline-primary" onclick="previewMessage()">
+                            <button type="button" class="btn btn-outline-primary" data-action="preview-message">
                                 <i class="bi bi-eye"></i> Preview
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -152,12 +152,12 @@
                 <div class="card-body">
                     <h6 class="card-title"><i class="bi bi-info-circle"></i> Message Tokens</h6>
                     <div class="d-flex flex-wrap gap-1 mb-2">
-                        <span class="badge bg-secondary" style="cursor: pointer;" onclick="insertTokenValue('{FirstName}')">{FirstName}</span>
-                        <span class="badge bg-secondary" style="cursor: pointer;" onclick="insertTokenValue('{LastName}')">{LastName}</span>
-                        <span class="badge bg-secondary" style="cursor: pointer;" onclick="insertTokenValue('{Email}')">{Email}</span>
-                        <span class="badge bg-secondary" style="cursor: pointer;" onclick="insertTokenValue('{Phone}')">{Phone}</span>
-                        <span class="badge bg-secondary" style="cursor: pointer;" onclick="insertTokenValue('{CompanyName}')">{CompanyName}</span>
-                        <span class="badge bg-secondary" style="cursor: pointer;" onclick="insertTokenValue('{UnsubscribeLink}')">{UnsubscribeLink}</span>
+                        <span class="badge bg-secondary" style="cursor: pointer;" data-token="{FirstName}">{FirstName}</span>
+                        <span class="badge bg-secondary" style="cursor: pointer;" data-token="{LastName}">{LastName}</span>
+                        <span class="badge bg-secondary" style="cursor: pointer;" data-token="{Email}">{Email}</span>
+                        <span class="badge bg-secondary" style="cursor: pointer;" data-token="{Phone}">{Phone}</span>
+                        <span class="badge bg-secondary" style="cursor: pointer;" data-token="{CompanyName}">{CompanyName}</span>
+                        <span class="badge bg-secondary" style="cursor: pointer;" data-token="{UnsubscribeLink}">{UnsubscribeLink}</span>
                     </div>
                     <small class="text-muted">Click to insert into message</small>
                 </div>
@@ -187,146 +187,9 @@
 
 @section Scripts {
     <script nonce="@Context.GetCspNonce()">
-        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            setupChannelSwitch();
-            setupSchedulingToggle();
-            setupCharCounter();
-            setupRecipientsCalculator();
-        });
-
-        function setupChannelSwitch() {
-            document.querySelectorAll('input[name="channel"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const channel = this.value;
-                    document.getElementById('emailFields').style.display = channel === 'Email' ? 'block' : 'none';
-                    document.getElementById('htmlEditor').style.display = channel === 'Email' ? 'block' : 'none';
-                    document.getElementById('smsFields').style.display = (channel === 'SMS' || channel === 'MMS') ? 'block' : 'none';
-                    document.getElementById('mmsFields').style.display = channel === 'MMS' ? 'block' : 'none';
-                    
-                    const bodyHelp = document.getElementById('bodyHelp');
-                    if (channel === 'SMS') {
-                        bodyHelp.textContent = 'SMS message (160 characters recommended)';
-                    } else if (channel === 'MMS') {
-                        bodyHelp.textContent = 'MMS message with media attachment';
-                    } else {
-                        bodyHelp.textContent = 'Email message content (plain text)';
-                    }
-                });
-            });
-        }
-
-        function setupSchedulingToggle() {
-            document.querySelectorAll('input[name="scheduling"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.getElementById('schedulingFields').style.display = 
-                        this.value === 'later' ? 'block' : 'none';
-                });
-            });
-        }
-
-        function setupCharCounter() {
-            document.getElementById('messageBody').addEventListener('input', function() {
-                const count = this.value.length;
-                document.getElementById('charCounter').textContent = `${count} characters`;
-            });
-        }
-
-        function setupRecipientsCalculator() {
-            document.getElementById('recipients').addEventListener('change', function() {
-                const selected = Array.from(this.selectedOptions);
-                let total = 0;
-                selected.forEach(option => {
-                    const match = option.text.match(/\(([0-9,]+)\)/);
-                    if (match) {
-                        total += parseInt(match[1].replace(/,/g, ''));
-                    }
-                });
-                document.querySelector('#estimatedReach h3').textContent = total.toLocaleString();
-                checkCompliance(total);
-            });
-        }
-
-        function checkCompliance(recipientCount) {
-            const complianceDiv = document.getElementById('complianceCheck');
-            let html = '';
-            
-            if (recipientCount > 0) {
-                html += '<div class="alert alert-success alert-sm p-2 mb-1"><small><i class="bi bi-check-circle"></i> Recipients verified</small></div>';
-                html += '<div class="alert alert-success alert-sm p-2 mb-1"><small><i class="bi bi-check-circle"></i> Opt-in consent checked</small></div>';
-                html += '<div class="alert alert-success alert-sm p-2 mb-0"><small><i class="bi bi-check-circle"></i> Unsubscribe link present</small></div>';
-            } else {
-                html = '<p class="text-muted small mb-0">Select recipients to check compliance</p>';
-            }
-            
-            complianceDiv.innerHTML = html;
-        }
-
-        function insertTokenValue(token) {
-            const textarea = document.getElementById('messageBody');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            textarea.value = text.substring(0, start) + token + text.substring(end);
-            textarea.focus();
-            textarea.setSelectionRange(start + token.length, start + token.length);
-        }
-
-        function loadTemplate() {
-            alert('Template selector would open here (Demo)');
-        }
-
-        function insertToken() {
-            alert('Token selector would open here (Demo)');
-        }
-
-        function toggleEditor(mode) {
-            document.querySelectorAll('#htmlEditor .btn-group button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        function saveDraft() {
-            alert('Message saved as draft! (Demo)');
-        }
-
-        function previewMessage() {
-            window.location.href = '/Messages/Preview';
-        }
-
-        document.getElementById('messageForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const channel = document.querySelector('input[name="channel"]:checked').value;
-            const recipients = document.getElementById('recipients').selectedOptions.length;
-            
-            if (recipients === 0) {
-                alert('Please select at least one recipient group.');
-                return;
-            }
-            
-            if (channel === 'Email' && !document.getElementById('subject').value) {
-                alert('Please enter an email subject.');
-                return;
-            }
-            
-            if (!document.getElementById('messageBody').value) {
-                alert('Please enter message content.');
-                return;
-            }
-            
-            const scheduling = document.querySelector('input[name="scheduling"]:checked').value;
-            if (scheduling === 'later') {
-                if (confirm('Schedule this message for delivery?')) {
-                    alert('Message scheduled successfully! (Demo)');
-                    window.location.href = '/Messages/Index';
-                }
-            } else {
-                if (confirm('Send this message immediately?')) {
-                    alert('Message sent successfully! (Demo)');
-                    window.location.href = '/Messages/Index';
-                }
-            }
-        });
+        window.messagesComposeConfig = {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl'
+        };
     </script>
+    <script src="~/js/messages-compose.js" asp-append-version="true"></script>
 }

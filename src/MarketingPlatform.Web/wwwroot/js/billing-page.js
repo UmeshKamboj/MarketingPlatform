@@ -218,7 +218,7 @@ async function cancelSubscription() {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(reason || 'User cancelled')
+            body: JSON.stringify({ reason: reason || 'User cancelled' })
         });
 
         const result = await response.json();
