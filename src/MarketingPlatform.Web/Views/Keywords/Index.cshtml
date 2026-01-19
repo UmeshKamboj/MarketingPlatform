@@ -14,27 +14,33 @@
         <div class="card-header">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search keywords...">
-                    </div>
+                    <h5 class="mb-0">Keywords List</h5>
                 </div>
                 <div class="col-md-6 text-end">
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-secondary btn-sm active" onclick="filterByStatus('all')">All</button>
-                        <button type="button" class="btn btn-outline-success btn-sm" onclick="filterByStatus('active')">Active</button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filterByStatus('inactive')">Inactive</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm active filter-btn" data-status="all">All</button>
+                        <button type="button" class="btn btn-outline-success btn-sm filter-btn" data-status="active">Active</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm filter-btn" data-status="inactive">Inactive</button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div id="keywords-list">
-                <div class="text-center py-5">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+            <div class="table-responsive">
+                <table id="keywordsTable" class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Keyword</th>
+                            <th>Auto Response</th>
+                            <th>Campaign</th>
+                            <th>Messages</th>
+                            <th>Opt-Ins / Opt-Outs</th>
+                            <th>Status</th>
+                            <th class="no-export text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -42,202 +48,9 @@
 
 @section Scripts {
     <script nonce="@Context.GetCspNonce()">
-        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
-        let currentFilter = 'all';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            loadKeywords();
-            
-            document.getElementById('searchInput').addEventListener('input', function() {
-                loadKeywords();
-            });
-        });
-
-        async function loadKeywords() {
-            const listContainer = document.getElementById('keywords-list');
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            try {
-                const mockKeywords = [
-                    {
-                        id: 1,
-                        keyword: 'JOIN',
-                        shortCode: '12345',
-                        autoResponseMessage: 'Welcome! You\'re now subscribed to our updates. Reply STOP to unsubscribe.',
-                        campaignName: 'Newsletter Signup',
-                        isActive: true,
-                        totalMessages: 1247,
-                        optIns: 1180,
-                        optOuts: 67,
-                        createdAt: '2024-01-15T10:00:00'
-                    },
-                    {
-                        id: 2,
-                        keyword: 'DEALS',
-                        shortCode: '12345',
-                        autoResponseMessage: 'Get ready for exclusive deals! Check your inbox for today\'s offers.',
-                        campaignName: 'Flash Deals',
-                        isActive: true,
-                        totalMessages: 892,
-                        optIns: 850,
-                        optOuts: 42,
-                        createdAt: '2024-02-10T14:30:00'
-                    },
-                    {
-                        id: 3,
-                        keyword: 'INFO',
-                        shortCode: '67890',
-                        autoResponseMessage: 'Thanks for your interest! Visit our website for more information: example.com',
-                        campaignName: 'Information Request',
-                        isActive: false,
-                        totalMessages: 324,
-                        optIns: 310,
-                        optOuts: 14,
-                        createdAt: '2023-11-20T09:15:00'
-                    },
-                    {
-                        id: 4,
-                        keyword: 'SALE',
-                        shortCode: '12345',
-                        autoResponseMessage: 'Our biggest sale is here! Get up to 50% off. Shop now!',
-                        campaignName: 'Summer Sale 2024',
-                        isActive: true,
-                        totalMessages: 2156,
-                        optIns: 2050,
-                        optOuts: 106,
-                        createdAt: '2024-03-01T08:00:00'
-                    },
-                    {
-                        id: 5,
-                        keyword: 'WIN',
-                        shortCode: '67890',
-                        autoResponseMessage: 'You\'re entered to win! Winner announced next Friday. Good luck!',
-                        campaignName: 'Contest Entry',
-                        isActive: true,
-                        totalMessages: 1567,
-                        optIns: 1567,
-                        optOuts: 0,
-                        createdAt: '2024-03-15T12:00:00'
-                    }
-                ];
-                
-                let filtered = mockKeywords;
-                
-                if (currentFilter === 'active') {
-                    filtered = filtered.filter(k => k.isActive);
-                } else if (currentFilter === 'inactive') {
-                    filtered = filtered.filter(k => !k.isActive);
-                }
-                
-                if (searchTerm) {
-                    filtered = filtered.filter(k => 
-                        k.keyword.toLowerCase().includes(searchTerm) ||
-                        k.campaignName.toLowerCase().includes(searchTerm) ||
-                        k.shortCode.includes(searchTerm)
-                    );
-                }
-                
-                renderKeywords(filtered);
-            } catch (error) {
-                listContainer.innerHTML = `<div class="alert alert-danger">Error loading keywords: ${error.message}</div>`;
-            }
-        }
-
-        function renderKeywords(keywords) {
-            const listContainer = document.getElementById('keywords-list');
-            
-            if (!keywords || keywords.length === 0) {
-                listContainer.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No keywords found.</div>';
-                return;
-            }
-
-            let html = '<div class="table-responsive"><table class="table table-hover">';
-            html += '<thead><tr>';
-            html += '<th>Keyword</th>';
-            html += '<th>Short Code</th>';
-            html += '<th>Campaign</th>';
-            html += '<th>Status</th>';
-            html += '<th>Messages</th>';
-            html += '<th>Opt-Ins</th>';
-            html += '<th>Opt-Outs</th>';
-            html += '<th>Actions</th>';
-            html += '</tr></thead><tbody>';
-
-            keywords.forEach(keyword => {
-                html += '<tr>';
-                html += `<td><strong class="text-primary">${escapeHtml(keyword.keyword)}</strong></td>`;
-                html += `<td><span class="badge bg-secondary">${escapeHtml(keyword.shortCode)}</span></td>`;
-                html += `<td>${escapeHtml(keyword.campaignName)}</td>`;
-                html += `<td>${keyword.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td>`;
-                html += `<td>${keyword.totalMessages.toLocaleString()}</td>`;
-                html += `<td><span class="text-success">${keyword.optIns.toLocaleString()}</span></td>`;
-                html += `<td><span class="text-danger">${keyword.optOuts.toLocaleString()}</span></td>`;
-                html += `<td>
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-primary" onclick="viewAnalytics(${keyword.id})" title="View Analytics">
-                            <i class="bi bi-graph-up"></i>
-                        </button>
-                        <button class="btn btn-outline-secondary" onclick="editKeyword(${keyword.id})" title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-outline-${keyword.isActive ? 'warning' : 'success'}" onclick="toggleStatus(${keyword.id}, ${keyword.isActive})" title="${keyword.isActive ? 'Deactivate' : 'Activate'}">
-                            <i class="bi bi-${keyword.isActive ? 'pause' : 'play'}-fill"></i>
-                        </button>
-                        <button class="btn btn-outline-danger" onclick="deleteKeyword(${keyword.id})" title="Delete">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>`;
-                html += '</tr>';
-            });
-
-            html += '</tbody></table></div>';
-            listContainer.innerHTML = html;
-        }
-
-        function filterByStatus(status) {
-            currentFilter = status;
-            document.querySelectorAll('.btn-group button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            loadKeywords();
-        }
-
-        function viewAnalytics(id) {
-            window.location.href = `/Keywords/Analytics/${id}`;
-        }
-
-        function editKeyword(id) {
-            window.location.href = `/Keywords/Edit/${id}`;
-        }
-
-        async function toggleStatus(id, isActive) {
-            const action = isActive ? 'deactivate' : 'activate';
-            if (!confirm(`Are you sure you want to ${action} this keyword?`)) return;
-            
-            try {
-                alert(`Keyword ${action}d successfully! (Demo)`);
-                loadKeywords();
-            } catch (error) {
-                alert(`Failed to ${action} keyword: ` + error.message);
-            }
-        }
-
-        async function deleteKeyword(id) {
-            if (!confirm('Are you sure you want to delete this keyword? This action cannot be undone.')) return;
-            
-            try {
-                alert('Keyword deleted successfully! (Demo)');
-                loadKeywords();
-            } catch (error) {
-                alert('Failed to delete keyword: ' + error.message);
-            }
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        window.keywordsConfig = {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl'
+        };
     </script>
+    <script src="~/js/keywords-index.js" asp-append-version="true"></script>
 }

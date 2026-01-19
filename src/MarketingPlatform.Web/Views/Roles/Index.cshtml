@@ -5,9 +5,9 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="bi bi-shield-lock"></i> Roles & Permissions</h2>
-        <button class="btn btn-primary" onclick="createRole()">
+        <a href="@Url.Action("Create", "Roles")" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Create Role
-        </button>
+        </a>
     </div>
 
     <div class="row">
@@ -15,70 +15,18 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table id="rolesTable" class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Role Name</th>
+                                    <th>Name</th>
                                     <th>Description</th>
                                     <th>Users</th>
                                     <th>Permissions</th>
+                                    <th>Created</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><strong>Super Admin</strong></td>
-                                    <td>Full system access</td>
-                                    <td><span class="badge bg-primary">5</span></td>
-                                    <td><span class="badge bg-success">All Permissions</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="viewRole(1)">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Admin</strong></td>
-                                    <td>Administrative access</td>
-                                    <td><span class="badge bg-primary">12</span></td>
-                                    <td><span class="badge bg-info">45 permissions</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="editRole(2)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRole(2)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Manager</strong></td>
-                                    <td>Campaign management</td>
-                                    <td><span class="badge bg-primary">28</span></td>
-                                    <td><span class="badge bg-info">23 permissions</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="editRole(3)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRole(3)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>User</strong></td>
-                                    <td>Basic user access</td>
-                                    <td><span class="badge bg-primary">156</span></td>
-                                    <td><span class="badge bg-info">10 permissions</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="editRole(4)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRole(4)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -90,22 +38,7 @@
 
 @section Scripts {
     <script nonce="@Context.GetCspNonce()">
-        function createRole() {
-            window.location.href = '/Roles/Create';
-        }
-
-        function viewRole(id) {
-            window.location.href = `/Roles/Details/${id}`;
-        }
-
-        function editRole(id) {
-            window.location.href = `/Roles/Edit/${id}`;
-        }
-
-        function deleteRole(id) {
-            if (confirm('Are you sure you want to delete this role?')) {
-                alert('Role deleted! (Demo)');
-            }
-        }
+        window.rolesConfig = { apiBaseUrl: '@ViewBag.ApiBaseUrl' };
     </script>
+    <script src="~/js/roles-index.js" asp-append-version="true" nonce="@Context.GetCspNonce()"></script>
 }
