@@ -1,7 +1,7 @@
 /**
  * URL Configuration - Centralized URL Management
  * All application URLs and API endpoints in one place for easy maintenance
- * COMPREHENSIVE API ENDPOINT CONFIGURATION - 500+ ENDPOINTS
+ * COMPREHENSIVE API ENDPOINT CONFIGURATION
  */
 
 const AppUrls = {

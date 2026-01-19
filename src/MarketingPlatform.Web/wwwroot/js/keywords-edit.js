@@ -73,10 +73,10 @@ async function loadKeyword() {
 
 function populateForm(keyword) {
     const fields = [
-        { id: 'keyword', value: keyword.keyword || keyword.keywordText },
+        { id: 'keyword', value: keyword.keywordText || keyword.keyword },
         { id: 'shortCode', value: keyword.shortCode },
         { id: 'campaignId', value: keyword.campaignId },
-        { id: 'autoResponse', value: keyword.autoResponseMessage || keyword.responseMessage },
+        { id: 'autoResponse', value: keyword.responseMessage || keyword.autoResponseMessage },
         { id: 'tags', value: keyword.tags }
     ];
     
@@ -86,13 +86,13 @@ function populateForm(keyword) {
     });
     
     const doubleOptInEl = document.getElementById('doubleOptIn');
-    if (doubleOptInEl) doubleOptInEl.checked = keyword.requireDoubleOptIn || false;
+    if (doubleOptInEl) doubleOptInEl.checked = !!keyword.requireDoubleOptIn;
     
     const trackClicksEl = document.getElementById('trackClicks');
-    if (trackClicksEl) trackClicksEl.checked = keyword.trackClicks !== false;
+    if (trackClicksEl) trackClicksEl.checked = keyword.trackClicks === undefined ? true : !!keyword.trackClicks;
     
     const isActiveEl = document.getElementById('isActive');
-    if (isActiveEl) isActiveEl.checked = keyword.isActive !== false;
+    if (isActiveEl) isActiveEl.checked = keyword.isActive === undefined ? true : !!keyword.isActive;
     
     updateCharCount();
 }
