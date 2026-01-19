@@ -18,7 +18,8 @@ const AppUrls = {
         register: '/auth/register',
         logout: '/auth/logout',
         forgotPassword: '/auth/forgot-password',
-        resetPassword: '/auth/reset-password'
+        resetPassword: '/auth/reset-password',
+        recaptchaConfig: '/auth/recaptcha-config'
     },
 
     // Keywords Management
@@ -251,7 +252,22 @@ const AppUrls = {
             logout: '/api/auth/logout',
             refreshToken: '/api/auth/refresh-token',
             forgotPassword: '/api/auth/forgot-password',
-            resetPassword: '/api/auth/reset-password'
+            resetPassword: '/api/auth/reset-password',
+            recaptchaConfig: '/api/auth/recaptcha-config'
+        },
+        
+        // Billing API
+        billing: {
+            subscription: '/api/billing/subscription',
+            invoices: '/api/billing/invoices',
+            cancel: '/api/billing/cancel',
+            subscribe: (planId) => `/api/billing/subscribe/${planId || ''}`,
+            downloadInvoice: (invoiceId) => `/api/billing/invoices/${invoiceId}/download`
+        },
+        
+        // Configuration API
+        config: {
+            recaptcha: '/api/auth/recaptcha-config'
         }
     }
 };

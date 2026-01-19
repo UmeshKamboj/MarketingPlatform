@@ -22,6 +22,7 @@ public class AuthController : Controller
     public IActionResult Login()
     {
         ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
+        ViewBag.RecaptchaSiteKey = _configuration["ReCaptcha:SiteKey"];
         return View();
     }
 
@@ -31,6 +32,7 @@ public class AuthController : Controller
     public IActionResult Register()
     {
         ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
+        ViewBag.RecaptchaSiteKey = _configuration["ReCaptcha:SiteKey"];
         return View();
     }
 
@@ -49,6 +51,21 @@ public class AuthController : Controller
     public IActionResult ForgotPassword()
     {
         ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
+        ViewBag.RecaptchaSiteKey = _configuration["ReCaptcha:SiteKey"];
         return View();
+    }
+
+    /// <summary>
+    /// Get ReCaptcha configuration for dynamic loading
+    /// </summary>
+    /// <returns>ReCaptcha configuration JSON</returns>
+    [HttpGet("recaptcha-config")]
+    public IActionResult GetRecaptchaConfig()
+    {
+        return Json(new
+        {
+            siteKey = _configuration["ReCaptcha:SiteKey"],
+            version = _configuration["ReCaptcha:Version"]
+        });
     }
 }

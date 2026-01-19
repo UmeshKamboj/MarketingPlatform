@@ -54,12 +54,12 @@
                     <div id="features">
                         <div class="input-group mb-2">
                             <input type="text" class="form-control" placeholder="Feature description">
-                            <button class="btn btn-outline-danger" type="button" onclick="removeFeature(this)">
+                            <button class="btn btn-outline-danger" type="button" data-action="remove-feature">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addFeature()">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="add-feature">
                         <i class="bi bi-plus"></i> Add Feature
                     </button>
                 </div>
@@ -91,28 +91,5 @@
 </div>
 
 @section Scripts {
-    <script nonce="@Context.GetCspNonce()">
-        function addFeature() {
-            const featuresDiv = document.getElementById('features');
-            const newFeature = document.createElement('div');
-            newFeature.className = 'input-group mb-2';
-            newFeature.innerHTML = `
-                <input type="text" class="form-control" placeholder="Feature description">
-                <button class="btn btn-outline-danger" type="button" onclick="removeFeature(this)">
-                    <i class="bi bi-trash"></i>
-                </button>
-            `;
-            featuresDiv.appendChild(newFeature);
-        }
-
-        function removeFeature(btn) {
-            btn.closest('.input-group').remove();
-        }
-
-        document.getElementById('pricingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Pricing plan created successfully! (Demo)');
-            window.location.href = '/Pricing/Index';
-        });
-    </script>
+    <script src="~/js/pricing-create.js" asp-append-version="true"></script>
 }
