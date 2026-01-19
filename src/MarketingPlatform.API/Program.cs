@@ -456,8 +456,6 @@ using (var scope = app.Services.CreateScope())
         {
             try
             {
-                // Use FormattableString to safely parameterize the query
-                var query = $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {{0}}";
                 var count = await context.Database.SqlQueryRaw<int>(
                     "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {0}", tableName).FirstOrDefaultAsync();
                 

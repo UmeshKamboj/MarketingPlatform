@@ -1,6 +1,7 @@
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace MarketingPlatform.Infrastructure.Data
@@ -76,7 +77,7 @@ namespace MarketingPlatform.Infrastructure.Data
             {
 
                 // Seed Custom Roles with Permissions
-                if (!context.CustomRoles.Any())
+                if (!await context.CustomRoles.AnyAsync())
                 {
                     logger?.LogInformation("Creating custom roles...");
 
@@ -219,7 +220,7 @@ namespace MarketingPlatform.Infrastructure.Data
                         await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
                         
                         // Assign SuperAdmin custom role
-                        var superAdminRole = context.CustomRoles.FirstOrDefault(r => r.Name == "SuperAdmin");
+                        var superAdminRole = await context.CustomRoles.FirstOrDefaultAsync(r => r.Name == "SuperAdmin");
                         if (superAdminRole != null)
                         {
                             var userRole = new Core.Entities.UserRole
@@ -281,7 +282,7 @@ namespace MarketingPlatform.Infrastructure.Data
                             await userManager.AddToRoleAsync(newUser, role);
                             
                             // Assign custom role
-                            var customRole = context.CustomRoles.FirstOrDefault(r => r.Name == role);
+                            var customRole = await context.CustomRoles.FirstOrDefaultAsync(r => r.Name == role);
                             if (customRole != null)
                             {
                                 var userRole = new Core.Entities.UserRole
@@ -323,7 +324,7 @@ namespace MarketingPlatform.Infrastructure.Data
             {
 
                 // Seed Subscription Plans
-                if (!context.SubscriptionPlans.Any())
+                if (!await context.SubscriptionPlans.AnyAsync())
                 {
                     logger?.LogInformation("Creating subscription plans...");
 
@@ -403,7 +404,7 @@ namespace MarketingPlatform.Infrastructure.Data
             {
 
                 // Seed Message Providers
-                if (!context.MessageProviders.Any())
+                if (!await context.MessageProviders.AnyAsync())
                 {
                     logger?.LogInformation("Creating message providers...");
 
@@ -453,7 +454,7 @@ namespace MarketingPlatform.Infrastructure.Data
             {
 
                 // Seed Channel Routing Configurations
-                if (!context.ChannelRoutingConfigs.Any())
+                if (!await context.ChannelRoutingConfigs.AnyAsync())
                 {
                     logger?.LogInformation("Creating channel routing configurations...");
 
@@ -530,7 +531,7 @@ namespace MarketingPlatform.Infrastructure.Data
             {
 
                 // Seed Pricing Models for Landing Page
-                if (!context.PricingModels.Any())
+                if (!await context.PricingModels.AnyAsync())
                 {
                     logger?.LogInformation("Creating pricing models...");
 
@@ -601,7 +602,7 @@ namespace MarketingPlatform.Infrastructure.Data
             {
 
                 // Seed Landing Page Configuration Settings
-                if (!context.PlatformSettings.Any(s => s.Category == "LandingPage"))
+                if (!await context.PlatformSettings.AnyAsync(s => s.Category == "LandingPage"))
                 {
                     logger?.LogInformation("Creating landing page settings...");
 
@@ -1127,7 +1128,7 @@ namespace MarketingPlatform.Infrastructure.Data
             try
             {
                 // Seed Privacy Policy if it doesn't exist
-                var existingPrivacy = context.PageContents.FirstOrDefault(p => p.PageKey == "privacy-policy");
+                var existingPrivacy = await context.PageContents.FirstOrDefaultAsync(p => p.PageKey == "privacy-policy");
                 if (existingPrivacy == null)
                 {
                     logger?.LogInformation("Creating Privacy Policy page content...");
@@ -1194,7 +1195,7 @@ namespace MarketingPlatform.Infrastructure.Data
                 }
 
                 // Seed Terms of Service if it doesn't exist
-                var existingTerms = context.PageContents.FirstOrDefault(p => p.PageKey == "terms-of-service");
+                var existingTerms = await context.PageContents.FirstOrDefaultAsync(p => p.PageKey == "terms-of-service");
                 if (existingTerms == null)
                 {
                     logger?.LogInformation("Creating Terms of Service page content...");
