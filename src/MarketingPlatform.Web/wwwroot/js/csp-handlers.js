@@ -431,7 +431,7 @@
     }
 
     function viewContactDetails(id) {
-        window.location.href = AppUrls.contacts.details(id);
+        window.location.href = AppUrls.contacts?.details ? AppUrls.contacts.details(id) : `/Contacts/Details/${id}`;
     }
 
     function loadTemplate(id) {
@@ -525,7 +525,7 @@
     }
 
     function viewMessageDetails(id) {
-        window.location.href = AppUrls.messages.details(id);
+        window.location.href = AppUrls.messages?.details ? AppUrls.messages.details(id) : `/Messages/Details/${id}`;
     }
 
     function deleteUser(id) {
@@ -545,7 +545,7 @@
     }
 
     function editRole(id) {
-        window.location.href = AppUrls.roles.edit(id);
+        window.location.href = AppUrls.roles?.edit ? AppUrls.roles.edit(id) : `/Roles/Edit/${id}`;
     }
 
     function togglePermission(roleId, permission) {
@@ -585,11 +585,11 @@
     }
 
     function editKeyword(id) {
-        window.location.href = AppUrls.keywords.edit(id);
+        window.location.href = AppUrls.keywords?.edit ? AppUrls.keywords.edit(id) : `/Keywords/Edit/${id}`;
     }
 
     function viewKeywordAnalytics(id) {
-        window.location.href = AppUrls.keywords.analytics(id);
+        window.location.href = AppUrls.keywords?.analytics ? AppUrls.keywords.analytics(id) : `/Keywords/Analytics/${id}`;
     }
 
     function deleteWebhook(id) {
@@ -651,7 +651,7 @@
     }
 
     function editPricingTier(id) {
-        window.location.href = AppUrls.pricing.edit(id);
+        window.location.href = AppUrls.pricing?.edit ? AppUrls.pricing.edit(id) : `/Pricing/Edit/${id}`;
     }
 
     function deleteProvider(id) {

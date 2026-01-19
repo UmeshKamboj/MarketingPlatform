@@ -233,7 +233,7 @@ function viewRole(id) {
  * Edit role
  */
 function editRole(id) {
-    window.location.href = AppUrls.roles.edit(id);
+    window.location.href = AppUrls.roles?.edit ? AppUrls.roles.edit(id) : `/Roles/Edit/${id}`;
 }
 
 /**

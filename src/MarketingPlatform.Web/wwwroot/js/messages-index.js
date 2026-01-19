@@ -323,7 +323,7 @@ function setupChannelFilter() {
  * View message details
  */
 function viewMessageDetails(id) {
-    window.location.href = AppUrls.messages.details(id);
+    window.location.href = AppUrls.messages?.details ? AppUrls.messages.details(id) : `/Messages/Details/${id}`;
 }
 
 /**

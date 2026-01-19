@@ -252,7 +252,7 @@ function viewKeyword(id) {
  * Edit keyword
  */
 function editKeyword(id) {
-    window.location.href = AppUrls.keywords.edit(id);
+    window.location.href = AppUrls.keywords?.edit ? AppUrls.keywords.edit(id) : `/Keywords/Edit/${id}`;
 }
 
 /**
