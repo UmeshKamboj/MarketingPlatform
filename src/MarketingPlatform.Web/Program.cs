@@ -9,6 +9,7 @@ using MarketingPlatform.Core.Interfaces.Repositories;
 using MarketingPlatform.Infrastructure.Repositories;
 using MarketingPlatform.Web;
 using MarketingPlatform.Web.Middleware;
+using MarketingPlatform.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +43,12 @@ builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IFileStorageProvider, MarketingPlatform.Infrastructure.Services.FileStorageProviders.LocalFileStorageProvider>();
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // Apply kebab-case transformation to route parameters
+    options.Conventions.Add(new Microsoft.AspNetCore.Mvc.ApplicationModels.RouteTokenTransformerConvention(
+        new SlugifyParameterTransformer()));
+});
 builder.Services.AddHttpContextAccessor();
 
 // Configure routing to use lowercase URLs with kebab-case
