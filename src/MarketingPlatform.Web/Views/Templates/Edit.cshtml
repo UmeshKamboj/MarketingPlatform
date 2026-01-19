@@ -74,7 +74,7 @@ Welcome to our platform! We're excited to have you on board.</textarea>
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function deleteTemplate() {
             if (confirm('Are you sure you want to delete this template?')) {
                 alert('Template deleted! (Demo)');

@@ -53,7 +53,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         document.getElementById('heroForm').addEventListener('submit', function(e) {
             e.preventDefault();
             alert('Hero section saved! (Demo)');

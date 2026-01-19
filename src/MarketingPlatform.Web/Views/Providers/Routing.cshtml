@@ -46,7 +46,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         document.getElementById('routingForm').addEventListener('submit', function(e) {
             e.preventDefault();
             alert('Routing configuration saved! (Demo)');

@@ -105,7 +105,7 @@
 </div>
 
 @section Scripts {
-<script>
+<script nonce="@Context.GetCspNonce()">
     let campaignId = parseInt('@ViewBag.CampaignId') || 0;
 
     function getAuthHeaders() {

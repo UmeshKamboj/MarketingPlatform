@@ -97,7 +97,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function exportReport() {
             alert('Exporting report... (Demo)');
         }

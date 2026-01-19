@@ -115,7 +115,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function saveWorkflow() {
             alert('Workflow saved! (Demo)');
             window.location.href = '/Workflows/Index';

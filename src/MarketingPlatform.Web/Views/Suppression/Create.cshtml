@@ -60,7 +60,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         document.getElementById('listForm').addEventListener('submit', function(e) {
             e.preventDefault();
             alert('Suppression list created! (Demo)');
