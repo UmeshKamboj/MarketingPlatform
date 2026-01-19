@@ -70,18 +70,20 @@ namespace MarketingPlatform.API.Middleware
         /// Builds a CSP header for development environment.
         /// More permissive to allow hot reload, browser-link, and WebSocket connections.
         /// Uses specific port ranges for common development tools to maintain security.
+        /// Allows CDN resources for Swagger UI.
         /// </summary>
         /// <param name="nonce">The nonce to include in the CSP</param>
         /// <returns>CSP header value</returns>
         private static string BuildDevelopmentCsp(string nonce)
         {
             // Common development ports: 5000-5999 (Kestrel), 7000-7999 (HTTPS), 44300-44399 (IIS Express HTTPS), 60000-65535 (dynamic)
+            // Allow CDN resources for Swagger UI
             return $"default-src 'self'; " +
-                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-eval'; " +
-                   $"style-src 'self' 'nonce-{nonce}'; " +
+                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-eval' https://cdnjs.cloudflare.com; " +
+                   $"style-src 'self' 'nonce-{nonce}' https://cdnjs.cloudflare.com; " +
                    $"connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:*; " +
                    $"img-src 'self' data: https:; " +
-                   $"font-src 'self'; " +
+                   $"font-src 'self' https://cdnjs.cloudflare.com; " +
                    $"object-src 'none'; " +
                    $"base-uri 'self';";
         }

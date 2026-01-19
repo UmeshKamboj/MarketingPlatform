@@ -307,10 +307,29 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 // Rate limiting middleware (before authentication)
 app.UseMiddleware<RateLimitingMiddleware>();
 
+// Enable static files for Swagger custom resources
+app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Marketing Platform API v1");
+        options.RoutePrefix = "swagger";
+        
+        // Use custom index.html without inline styles/scripts for CSP compliance
+        options.IndexStream = () => app.Environment
+            .ContentRootFileProvider
+            .GetFileInfo("wwwroot/swagger/index.html")
+            .CreateReadStream();
+        
+        // Inject custom CSS
+        options.InjectStylesheet("/swagger/swagger-custom.css");
+        
+        // Inject custom JavaScript
+        options.InjectJavascript("/swagger/swagger-custom.js");
+    });
 }
 
 // HTTPS Redirection - Enforce TLS 1.2+
