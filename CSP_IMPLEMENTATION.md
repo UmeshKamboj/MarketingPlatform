@@ -4,6 +4,8 @@
 
 This application implements a nonce-based Content Security Policy to prevent CSP violations while maintaining security. The implementation differentiates between Development and Production environments to balance security with developer experience.
 
+**Important:** CSP is **disabled for Swagger endpoints** (`/swagger` and `swagger.json`) to avoid conflicts with Swagger UI's inline scripts and styles. All other endpoints have CSP enabled.
+
 ## Components
 
 ### 1. CspMiddleware (`src/MarketingPlatform.API/Middleware/CspMiddleware.cs`)
@@ -15,6 +17,10 @@ The CSP middleware generates a unique cryptographically secure nonce for each HT
 - Stores nonce in `HttpContext.Items["csp-nonce"]` for access in views
 - Sets all security headers (X-Content-Type-Options, X-Frame-Options, etc.)
 - Environment-aware CSP policies
+- **Automatically skips CSP for Swagger endpoints** to allow Swagger UI to function without violations
+
+**Swagger Exception:**
+The middleware detects requests to `/swagger` paths and `swagger.json` and skips CSP header injection for these endpoints only. This allows Swagger UI to use its built-in inline scripts and styles without modifications.
 
 **Development CSP:**
 ```
@@ -105,14 +111,29 @@ The production CSP is strict and secure:
 - **Frame protection**: `frame-ancestors 'none'` prevents clickjacking
 - **Form protection**: `form-action 'self'` prevents form hijacking
 
+### Swagger CSP Exception
+
+**Why CSP is Disabled for Swagger:**
+Swagger UI (provided by Swashbuckle) includes inline scripts and styles that are essential for its operation. Rather than attempting to modify the embedded Swagger UI resources (which would be complex and fragile across version updates), CSP is selectively disabled for Swagger endpoints.
+
+**Security Considerations:**
+- Swagger is typically only enabled in Development environments
+- The Swagger endpoint is limited to `/swagger` path only
+- All other API endpoints maintain full CSP protection
+- In Production, Swagger should be disabled entirely (already implemented in `Program.cs`)
+
+**Implementation:**
+The middleware checks if the request path starts with `/swagger` or contains `swagger.json` and skips CSP header injection for these requests only.
+
 ## What This Fixes
 
 This implementation resolves the following CSP violations:
 
-1. ✅ **Inline styles** - Now allowed with nonce
-2. ✅ **Inline scripts** - Now allowed with nonce
+1. ✅ **Inline styles** - Now allowed with nonce (for non-Swagger pages)
+2. ✅ **Inline scripts** - Now allowed with nonce (for non-Swagger pages)
 3. ✅ **WebSocket connections** - Allowed in development for browser-link and hot reload
 4. ✅ **Localhost connections** - Allowed in development for debugging tools
+5. ✅ **Swagger UI violations** - CSP disabled for Swagger endpoints to allow inline scripts/styles
 
 ## Browser Console Verification
 

@@ -27,6 +27,10 @@ namespace MarketingPlatform.API.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // Skip CSP for Swagger endpoints to avoid conflicts with Swagger UI inline scripts/styles
+            var path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+            var isSwaggerRequest = path.StartsWith("/swagger") || path.Contains("swagger.json");
+            
             // Generate a cryptographically secure nonce for this request
             var nonce = GenerateNonce();
             
@@ -42,15 +46,23 @@ namespace MarketingPlatform.API.Middleware
             context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
             context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
             
-            // Set CSP header based on environment
-            var cspHeader = _environment.IsDevelopment()
-                ? BuildDevelopmentCsp(nonce)
-                : BuildProductionCsp(nonce);
-            
-            context.Response.Headers.Append("Content-Security-Policy", cspHeader);
-            
-            _logger.LogDebug("CSP header set with nonce: {Nonce} for environment: {Environment}", 
-                nonce, _environment.EnvironmentName);
+            // Only apply CSP to non-Swagger endpoints
+            if (!isSwaggerRequest)
+            {
+                // Set CSP header based on environment
+                var cspHeader = _environment.IsDevelopment()
+                    ? BuildDevelopmentCsp(nonce)
+                    : BuildProductionCsp(nonce);
+                
+                context.Response.Headers.Append("Content-Security-Policy", cspHeader);
+                
+                _logger.LogDebug("CSP header set with nonce: {Nonce} for environment: {Environment}", 
+                    nonce, _environment.EnvironmentName);
+            }
+            else
+            {
+                _logger.LogDebug("CSP disabled for Swagger endpoint: {Path}", path);
+            }
 
             await _next(context);
         }
@@ -70,20 +82,18 @@ namespace MarketingPlatform.API.Middleware
         /// Builds a CSP header for development environment.
         /// More permissive to allow hot reload, browser-link, and WebSocket connections.
         /// Uses specific port ranges for common development tools to maintain security.
-        /// Allows CDN resources for Swagger UI.
         /// </summary>
         /// <param name="nonce">The nonce to include in the CSP</param>
         /// <returns>CSP header value</returns>
         private static string BuildDevelopmentCsp(string nonce)
         {
             // Common development ports: 5000-5999 (Kestrel), 7000-7999 (HTTPS), 44300-44399 (IIS Express HTTPS), 60000-65535 (dynamic)
-            // Allow CDN resources for Swagger UI
             return $"default-src 'self'; " +
-                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-eval' https://cdnjs.cloudflare.com; " +
-                   $"style-src 'self' 'nonce-{nonce}' https://cdnjs.cloudflare.com; " +
+                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-eval'; " +
+                   $"style-src 'self' 'nonce-{nonce}'; " +
                    $"connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:*; " +
                    $"img-src 'self' data: https:; " +
-                   $"font-src 'self' https://cdnjs.cloudflare.com; " +
+                   $"font-src 'self'; " +
                    $"object-src 'none'; " +
                    $"base-uri 'self';";
         }
