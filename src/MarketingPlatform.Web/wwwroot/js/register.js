@@ -1,5 +1,5 @@
 // Register.js - Registration flow with OTP verification
-const apiBaseUrl = '/api';
+
 let registrationData = {};
 let countdownInterval;
 
@@ -63,20 +63,27 @@ function initializeRegistrationForm() {
         const errorDiv = document.getElementById('errorMessage');
         const successDiv = document.getElementById('successMessage');
         const registerBtn = document.getElementById('registerBtn');
-        errorDiv.classList.add('d-none');
-        successDiv.classList.add('d-none');
+        
+        if (errorDiv) errorDiv.classList.add('d-none');
+        if (successDiv) successDiv.classList.add('d-none');
         if (password !== confirmPassword) {
-            errorDiv.textContent = 'Passwords do not match';
-            errorDiv.classList.remove('d-none');
+            if (errorDiv) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.classList.remove('d-none');
+            }
             return;
         }
         if (!recaptchaResponse) {
-            errorDiv.textContent = 'Please complete the reCAPTCHA verification';
-            errorDiv.classList.remove('d-none');
+            if (errorDiv) {
+                errorDiv.textContent = 'Please complete the reCAPTCHA verification';
+                errorDiv.classList.remove('d-none');
+            }
             return;
         }
-        registerBtn.disabled = true;
-        registerBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
+        if (registerBtn) {
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
+        }
         registrationData = {
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
@@ -87,29 +94,41 @@ function initializeRegistrationForm() {
             recaptchaToken: recaptchaResponse
         };
         try {
-            const response = await fetch(`${apiBaseUrl}/auth/register`, {
+            // Build full API URL using AppUrls helper
+            const registerUrl = window.AppUrls ? 
+                window.AppUrls.buildApiUrl(window.AppUrls.api.auth.register) : 
+                '/api/auth/register';
+            
+            const response = await fetch(registerUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(registrationData)
             });
             const data = await response.json();
             if (response.ok) {
-                document.getElementById('displayEmail').textContent = email;
+                const displayEmailEl = document.getElementById('displayEmail');
+                if (displayEmailEl) displayEmailEl.textContent = email;
                 goToStep(2);
                 startCountdown();
             } else {
-                errorDiv.textContent = data.message || 'Registration failed. Please try again.';
-                errorDiv.classList.remove('d-none');
+                if (errorDiv) {
+                    errorDiv.textContent = data.message || 'Registration failed. Please try again.';
+                    errorDiv.classList.remove('d-none');
+                }
                 grecaptcha.reset();
             }
         } catch (error) {
             console.error('Registration error:', error);
-            errorDiv.textContent = 'An error occurred. Please try again.';
-            errorDiv.classList.remove('d-none');
+            if (errorDiv) {
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                errorDiv.classList.remove('d-none');
+            }
             grecaptcha.reset();
         } finally {
-            registerBtn.disabled = false;
-            registerBtn.innerHTML = '<i class="bi bi-person-check"></i> Create Account';
+            if (registerBtn) {
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<i class="bi bi-person-check"></i> Create Account';
+            }
         }
     });
 }
@@ -149,17 +168,27 @@ function initializeOtpForm() {
         const errorDiv = document.getElementById('errorMessage');
         const successDiv = document.getElementById('successMessage');
         const verifyBtn = document.getElementById('verifyBtn');
-        errorDiv.classList.add('d-none');
-        successDiv.classList.add('d-none');
+        
+        if (errorDiv) errorDiv.classList.add('d-none');
+        if (successDiv) successDiv.classList.add('d-none');
         if (otp.length !== 6) {
-            errorDiv.textContent = 'Please enter the complete 6-digit code';
-            errorDiv.classList.remove('d-none');
+            if (errorDiv) {
+                errorDiv.textContent = 'Please enter the complete 6-digit code';
+                errorDiv.classList.remove('d-none');
+            }
             return;
         }
-        verifyBtn.disabled = true;
-        verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
+        if (verifyBtn) {
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
+        }
         try {
-            const response = await fetch(`${apiBaseUrl}/auth/verify-email`, {
+            // Build full API URL using AppUrls helper
+            const verifyUrl = window.AppUrls ? 
+                window.AppUrls.buildApiUrl('/api/auth/verify-email') : 
+                '/api/auth/verify-email';
+            
+            const response = await fetch(verifyUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: registrationData.email, otp: otp })
@@ -169,18 +198,24 @@ function initializeOtpForm() {
                 clearInterval(countdownInterval);
                 goToStep(3);
             } else {
-                errorDiv.textContent = data.message || 'Invalid verification code';
-                errorDiv.classList.remove('d-none');
+                if (errorDiv) {
+                    errorDiv.textContent = data.message || 'Invalid verification code';
+                    errorDiv.classList.remove('d-none');
+                }
                 otpInputs.forEach(input => input.value = '');
                 otpInputs[0].focus();
             }
         } catch (error) {
             console.error('Verification error:', error);
-            errorDiv.textContent = 'An error occurred. Please try again.';
-            errorDiv.classList.remove('d-none');
+            if (errorDiv) {
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                errorDiv.classList.remove('d-none');
+            }
         } finally {
-            verifyBtn.disabled = false;
-            verifyBtn.innerHTML = '<i class="bi bi-check-circle"></i> Verify Email';
+            if (verifyBtn) {
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="bi bi-check-circle"></i> Verify Email';
+            }
         }
     });
 }
@@ -195,24 +230,35 @@ function initializeResendOtp() {
         btn.disabled = true;
         btn.textContent = 'Sending...';
         try {
-            const response = await fetch(`${apiBaseUrl}/auth/resend-otp`, {
+            // Build full API URL using AppUrls helper
+            const resendUrl = window.AppUrls ? 
+                window.AppUrls.buildApiUrl('/api/auth/resend-otp') : 
+                '/api/auth/resend-otp';
+            
+            const response = await fetch(resendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: registrationData.email })
             });
             if (response.ok) {
-                successDiv.textContent = 'Verification code resent successfully!';
-                successDiv.classList.remove('d-none');
-                errorDiv.classList.add('d-none');
+                if (successDiv) {
+                    successDiv.textContent = 'Verification code resent successfully!';
+                    successDiv.classList.remove('d-none');
+                }
+                if (errorDiv) errorDiv.classList.add('d-none');
                 startCountdown();
-                setTimeout(() => successDiv.classList.add('d-none'), 3000);
+                setTimeout(() => { if (successDiv) successDiv.classList.add('d-none'); }, 3000);
             } else {
-                errorDiv.textContent = 'Failed to resend code. Please try again.';
-                errorDiv.classList.remove('d-none');
+                if (errorDiv) {
+                    errorDiv.textContent = 'Failed to resend code. Please try again.';
+                    errorDiv.classList.remove('d-none');
+                }
             }
         } catch (error) {
-            errorDiv.textContent = 'An error occurred. Please try again.';
-            errorDiv.classList.remove('d-none');
+            if (errorDiv) {
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                errorDiv.classList.remove('d-none');
+            }
         } finally {
             btn.disabled = false;
             btn.textContent = 'Resend';
@@ -237,6 +283,8 @@ function goToStep(stepNumber) {
 function startCountdown() {
     let timeLeft = 300;
     const countdownEl = document.getElementById('countdown');
+    if (!countdownEl) return;
+    
     clearInterval(countdownInterval);
     countdownInterval = setInterval(() => {
         const minutes = Math.floor(timeLeft / 60);

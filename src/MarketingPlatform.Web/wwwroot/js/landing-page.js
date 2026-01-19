@@ -16,11 +16,13 @@ async function loadPricingPlans() {
     if (!container) return;
     
     try {
-        // Get API base URL from config or fallback
-        const apiBaseUrl = (window.appConfig && window.appConfig.apiBaseUrl) || '/api';
+        // Build full API URL using AppUrls helper - NO STATIC URLS
+        const apiUrl = window.AppUrls ? 
+            window.AppUrls.buildApiUrl(window.AppUrls.api.subscriptionPlans.landing) : 
+            '/api/subscriptionplans/landing';
         
         // Fetch plans from API that are marked to show on landing page
-        const response = await fetch(`${apiBaseUrl}/subscriptionplans/landing`);
+        const response = await fetch(apiUrl);
         
         if (!response.ok) {
             throw new Error('Failed to load pricing plans');
