@@ -729,7 +729,7 @@ AppUrls.buildUrl = function(baseUrl, params = {}) {
 // Returns the base URL from appConfig (set in _Layout.cshtml from appsettings)
 AppUrls.getApiBaseUrl = function() {
     // Priority: appConfig (from appsettings) > fallback to empty string (same origin)
-    return window.appConfig?.apiBaseUrl || '';
+    return window.authConfig?.apiBaseUrl || '' ;
 };
 
 // Helper function to build full API URL by prepending base URL to a path

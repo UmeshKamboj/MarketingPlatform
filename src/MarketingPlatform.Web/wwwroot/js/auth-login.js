@@ -106,10 +106,8 @@ function initializeLoginForm() {
         loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
         
         try {
-            // Build full API URL using AppUrls helper
-            const loginUrl = window.AppUrls ? 
-                window.AppUrls.buildApiUrl(window.AppUrls.api.auth.login) : 
-                '/api/auth/login';
+            
+            const loginUrl = window.AppUrls ? window.AppUrls.buildApiUrl(window.AppUrls.api.auth.login) : '/api/auth/login';
             
             const response = await fetch(loginUrl, {
                 method: 'POST',
@@ -124,26 +122,45 @@ function initializeLoginForm() {
             
             const data = await response.json();
             
-            if (response.ok) {
-                // Store authentication token
-                localStorage.setItem('authToken', data.data.token);
-                localStorage.setItem('userEmail', email);
-                
-                // Show success notification
-                if (typeof showNotification === 'function') {
-                    showNotification('Login successful! Redirecting...', 'success');
+            if (response.ok && data.success) {
+                 
+
+                const callbackResponse = await fetch('/auth/login-callback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: data.data.token,
+                        refreshToken: data.data.refreshToken,
+                        email: email,
+                        rememberMe: rememberMe
+                    })
+                });
+
+                if (callbackResponse.ok) {
+                    // Also store in localStorage for client-side API calls
+                    localStorage.setItem('authToken', data.data.token);
+                    localStorage.setItem('userEmail', email);
+                    
+                    if (data.data.refreshToken) {
+                        localStorage.setItem('refreshToken', data.data.refreshToken);
+                    }
+
+                    // Show success notification
+                    if (typeof showNotification === 'function') {
+                        showNotification('Login successful! Redirecting...', 'success');
+                    } else {
+                        successDiv.textContent = 'Login successful! Redirecting...';
+                        successDiv.classList.remove('d-none');
+                    }
+                    
+                    // Redirect to dashboard
+                    const dashboardUrl = window.AppUrls?.users?.dashboard || '/users/dashboard';
+                    setTimeout(() => {
+                        window.location.href = dashboardUrl;
+                    }, 1000);
                 } else {
-                    successDiv.textContent = 'Login successful! Redirecting...';
-                    successDiv.classList.remove('d-none');
+                    throw new Error('Failed to store authentication token');
                 }
-                
-                // Redirect to dashboard using AppUrls if available
-                const dashboardUrl = (window.AppUrls && window.AppUrls.users && window.AppUrls.users.dashboard) 
-                    || '/users/dashboard';
-                
-                setTimeout(() => {
-                    window.location.href = dashboardUrl;
-                }, 1000);
             } else {
                 const errorMessage = data.message || 'Invalid email or password';
                 

@@ -10,6 +10,8 @@ using MarketingPlatform.Infrastructure.Repositories;
 using MarketingPlatform.Web;
 using MarketingPlatform.Web.Middleware;
 using MarketingPlatform.Web.Extensions;
+using MarketingPlatform.Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,18 +19,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 8;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
-    options.User.RequireUniqueEmail = true;
-})
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
+// Add Cookie Authentication (for web application sessions)
+// Note: We're NOT using Identity here - authentication is handled by the API
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.Cookie.Name = "MarketingPlatform.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Allow both HTTP and HTTPS for development
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.ExpireTimeSpan = TimeSpan.FromHours(1);
+        options.SlidingExpiration = true;
+        options.LoginPath = "/auth/login";
+        options.LogoutPath = "/auth/logout";
+        options.AccessDeniedPath = "/auth/access-denied";
+        options.ReturnUrlParameter = "returnUrl";
+    });
 
 // Repository Pattern
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -41,6 +47,11 @@ builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
 // File Storage Providers
 builder.Services.AddScoped<IFileStorageProvider, MarketingPlatform.Infrastructure.Services.FileStorageProviders.LocalFileStorageProvider>();
+
+// HTTP Client Services (Server-side API communication)
+builder.Services.AddHttpClient<IApiClient, ApiClient>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<ICampaignApiService, CampaignApiService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>
@@ -64,7 +75,7 @@ var app = builder.Build();
 // This middleware generates a unique nonce per request and sets CSP headers
 // Development: Permissive CSP to allow hot reload, browser-link, WebSockets
 // Production: Strict nonce-based CSP for security
-//app.UseMiddleware<CspMiddleware>();
+app.UseMiddleware<CspMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

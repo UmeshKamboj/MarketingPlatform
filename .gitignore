@@ -56,3 +56,4 @@ appsettings.Production.json
 *.pdb
 /src/MarketingPlatform.API/appsettings.json
 /src/MarketingPlatform.Web/appsettings.json
+/src/MarketingPlatform.Web/appsettings.json

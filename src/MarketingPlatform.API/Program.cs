@@ -457,30 +457,30 @@ using (var scope = app.Services.CreateScope())
         
         // Ensure all required tables exist
         logger.LogInformation("Verifying required tables exist...");
-        var requiredTables = new[] 
-        { 
-            "AspNetUsers", "AspNetRoles", "CustomRoles", "CustomUserRoles",
-            "SubscriptionPlans", "PlatformSettings", "PageContents",
-            "MessageProviders", "ChannelRoutingConfigs", "PricingModels"
-        };
+        //var requiredTables = new[] 
+        //{ 
+        //    "AspNetUsers", "AspNetRoles", "CustomRoles", "CustomUserRoles",
+        //    "SubscriptionPlans", "PlatformSettings", "PageContents",
+        //    "MessageProviders", "ChannelRoutingConfigs", "PricingModels"
+        //};
         
-        foreach (var tableName in requiredTables)
-        {
-            try
-            {
-                var count = await context.Database.SqlQueryRaw<int>(
-                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {0}", tableName).FirstOrDefaultAsync();
+        //foreach (var tableName in requiredTables)
+        //{
+        //    try
+        //    {
+        //        var count = await context.Database.SqlQueryRaw<int>(
+        //            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {0}", tableName).FirstOrDefaultAsync();
                 
-                if (count == 0)
-                {
-                    logger.LogWarning("Required table '{TableName}' may not exist.", tableName);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning("Could not verify table '{TableName}': {Error}", tableName, ex.Message);
-            }
-        }
+        //        if (count == 0)
+        //        {
+        //            logger.LogWarning("Required table '{TableName}' may not exist.", tableName);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.LogWarning("Could not verify table '{TableName}': {Error}", tableName, ex.Message);
+        //    }
+        //}
         logger.LogInformation("Table verification completed.");
         
         // Seed initial data

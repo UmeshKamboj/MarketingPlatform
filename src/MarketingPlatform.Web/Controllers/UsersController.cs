@@ -32,6 +32,19 @@ public class UsersController : Controller
     /// </summary>
     public IActionResult Dashboard()
     {
+        _logger.LogInformation("Dashboard accessed. User authenticated: {IsAuthenticated}, User: {User}",
+            User.Identity?.IsAuthenticated,
+            User.Identity?.Name ?? "Anonymous");
+
+        if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            _logger.LogWarning("User not authenticated when accessing Dashboard - will be redirected to login");
+        }
+        else
+        {
+            _logger.LogInformation("User {User} successfully authenticated on Dashboard", User.Identity.Name);
+        }
+
         ViewBag.ApiBaseUrl = _configuration["ApiSettings:BaseUrl"];
         return View();
     }

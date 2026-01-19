@@ -16,7 +16,9 @@ async function loadRecaptchaConfig() {
         if (typeof window.authConfig !== 'undefined' && window.authConfig.recaptchaSiteKey) {
             renderRecaptcha(window.authConfig.recaptchaSiteKey);
         } else {
-            const response = await fetch('/api/auth/recaptcha-config');
+            const recaptchaConfigUrl = window.AppUrls ? window.AppUrls.buildApiUrl(window.AppUrls.api.auth.recaptchaConfig) : '/api/auth/recaptcha-config';
+                 
+            const response = await fetch(recaptchaConfigUrl);
             if (response.ok) {
                 const config = await response.json();
                 renderRecaptcha(config.siteKey);

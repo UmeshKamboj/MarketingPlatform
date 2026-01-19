@@ -40,36 +40,48 @@
             </div>
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="hero-image-wrapper position-relative">
-                    <!-- Dashboard Preview Mockup -->
-                    <div class="dashboard-mockup bg-white rounded-4 shadow-2xl p-4">
+                    <!-- Product Demo Video -->
+                    <div class="dashboard-mockup bg-white rounded-4 shadow-2xl p-4 overflow-hidden">
                         <div class="d-flex gap-2 mb-3">
                             <div class="mockup-dot bg-danger"></div>
                             <div class="mockup-dot bg-warning"></div>
                             <div class="mockup-dot bg-success"></div>
                         </div>
-                        <div class="mockup-content">
-                            <div class="row g-3 mb-3">
+                        <div class="mockup-content position-relative">
+                            <!-- Video Player -->
+                            <div class="demo-video-container rounded-3 overflow-hidden bg-dark position-relative">
+                                <video id="demoVideo" class="w-100" poster="/images/video-poster.jpg" controls>
+                                    <source src="/videos/product-demo.mp4" type="video/mp4">
+                                    <!-- Fallback to GIF if video not available -->
+                                    <img src="/images/product-demo.gif" alt="Product Demo" class="w-100">
+                                </video>
+                                <!-- Play button overlay -->
+                                <div class="video-play-overlay position-absolute top-50 start-50 translate-middle">
+                                    <button class="btn-play-video btn btn-light btn-lg rounded-circle shadow-lg" onclick="document.getElementById('demoVideo').play(); this.parentElement.style.display='none';">
+                                        <i class="bi bi-play-fill fs-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Quick Stats Below Video -->
+                            <div class="row g-2 mt-3">
                                 <div class="col-4">
-                                    <div class="stat-card bg-primary bg-opacity-10 rounded-3 p-3">
-                                        <div class="h6 mb-1 text-primary">10M+</div>
+                                    <div class="stat-card bg-primary bg-opacity-10 rounded-3 p-2 text-center">
+                                        <div class="h6 mb-0 text-primary">10M+</div>
                                         <small class="text-muted">Messages</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
-                                    <div class="stat-card bg-success bg-opacity-10 rounded-3 p-3">
-                                        <div class="h6 mb-1 text-success">98%</div>
+                                    <div class="stat-card bg-success bg-opacity-10 rounded-3 p-2 text-center">
+                                        <div class="h6 mb-0 text-success">98%</div>
                                         <small class="text-muted">Delivered</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
-                                    <div class="stat-card bg-info bg-opacity-10 rounded-3 p-3">
-                                        <div class="h6 mb-1 text-info">5K+</div>
+                                    <div class="stat-card bg-info bg-opacity-10 rounded-3 p-2 text-center">
+                                        <div class="h6 mb-0 text-info">5K+</div>
                                         <small class="text-muted">Users</small>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="chart-placeholder bg-light rounded-3 p-4">
-                                <i class="bi bi-graph-up text-primary display-4"></i>
                             </div>
                         </div>
                     </div>
@@ -89,27 +101,52 @@
     </div>
 </section>
 
-<!-- Trusted By Section -->
-<section class="py-4 bg-light">
+<!-- Trusted By Section with Real Logos -->
+<section class="py-5 bg-light">
     <div class="container">
-        <div class="text-center text-muted mb-3">
-            <small class="text-uppercase fw-semibold">Trusted by leading companies worldwide</small>
+        <div class="text-center text-muted mb-4">
+            <small class="text-uppercase fw-semibold letter-spacing-1">Trusted by 5,000+ leading companies worldwide</small>
         </div>
-        <div class="row align-items-center justify-content-center g-4 text-muted">
+        <div class="row align-items-center justify-content-center g-4">
             <div class="col-6 col-md-2 text-center">
-                <i class="bi bi-building display-6"></i>
+                <div class="company-logo-wrapper">
+                    <img src="/images/logos/company-1.svg"
+                         alt="Company 1"
+                         class="company-logo img-fluid grayscale-logo"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 1%3C/text%3E%3C/svg%3E';">
+                </div>
             </div>
             <div class="col-6 col-md-2 text-center">
-                <i class="bi bi-shop display-6"></i>
+                <div class="company-logo-wrapper">
+                    <img src="/images/logos/company-2.svg"
+                         alt="Company 2"
+                         class="company-logo img-fluid grayscale-logo"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 2%3C/text%3E%3C/svg%3E';">
+                </div>
             </div>
             <div class="col-6 col-md-2 text-center">
-                <i class="bi bi-hospital display-6"></i>
+                <div class="company-logo-wrapper">
+                    <img src="/images/logos/company-3.svg"
+                         alt="Company 3"
+                         class="company-logo img-fluid grayscale-logo"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 3%3C/text%3E%3C/svg%3E';">
+                </div>
             </div>
             <div class="col-6 col-md-2 text-center">
-                <i class="bi bi-bank display-6"></i>
+                <div class="company-logo-wrapper">
+                    <img src="/images/logos/company-4.svg"
+                         alt="Company 4"
+                         class="company-logo img-fluid grayscale-logo"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 4%3C/text%3E%3C/svg%3E';">
+                </div>
             </div>
             <div class="col-6 col-md-2 text-center">
-                <i class="bi bi-briefcase display-6"></i>
+                <div class="company-logo-wrapper">
+                    <img src="/images/logos/company-5.svg"
+                         alt="Company 5"
+                         class="company-logo img-fluid grayscale-logo"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 5%3C/text%3E%3C/svg%3E';">
+                </div>
             </div>
         </div>
     </div>
@@ -356,6 +393,260 @@
                         <div>
                             <div class="fw-bold">Emma Williams</div>
                             <small class="text-muted">Founder, RetailPlus</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trust Badges Section -->
+<section class="trust-badges-section py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 mb-3">
+                <i class="bi bi-shield-check"></i> Security & Compliance
+            </span>
+            <h2 class="h3 fw-bold mb-3">Enterprise-Grade Security You Can Trust</h2>
+            <p class="text-muted">We take security and compliance seriously with industry-leading certifications</p>
+        </div>
+
+        <div class="row g-4 justify-content-center align-items-center">
+            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="100">
+                <div class="trust-badge-card p-4 h-100">
+                    <img src="/images/badges/gdpr.svg"
+                         alt="GDPR Compliant"
+                         class="trust-badge-img mb-3"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%2310b981%22 stroke=%22%2310b981%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22white%22 font-weight=%22bold%22%3EGDPR%3C/text%3E%3C/svg%3E';">
+                    <div class="fw-semibold text-dark">GDPR</div>
+                    <small class="text-muted">Compliant</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="200">
+                <div class="trust-badge-card p-4 h-100">
+                    <img src="/images/badges/iso-27001.svg"
+                         alt="ISO 27001"
+                         class="trust-badge-img mb-3"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%234f46e5%22 stroke=%22%234f46e5%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2245%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2210%22 fill=%22white%22 font-weight=%22bold%22%3EISO%3C/text%3E%3Ctext x=%2250%25%22 y=%2258%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2210%22 fill=%22white%22 font-weight=%22bold%22%3E27001%3C/text%3E%3C/svg%3E';">
+                    <div class="fw-semibold text-dark">ISO 27001</div>
+                    <small class="text-muted">Certified</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="300">
+                <div class="trust-badge-card p-4 h-100">
+                    <img src="/images/badges/soc2.svg"
+                         alt="SOC 2"
+                         class="trust-badge-img mb-3"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%233b82f6%22 stroke=%22%233b82f6%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22white%22 font-weight=%22bold%22%3ESOC 2%3C/text%3E%3C/svg%3E';">
+                    <div class="fw-semibold text-dark">SOC 2</div>
+                    <small class="text-muted">Type II</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="400">
+                <div class="trust-badge-card p-4 h-100">
+                    <img src="/images/badges/hipaa.svg"
+                         alt="HIPAA"
+                         class="trust-badge-img mb-3"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%23f59e0b%22 stroke=%22%23f59e0b%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22white%22 font-weight=%22bold%22%3EHIPAA%3C/text%3E%3C/svg%3E';">
+                    <div class="fw-semibold text-dark">HIPAA</div>
+                    <small class="text-muted">Compliant</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="500">
+                <div class="trust-badge-card p-4 h-100">
+                    <img src="/images/badges/ssl.svg"
+                         alt="SSL Encrypted"
+                         class="trust-badge-img mb-3"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%2310b981%22 stroke=%22%2310b981%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22white%22 font-weight=%22bold%22%3ESSL%3C/text%3E%3C/svg%3E';">
+                    <div class="fw-semibold text-dark">256-bit SSL</div>
+                    <small class="text-muted">Encrypted</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Use Cases by Industry Section -->
+<section class="use-cases-section py-5 my-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 mb-3">
+                <i class="bi bi-briefcase"></i> Use Cases
+            </span>
+            <h2 class="display-4 fw-bold mb-3">Built for Every Industry</h2>
+            <p class="lead text-muted">See how businesses like yours use our platform to grow</p>
+        </div>
+
+        <!-- Industry Tabs -->
+        <ul class="nav nav-pills justify-content-center mb-5 industry-tabs" id="industryTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="ecommerce-tab" data-bs-toggle="pill" data-bs-target="#ecommerce" type="button" role="tab">
+                    <i class="bi bi-cart"></i> E-Commerce
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="healthcare-tab" data-bs-toggle="pill" data-bs-target="#healthcare" type="button" role="tab">
+                    <i class="bi bi-hospital"></i> Healthcare
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="realestate-tab" data-bs-toggle="pill" data-bs-target="#realestate" type="button" role="tab">
+                    <i class="bi bi-house"></i> Real Estate
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="retail-tab" data-bs-toggle="pill" data-bs-target="#retail" type="button" role="tab">
+                    <i class="bi bi-shop"></i> Retail
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="industryTabContent">
+            <!-- E-Commerce -->
+            <div class="tab-pane fade show active" id="ecommerce" role="tabpanel">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-6" data-aos="fade-right">
+                        <div class="use-case-image-wrapper">
+                            <img src="/images/use-cases/ecommerce.svg" alt="E-Commerce Use Case" class="img-fluid rounded-4 shadow-lg"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22600%22 height=%22400%22 rx=%2216%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%239ca3af%22%3EE-Commerce%3C/text%3E%3C/svg%3E';">
+                        </div>
+                    </div>
+                    <div class="col-lg-6" data-aos="fade-left">
+                        <h3 class="fw-bold mb-4">Boost Online Sales with Targeted Campaigns</h3>
+                        <ul class="list-unstyled use-case-list">
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Cart Abandonment Recovery:</strong> Send automated SMS reminders to recover lost sales
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Order Updates:</strong> Keep customers informed with delivery notifications
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Flash Sale Alerts:</strong> Drive urgency with time-sensitive promotions
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Product Recommendations:</strong> Personalized offers based on purchase history
+                            </li>
+                        </ul>
+                        <div class="alert alert-light border">
+                            <strong class="text-primary">Case Study:</strong> E-commerce store increased revenue by 45% using cart abandonment campaigns
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Healthcare -->
+            <div class="tab-pane fade" id="healthcare" role="tabpanel">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-6" data-aos="fade-right">
+                        <div class="use-case-image-wrapper">
+                            <img src="/images/use-cases/healthcare.svg" alt="Healthcare Use Case" class="img-fluid rounded-4 shadow-lg"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22600%22 height=%22400%22 rx=%2216%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%239ca3af%22%3EHealthcare%3C/text%3E%3C/svg%3E';">
+                        </div>
+                    </div>
+                    <div class="col-lg-6" data-aos="fade-left">
+                        <h3 class="fw-bold mb-4">Improve Patient Engagement & Care</h3>
+                        <ul class="list-unstyled use-case-list">
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Appointment Reminders:</strong> Reduce no-shows with automated SMS reminders
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Prescription Notifications:</strong> Alert patients when prescriptions are ready
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Health Tips:</strong> Send personalized wellness information
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Test Results:</strong> Securely notify patients of available results
+                            </li>
+                        </ul>
+                        <div class="alert alert-light border">
+                            <strong class="text-primary">Case Study:</strong> Medical practice reduced no-shows by 60% with appointment reminders
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real Estate -->
+            <div class="tab-pane fade" id="realestate" role="tabpanel">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-6" data-aos="fade-right">
+                        <div class="use-case-image-wrapper">
+                            <img src="/images/use-cases/realestate.svg" alt="Real Estate Use Case" class="img-fluid rounded-4 shadow-lg"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22600%22 height=%22400%22 rx=%2216%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%239ca3af%22%3EReal Estate%3C/text%3E%3C/svg%3E';">
+                        </div>
+                    </div>
+                    <div class="col-lg-6" data-aos="fade-left">
+                        <h3 class="fw-bold mb-4">Close More Deals Faster</h3>
+                        <ul class="list-unstyled use-case-list">
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>New Listing Alerts:</strong> Instantly notify buyers of properties matching their criteria
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Open House Reminders:</strong> Maximize attendance with timely notifications
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Price Drop Alerts:</strong> Re-engage interested buyers when prices change
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Market Updates:</strong> Keep clients informed with market insights
+                            </li>
+                        </ul>
+                        <div class="alert alert-light border">
+                            <strong class="text-primary">Case Study:</strong> Real estate agency increased showings by 35% with listing alerts
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Retail -->
+            <div class="tab-pane fade" id="retail" role="tabpanel">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-6" data-aos="fade-right">
+                        <div class="use-case-image-wrapper">
+                            <img src="/images/use-cases/retail.svg" alt="Retail Use Case" class="img-fluid rounded-4 shadow-lg"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22600%22 height=%22400%22 rx=%2216%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%239ca3af%22%3ERetail%3C/text%3E%3C/svg%3E';">
+                        </div>
+                    </div>
+                    <div class="col-lg-6" data-aos="fade-left">
+                        <h3 class="fw-bold mb-4">Drive Foot Traffic & Repeat Business</h3>
+                        <ul class="list-unstyled use-case-list">
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Grand Opening Announcements:</strong> Generate buzz for new store openings
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Exclusive Offers:</strong> Reward loyal customers with VIP promotions
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Inventory Updates:</strong> Alert customers when popular items are back in stock
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                <strong>Event Invitations:</strong> Fill your store with in-store event announcements
+                            </li>
+                        </ul>
+                        <div class="alert alert-light border">
+                            <strong class="text-primary">Case Study:</strong> Retail chain increased foot traffic by 50% with targeted promotions
                         </div>
                     </div>
                 </div>
