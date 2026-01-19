@@ -3,7 +3,6 @@
  * Handles contact creation and editing with validation and toast notifications
  */
 
-const apiBaseUrl = window.contactsConfig?.apiBaseUrl || '/api';
 const contactId = window.contactsConfig?.contactId || null;
 const isEditMode = contactId !== null;
 
@@ -21,7 +20,7 @@ $(document).ready(function() {
  */
 function loadContactData() {
     $.ajax({
-        url: `${apiBaseUrl}/contacts/${contactId}`,
+        url: window.AppUrls.buildApiUrl(window.AppUrls.api.contacts.get(contactId)),
         method: 'GET',
         headers: getAjaxHeaders(),
         success: function(response) {
@@ -31,7 +30,7 @@ function loadContactData() {
         error: function(xhr) {
             handleAjaxError(xhr, 'Failed to load contact data');
             setTimeout(() => {
-                window.location.href = AppUrls.contacts?.index || '/Contacts/Index';
+                window.location.href = window.AppUrls.contacts?.index || '/Contacts/Index';
             }, 2000);
         }
     });
@@ -41,17 +40,28 @@ function loadContactData() {
  * Populate form with contact data
  */
 function populateForm(contact) {
-    $('#firstName').val(contact.firstName);
-    $('#lastName').val(contact.lastName);
-    $('#email').val(contact.email);
-    $('#phoneNumber').val(contact.phoneNumber);
-    $('#company').val(contact.company);
-    $('#city').val(contact.city);
-    $('#state').val(contact.state);
-    $('#country').val(contact.country);
-    $('#notes').val(contact.notes);
-    $('#emailOptIn').prop('checked', contact.emailOptIn);
-    $('#smsOptIn').prop('checked', contact.smsOptIn);
+    const fields = [
+        { id: 'firstName', value: contact.firstName },
+        { id: 'lastName', value: contact.lastName },
+        { id: 'email', value: contact.email },
+        { id: 'phoneNumber', value: contact.phoneNumber },
+        { id: 'company', value: contact.company },
+        { id: 'city', value: contact.city },
+        { id: 'state', value: contact.state },
+        { id: 'country', value: contact.country },
+        { id: 'notes', value: contact.notes }
+    ];
+    
+    fields.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (element) element.value = field.value || '';
+    });
+    
+    const emailOptInEl = document.getElementById('emailOptIn');
+    if (emailOptInEl) emailOptInEl.checked = contact.emailOptIn;
+    
+    const smsOptInEl = document.getElementById('smsOptIn');
+    if (smsOptInEl) smsOptInEl.checked = contact.smsOptIn;
 }
 
 /**
@@ -94,12 +104,17 @@ function getFormData() {
  * Submit form via AJAX
  */
 function submitForm(formData) {
-    const url = isEditMode ? `${apiBaseUrl}/contacts/${contactId}` : `${apiBaseUrl}/contacts`;
+    const url = isEditMode ? 
+        window.AppUrls.buildApiUrl(window.AppUrls.api.contacts.update(contactId)) : 
+        window.AppUrls.buildApiUrl(window.AppUrls.api.contacts.create);
     const method = isEditMode ? 'PUT' : 'POST';
     
     // Disable submit button
-    const submitBtn = $('#contactForm button[type="submit"]');
-    submitBtn.prop('disabled', true).html('<i class="spinner-border spinner-border-sm me-2"></i>Saving...');
+    const submitBtn = document.querySelector('#contactForm button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Saving...';
+    }
     
     $.ajax({
         url: url,
@@ -114,16 +129,22 @@ function submitForm(formData) {
                 
                 // Redirect after short delay
                 setTimeout(() => {
-                    window.location.href = AppUrls.contacts?.index || '/Contacts/Index';
+                    window.location.href = window.AppUrls.contacts?.index || '/Contacts/Index';
                 }, 1500);
             } else {
                 showNotification(response.message || 'Failed to save contact', 'error');
-                submitBtn.prop('disabled', false).html('<i class="bi bi-check-circle"></i> ' + (isEditMode ? 'Update Contact' : 'Create Contact'));
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> ' + (isEditMode ? 'Update Contact' : 'Create Contact');
+                }
             }
         },
         error: function(xhr) {
             handleAjaxError(xhr, 'Failed to save contact');
-            submitBtn.prop('disabled', false).html('<i class="bi bi-check-circle"></i> ' + (isEditMode ? 'Update Contact' : 'Create Contact'));
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> ' + (isEditMode ? 'Update Contact' : 'Create Contact');
+            }
         }
     });
 }
@@ -229,7 +250,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = AppUrls.auth.login;
+            window.location.href = window.AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');

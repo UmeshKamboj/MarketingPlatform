@@ -69,7 +69,11 @@ function getAuthHeaders() {
  * Load campaign information
  */
 function loadCampaignInfo() {
-    fetch(`/api/campaigns/${campaignId}`, {
+    const url = window.AppUrls ? 
+        window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.get(campaignId)) : 
+        `/api/campaigns/${campaignId}`;
+    
+    fetch(url, {
         method: 'GET',
         headers: getAuthHeaders()
     })
@@ -88,7 +92,11 @@ function loadCampaignInfo() {
  * Load all variants for the campaign
  */
 function loadVariants() {
-    fetch(`/api/campaigns/${campaignId}/variants`, {
+    const url = window.AppUrls ? 
+        window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.variants.list(campaignId)) : 
+        `/api/campaigns/${campaignId}/variants`;
+    
+    fetch(url, {
         method: 'GET',
         headers: getAuthHeaders()
     })
@@ -206,7 +214,11 @@ function createVariant() {
         messageBody: document.getElementById('variantMessage').value
     };
 
-    fetch(`/api/campaigns/${campaignId}/variants`, {
+    const url = window.AppUrls ? 
+        window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.variants.create(campaignId)) : 
+        `/api/campaigns/${campaignId}/variants`;
+
+    fetch(url, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
@@ -233,7 +245,11 @@ function createVariant() {
 function deleteVariant(variantId) {
     if (!confirm('Are you sure you want to delete this variant?')) return;
 
-    fetch(`/api/campaigns/${campaignId}/variants/${variantId}`, {
+    const url = window.AppUrls ? 
+        window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.variants.delete(campaignId, variantId)) : 
+        `/api/campaigns/${campaignId}/variants/${variantId}`;
+
+    fetch(url, {
         method: 'DELETE',
         headers: getAuthHeaders()
     })
@@ -254,7 +270,11 @@ function deleteVariant(variantId) {
  * Load variant comparison data
  */
 function loadComparison() {
-    fetch(`/api/campaigns/${campaignId}/variants/comparison`, {
+    const url = window.AppUrls ? 
+        window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.variants.comparison(campaignId)) : 
+        `/api/campaigns/${campaignId}/variants/comparison`;
+
+    fetch(url, {
         method: 'GET',
         headers: getAuthHeaders()
     })
@@ -316,7 +336,11 @@ function renderComparison(comparison) {
 function selectWinner(variantId) {
     if (!confirm('Are you sure you want to select this variant as the winner?')) return;
 
-    fetch(`/api/campaigns/${campaignId}/variants/${variantId}/select-winner`, {
+    const url = window.AppUrls ? 
+        window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.variants.selectWinner(campaignId, variantId)) : 
+        `/api/campaigns/${campaignId}/variants/${variantId}/select-winner`;
+
+    fetch(url, {
         method: 'POST',
         headers: getAuthHeaders()
     })

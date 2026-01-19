@@ -3,10 +3,8 @@
  * Handles campaign listing with server-side pagination, filtering, and actions
  */
 
-// Global variables
 let campaignsTable;
 let currentStatus = null;
-const apiBaseUrl = window.campaignsConfig?.apiBaseUrl || '/api';
 
 // Campaign enums
 const CampaignStatus = {
@@ -42,7 +40,7 @@ function initCampaignsTable() {
         
         // AJAX configuration
         ajax: {
-            url: apiBaseUrl + '/campaigns',
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.list),
             type: 'POST',
             headers: getAjaxHeaders(),
             data: function(d) {
@@ -65,7 +63,7 @@ function initCampaignsTable() {
                 if (xhr.status === 401) {
                     showNotification('Session expired. Please log in again.', 'error');
                     setTimeout(() => {
-                        window.location.href = AppUrls.auth.login;
+                        window.location.href = window.AppUrls.auth.login;
                     }, 2000);
                 } else if (xhr.status === 0) {
                     showNotification('Network error. Please check your connection.', 'error');
@@ -344,7 +342,7 @@ function setupTabHandlers() {
  * Navigate to campaign details page
  */
 function viewCampaign(id) {
-    window.location.href = AppUrls.campaigns.details ? AppUrls.campaigns.details(id) : `/Campaigns/Details/${id}`;
+    window.location.href = window.AppUrls.campaigns.details ? window.AppUrls.campaigns.details(id) : `/Campaigns/Details/${id}`;
 }
 
 /**
@@ -353,7 +351,7 @@ function viewCampaign(id) {
 function duplicateCampaign(id) {
     confirmAction('Are you sure you want to duplicate this campaign?', function() {
         $.ajax({
-            url: `${apiBaseUrl}/campaigns/${id}/duplicate`,
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.duplicate(id)),
             method: 'POST',
             headers: getAjaxHeaders(),
             success: function(response) {
@@ -377,7 +375,7 @@ function duplicateCampaign(id) {
 function startCampaign(id) {
     confirmAction('Are you sure you want to start this campaign?', function() {
         $.ajax({
-            url: `${apiBaseUrl}/campaigns/${id}/start`,
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.start(id)),
             method: 'POST',
             headers: getAjaxHeaders(),
             success: function(response) {
@@ -401,7 +399,7 @@ function startCampaign(id) {
 function pauseCampaign(id) {
     confirmAction('Are you sure you want to pause this campaign?', function() {
         $.ajax({
-            url: `${apiBaseUrl}/campaigns/${id}/pause`,
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.pause(id)),
             method: 'POST',
             headers: getAjaxHeaders(),
             success: function(response) {
@@ -425,7 +423,7 @@ function pauseCampaign(id) {
 function resumeCampaign(id) {
     confirmAction('Are you sure you want to resume this campaign?', function() {
         $.ajax({
-            url: `${apiBaseUrl}/campaigns/${id}/resume`,
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.resume(id)),
             method: 'POST',
             headers: getAjaxHeaders(),
             success: function(response) {
@@ -449,7 +447,7 @@ function resumeCampaign(id) {
 function cancelCampaign(id) {
     confirmAction('Are you sure you want to cancel this campaign? This action cannot be undone.', function() {
         $.ajax({
-            url: `${apiBaseUrl}/campaigns/${id}/cancel`,
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.cancel(id)),
             method: 'POST',
             headers: getAjaxHeaders(),
             success: function(response) {
@@ -473,7 +471,7 @@ function cancelCampaign(id) {
 function deleteCampaign(id) {
     confirmAction('Are you sure you want to delete this campaign? This action cannot be undone.', function() {
         $.ajax({
-            url: `${apiBaseUrl}/campaigns/${id}`,
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.campaigns.delete(id)),
             method: 'DELETE',
             headers: getAjaxHeaders(),
             success: function(response) {
@@ -498,7 +496,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = AppUrls.auth.login;
+            window.location.href = window.AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');

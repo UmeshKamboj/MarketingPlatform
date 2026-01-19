@@ -3,10 +3,8 @@
  * Handles SMS keyword listing with server-side pagination and filtering
  */
 
-// Global variables
 let keywordsTable;
 let currentStatus = null;
-const apiBaseUrl = window.keywordsConfig?.apiBaseUrl || '/api';
 
 // Initialize on document ready
 $(document).ready(function() {
@@ -25,7 +23,7 @@ function initKeywordsTable() {
         
         // AJAX configuration
         ajax: {
-            url: apiBaseUrl + '/keywords',
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.keywords.list),
             type: 'POST',
             headers: getAjaxHeaders(),
             data: function(d) {
@@ -245,14 +243,14 @@ function setupFilters() {
  * View keyword details
  */
 function viewKeyword(id) {
-    window.location.href = AppUrls.keywords?.details ? AppUrls.keywords.details(id) : `/Keywords/Details/${id}`;
+    window.location.href = window.AppUrls.keywords?.details ? window.AppUrls.keywords.details(id) : `/Keywords/Details/${id}`;
 }
 
 /**
  * Edit keyword
  */
 function editKeyword(id) {
-    window.location.href = AppUrls.keywords?.edit ? AppUrls.keywords.edit(id) : `/Keywords/Edit/${id}`;
+    window.location.href = window.AppUrls.keywords?.edit ? window.AppUrls.keywords.edit(id) : `/Keywords/Edit/${id}`;
 }
 
 /**
@@ -261,7 +259,7 @@ function editKeyword(id) {
 function deleteKeyword(id) {
     confirmAction('Are you sure you want to delete this keyword?', function() {
         $.ajax({
-            url: `${apiBaseUrl}/keywords/${id}`,
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.keywords.delete(id)),
             method: 'DELETE',
             headers: getAjaxHeaders(),
             success: function(response) {
@@ -286,7 +284,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = AppUrls.auth.login;
+            window.location.href = window.AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');

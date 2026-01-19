@@ -3,15 +3,10 @@
  * Handles keyword creation with validation and API bindings
  */
 
-// Global variables
-let apiBaseUrl = '';
-
 /**
  * Initialize the create page
  */
 function initKeywordCreate() {
-    apiBaseUrl = AppUrls.getApiBaseUrl();
-    
     setupEventListeners();
     setupFormValidation();
     loadExistingKeywords();
@@ -68,6 +63,8 @@ function handleKeywordInput(e) {
  */
 async function checkKeywordAvailability() {
     const keywordInput = document.getElementById('keyword');
+    if (!keywordInput) return;
+    
     const keyword = keywordInput.value.trim();
     
     if (!keyword || keyword.length < 2) {
@@ -75,8 +72,8 @@ async function checkKeywordAvailability() {
     }
 
     try {
-        const url = AppUrls.buildUrl(
-            `${apiBaseUrl}/keywords/check-availability`,
+        const url = window.AppUrls.buildUrl(
+            window.AppUrls.buildApiUrl(window.AppUrls.api.keywords.checkAvailability),
             { keywordText: keyword }
         );
         
@@ -148,19 +145,27 @@ function updateCharacterCount(e) {
 function previewKeyword(e) {
     if (e) e.preventDefault();
     
-    const shortCode = document.getElementById('shortCode').value;
-    const message = document.getElementById('autoResponse').value;
+    const shortCodeEl = document.getElementById('shortCode');
+    const messageEl = document.getElementById('autoResponse');
+    const shortCode = shortCodeEl ? shortCodeEl.value : '';
+    const message = messageEl ? messageEl.value : '';
     
     if (!shortCode || !message) {
         showNotification('Please fill in short code and auto-response message to preview.', 'warning');
         return;
     }
     
-    document.getElementById('previewShortCode').textContent = shortCode;
-    document.getElementById('previewMessage').textContent = message;
+    const previewShortCodeEl = document.getElementById('previewShortCode');
+    if (previewShortCodeEl) previewShortCodeEl.textContent = shortCode;
     
-    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
-    modal.show();
+    const previewMessageEl = document.getElementById('previewMessage');
+    if (previewMessageEl) previewMessageEl.textContent = message;
+    
+    const modalElement = document.getElementById('previewModal');
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
 }
 
 /**
@@ -246,14 +251,16 @@ async function handleFormSubmit(e) {
  */
 async function createKeyword(data) {
     const submitBtn = document.querySelector('#keywordForm button[type="submit"]');
-    const originalBtnContent = submitBtn.innerHTML;
+    const originalBtnContent = submitBtn ? submitBtn.innerHTML : '';
     
     // Disable button and show loading state
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+    }
     
     try {
-        const response = await fetch(`${apiBaseUrl}/keywords`, {
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.keywords.create), {
             method: 'POST',
             headers: getAjaxHeaders(),
             body: JSON.stringify(data)
@@ -266,7 +273,7 @@ async function createKeyword(data) {
             
             // Redirect after short delay
             setTimeout(() => {
-                window.location.href = AppUrls.keywords?.index || '/Keywords/Index';
+                window.location.href = window.AppUrls.keywords?.index || '/Keywords/Index';
             }, 1500);
         } else {
             // Handle validation errors
@@ -279,16 +286,20 @@ async function createKeyword(data) {
             }
             
             // Re-enable button
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnContent;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnContent;
+            }
         }
     } catch (error) {
         console.error('Error creating keyword:', error);
         showNotification('An error occurred while creating the keyword. Please try again.', 'error');
         
         // Re-enable button
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnContent;
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnContent;
+        }
     }
 }
 
@@ -325,7 +336,7 @@ function displayValidationErrors(errors) {
  */
 async function loadExistingKeywords() {
     try {
-        const url = AppUrls.buildUrl(`${apiBaseUrl}/keywords`, {
+        const url = window.AppUrls.buildUrl(window.AppUrls.buildApiUrl(window.AppUrls.api.keywords.list), {
             pageNumber: 1,
             pageSize: 100
         });

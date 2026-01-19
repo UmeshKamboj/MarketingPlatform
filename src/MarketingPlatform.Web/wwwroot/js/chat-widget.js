@@ -38,13 +38,21 @@
     function initChatWidget() {
         console.log('Initializing chat widget...');
         
+        // Check if required elements exist
+        if (!elements.chatButton || !elements.chatWindow) {
+            console.warn('Chat widget elements not found');
+            return;
+        }
+        
         // Event Listeners
-        elements.chatButton.addEventListener('click', toggleChatWindow);
-        elements.chatCloseBtn.addEventListener('click', closeChatWindow);
-        elements.startChatBtn.addEventListener('click', handleStartChat);
-        elements.sendMessageBtn.addEventListener('click', sendMessage);
-        elements.chatInput.addEventListener('keydown', handleChatInputKeydown);
-        elements.chatInput.addEventListener('input', handleTyping);
+        if (elements.chatButton) elements.chatButton.addEventListener('click', toggleChatWindow);
+        if (elements.chatCloseBtn) elements.chatCloseBtn.addEventListener('click', closeChatWindow);
+        if (elements.startChatBtn) elements.startChatBtn.addEventListener('click', handleStartChat);
+        if (elements.sendMessageBtn) elements.sendMessageBtn.addEventListener('click', sendMessage);
+        if (elements.chatInput) {
+            elements.chatInput.addEventListener('keydown', handleChatInputKeydown);
+            elements.chatInput.addEventListener('input', handleTyping);
+        }
 
         // Check if there's a saved chat session
         checkSavedSession();
@@ -52,16 +60,21 @@
 
     // Toggle chat window
     function toggleChatWindow() {
+        if (!elements.chatWindow) return;
+        
         elements.chatWindow.classList.toggle('show');
         if (elements.chatWindow.classList.contains('show')) {
             // Reset unread count
-            elements.unreadBadge.style.display = 'none';
-            elements.unreadBadge.textContent = '0';
+            if (elements.unreadBadge) {
+                elements.unreadBadge.style.display = 'none';
+                elements.unreadBadge.textContent = '0';
+            }
         }
     }
 
     // Close chat window
     function closeChatWindow() {
+        if (!elements.chatWindow) return;
         elements.chatWindow.classList.remove('show');
     }
 
@@ -107,8 +120,9 @@
         elements.startChatBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Starting...';
 
         try {
-            // Create chat room via API
-            const response = await fetch(`${window.chatConfig.apiBaseUrl}/api/chat/rooms`, {
+            // Create chat room via API using AppUrls
+            const apiUrl = window.AppUrls ? window.AppUrls.buildApiUrl(window.AppUrls.api.chat.createRoom) : '/api/chat/rooms';
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -160,8 +174,11 @@
         }
 
         try {
+            // Build SignalR hub URL using dedicated hub helper
+            const hubUrl = window.AppUrls ? window.AppUrls.buildHubUrl(window.AppUrls.hubs.chat) : '/hubs/chat';
+            
             chatState.connection = new signalR.HubConnectionBuilder()
-                .withUrl(window.chatConfig.hubUrl)
+                .withUrl(hubUrl)
                 .withAutomaticReconnect()
                 .build();
 
@@ -336,7 +353,10 @@
     // Load chat history
     async function loadChatHistory() {
         try {
-            const response = await fetch(`${window.chatConfig.apiBaseUrl}/api/chat/rooms/${chatState.chatRoomId}/messages`);
+            const apiUrl = window.AppUrls ? 
+                window.AppUrls.buildApiUrl(window.AppUrls.api.chat.getMessages(chatState.chatRoomId)) : 
+                `/api/chat/rooms/${chatState.chatRoomId}/messages`;
+            const response = await fetch(apiUrl);
             const result = await response.json();
 
             if (result.success && result.data) {
@@ -355,6 +375,8 @@
 
     // Increment unread count
     function incrementUnreadCount() {
+        if (!elements.unreadBadge) return;
+        
         let count = parseInt(elements.unreadBadge.textContent) || 0;
         count++;
         elements.unreadBadge.textContent = count;
@@ -363,6 +385,7 @@
 
     // Scroll chat to bottom
     function scrollToBottom() {
+        if (!elements.chatMessages) return;
         elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
     }
 

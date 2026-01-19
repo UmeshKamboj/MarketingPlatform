@@ -3,7 +3,6 @@
  */
 
 let billingTable;
-const apiBaseUrl = window.billingConfig?.apiBaseUrl || '/api';
 
 $(document).ready(function() {
     initBillingTable();
@@ -15,7 +14,7 @@ function initBillingTable() {
         processing: true,
         
         ajax: {
-            url: apiBaseUrl + '/billing/invoices',
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.billing.invoices),
             type: 'POST',
             headers: getAjaxHeaders(),
             data: function(d) {
@@ -123,7 +122,7 @@ function viewInvoice(id) { window.location.href = AppUrls.billing?.invoice ? App
 
 function downloadInvoice(id) {
     showNotification('Downloading invoice...', 'info');
-    window.location.href = `${apiBaseUrl}/billing/invoices/${id}/download`;
+    window.location.href = window.AppUrls.buildApiUrl(window.AppUrls.api.billing.downloadInvoice(id));
 }
 
 function payInvoice(id) {

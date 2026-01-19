@@ -54,10 +54,9 @@ function handleBillingCycleChange(e) {
  */
 async function loadPlans() {
     try {
-        const apiBaseUrl = window.billingSubscribeConfig?.apiBaseUrl || '';
         const token = localStorage.getItem('token');
 
-        const response = await fetch(`${apiBaseUrl}/subscriptionplans/visible`, {
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.subscriptionPlans.visible), {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -85,6 +84,7 @@ async function loadPlans() {
  */
 function displayPlans(plans) {
     const container = document.getElementById('subscriptionPlans');
+    if (!container) return;
     
     if (plans.length === 0) {
         container.innerHTML = `
@@ -166,12 +166,15 @@ function displayPlans(plans) {
  * Display error message
  */
 function displayError(message) {
-    document.getElementById('subscriptionPlans').innerHTML = `
-        <div class="col-12 text-center py-5">
-            <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
-            <h5 class="mt-3">${message}</h5>
-        </div>
-    `;
+    const container = document.getElementById('subscriptionPlans');
+    if (container) {
+        container.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">${message}</h5>
+            </div>
+        `;
+    }
 }
 
 /**
@@ -186,21 +189,27 @@ function selectPlan(planId, planName, monthlyPrice, yearlyPrice) {
     };
 
     // Display selected plan details
-    document.getElementById('selectedPlanDetails').innerHTML = `
-        <div class="card">
-            <div class="card-body">
-                <h5>${planName}</h5>
-                <p class="mb-0">
-                    <strong>$${selectedPlan.price.toFixed(2)}</strong>
-                    <span class="text-muted">/${billingCycle === 'monthly' ? 'month' : 'year'}</span>
-                </p>
+    const detailsContainer = document.getElementById('selectedPlanDetails');
+    if (detailsContainer) {
+        detailsContainer.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <h5>${planName}</h5>
+                    <p class="mb-0">
+                        <strong>$${selectedPlan.price.toFixed(2)}</strong>
+                        <span class="text-muted">/${billingCycle === 'monthly' ? 'month' : 'year'}</span>
+                    </p>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     // Show payment modal
-    const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    modal.show();
+    const modalElement = document.getElementById('paymentModal');
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
 }
 
 /**
@@ -213,11 +222,10 @@ async function processPayment() {
     }
 
     try {
-        const apiBaseUrl = window.billingSubscribeConfig?.apiBaseUrl || '';
         const token = localStorage.getItem('token');
 
         // Create subscription
-        const response = await fetch(`${apiBaseUrl}/billing/subscribe`, {
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.billing.subscribe), {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

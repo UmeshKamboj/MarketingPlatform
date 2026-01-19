@@ -106,12 +106,10 @@ function initializeLoginForm() {
         loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
         
         try {
-            // Get API base URL from config or fallback
-            const apiBaseUrl = (window.authConfig && window.authConfig.apiBaseUrl) || '/api';
-            
-            // Call login API using AppUrls if available
-            const loginUrl = (window.AppUrls && window.AppUrls.api && window.AppUrls.api.auth && window.AppUrls.api.auth.login) 
-                || `${apiBaseUrl}/auth/login`;
+            // Build full API URL using AppUrls helper
+            const loginUrl = window.AppUrls ? 
+                window.AppUrls.buildApiUrl(window.AppUrls.api.auth.login) : 
+                '/api/auth/login';
             
             const response = await fetch(loginUrl, {
                 method: 'POST',
