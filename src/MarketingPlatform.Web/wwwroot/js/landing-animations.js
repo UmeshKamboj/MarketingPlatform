@@ -9,7 +9,6 @@
     // Initialize animations on DOM load
     document.addEventListener('DOMContentLoaded', function() {
         initScrollAnimations();
-        initCounterAnimations();
         initFloatingMessages();
     });
 
@@ -70,13 +69,6 @@
         };
 
         updateCounter();
-    }
-
-    /**
-     * Initialize counter animations for stats section
-     */
-    function initCounterAnimations() {
-        // This is handled by the scroll observer now
     }
 
     /**
@@ -209,28 +201,6 @@
             setTimeout(() => ripple.remove(), 600);
         });
     });
-
-    /**
-     * Typing animation for hero title (optional)
-     */
-    function initTypingAnimation() {
-        const typingElement = document.querySelector('.typing-text');
-        if (!typingElement) return;
-
-        const text = typingElement.textContent;
-        typingElement.textContent = '';
-        let index = 0;
-
-        function type() {
-            if (index < text.length) {
-                typingElement.textContent += text.charAt(index);
-                index++;
-                setTimeout(type, 50);
-            }
-        }
-
-        type();
-    }
 
 })();
 
