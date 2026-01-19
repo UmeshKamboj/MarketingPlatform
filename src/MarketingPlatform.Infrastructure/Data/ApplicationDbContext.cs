@@ -82,20 +82,8 @@ namespace MarketingPlatform.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             // Apply all entity configurations from assembly
+            // This includes KeywordConfiguration which defines the Keyword -> Campaign foreign key relationship
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-
-            // Ensure proper table creation order for foreign key dependencies
-            // Campaigns table must be created before Keywords table
-            modelBuilder.Entity<Campaign>().ToTable("Campaigns");
-            modelBuilder.Entity<Keyword>().ToTable("Keywords");
-            
-            // Explicitly configure the foreign key relationship with Restrict behavior
-            modelBuilder.Entity<Keyword>()
-                .HasOne(k => k.LinkedCampaign)
-                .WithMany()
-                .HasForeignKey(k => k.LinkedCampaignId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired(false);
 
             // Global query filters for soft delete
             modelBuilder.Entity<Contact>().HasQueryFilter(c => !c.IsDeleted);
