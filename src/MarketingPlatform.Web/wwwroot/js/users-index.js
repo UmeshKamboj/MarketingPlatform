@@ -253,7 +253,7 @@ function viewUser(id) {
  * Edit user
  */
 function editUser(id) {
-    window.location.href = AppUrls.users.edit ? AppUrls.users.edit(id) : `/Users/Edit/${id}`;
+    window.location.href = AppUrls.users?.edit ? AppUrls.users.edit(id) : `/Users/Edit/${id}`;
 }
 
 /**

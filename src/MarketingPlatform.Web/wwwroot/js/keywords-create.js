@@ -266,7 +266,7 @@ async function createKeyword(data) {
             
             // Redirect after short delay
             setTimeout(() => {
-                window.location.href = AppUrls.keywords.index;
+                window.location.href = AppUrls.keywords?.index || '/Keywords/Index';
             }, 1500);
         } else {
             // Handle validation errors

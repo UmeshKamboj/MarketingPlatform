@@ -31,7 +31,7 @@ function loadContactData() {
         error: function(xhr) {
             handleAjaxError(xhr, 'Failed to load contact data');
             setTimeout(() => {
-                window.location.href = AppUrls.contacts.index;
+                window.location.href = AppUrls.contacts?.index || '/Contacts/Index';
             }, 2000);
         }
     });
@@ -114,7 +114,7 @@ function submitForm(formData) {
                 
                 // Redirect after short delay
                 setTimeout(() => {
-                    window.location.href = AppUrls.contacts.index;
+                    window.location.href = AppUrls.contacts?.index || '/Contacts/Index';
                 }, 1500);
             } else {
                 showNotification(response.message || 'Failed to save contact', 'error');
