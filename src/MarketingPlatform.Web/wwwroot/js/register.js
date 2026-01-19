@@ -3,21 +3,75 @@ const apiBaseUrl = '/api';
 let registrationData = {};
 let countdownInterval;
 
-// Toggle password visibility
-document.getElementById('togglePassword')?.addEventListener('click', function() {
-    const passwordInput = document.getElementById('password');
-    const icon = this.querySelector('i');
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.classList.replace('bi-eye', 'bi-eye-slash');
-    } else {
-        passwordInput.type = 'password';
-        icon.classList.replace('bi-eye-slash', 'bi-eye');
-    }
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    loadRecaptchaConfig();
+    initializePasswordToggle();
+    initializeRegistrationForm();
+    initializeOtpForm();
+    initializeResendOtp();
 });
 
-// Step 1: Registration Form
-document.getElementById('registerForm').addEventListener('submit', async function(e) {
+/**
+ * Load reCAPTCHA configuration dynamically from API
+ */
+async function loadRecaptchaConfig() {
+    try {
+        // Check if authConfig is available (set from server)
+        if (typeof window.authConfig !== 'undefined' && window.authConfig.recaptchaSiteKey) {
+            // Use the siteKey from server-side config
+            renderRecaptcha(window.authConfig.recaptchaSiteKey);
+        } else {
+            // Fallback: try to fetch from API endpoint
+            const response = await fetch('/api/auth/recaptcha-config');
+            if (response.ok) {
+                const config = await response.json();
+                renderRecaptcha(config.siteKey);
+            } else {
+                console.warn('Could not load reCAPTCHA configuration');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading reCAPTCHA config:', error);
+    }
+}
+
+/**
+ * Render reCAPTCHA widget
+ */
+function renderRecaptcha(siteKey) {
+    const recaptchaContainer = document.querySelector('.g-recaptcha');
+    if (recaptchaContainer && siteKey && siteKey !== 'YOUR_RECAPTCHA_SITE_KEY') {
+        recaptchaContainer.setAttribute('data-sitekey', siteKey);
+    }
+}
+
+/**
+ * Initialize password visibility toggle
+ */
+function initializePasswordToggle() {
+    const toggleButton = document.getElementById('togglePassword');
+    if (!toggleButton) return;
+
+    toggleButton.addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    });
+}
+
+/**
+ * Initialize registration form
+ */
+function initializeRegistrationForm() {
+    const registerForm = document.getElementById('registerForm');
+    if (!registerForm) return;
     e.preventDefault();
     
     const email = document.getElementById('email').value;
@@ -88,9 +142,13 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         registerBtn.disabled = false;
         registerBtn.innerHTML = '<i class="bi bi-person-check"></i> Create Account';
     }
-});
+    });
+}
 
-// Step 2: OTP Verification
+/**
+ * Initialize OTP verification form
+ */
+function initializeOtpForm() {
 const otpInputs = document.querySelectorAll('.otp-input');
 otpInputs.forEach((input, index) => {
     input.addEventListener('input', function(e) {
@@ -118,9 +176,11 @@ otpInputs.forEach((input, index) => {
             otpInputs[index + digits.length].focus();
         }
     });
-});
-
-document.getElementById('otpForm').addEventListener('submit', async function(e) {
+    
+    const otpForm = document.getElementById('otpForm');
+    if (!otpForm) return;
+    
+    otpForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const otp = Array.from(otpInputs).map(input => input.value).join('');
@@ -169,10 +229,17 @@ document.getElementById('otpForm').addEventListener('submit', async function(e) 
         verifyBtn.disabled = false;
         verifyBtn.innerHTML = '<i class="bi bi-check-circle"></i> Verify Email';
     }
-});
+    });
+}
 
-// Resend OTP
-document.getElementById('resendOtpBtn').addEventListener('click', async function() {
+/**
+ * Initialize resend OTP button
+ */
+function initializeResendOtp() {
+    const resendBtn = document.getElementById('resendOtpBtn');
+    if (!resendBtn) return;
+    
+    resendBtn.addEventListener('click', async function() {
     const errorDiv = document.getElementById('errorMessage');
     const successDiv = document.getElementById('successMessage');
     const btn = this;
@@ -204,7 +271,8 @@ document.getElementById('resendOtpBtn').addEventListener('click', async function
         btn.disabled = false;
         btn.textContent = 'Resend';
     }
-});
+    });
+}
 
 // Navigation between steps
 function goToStep(stepNumber) {
