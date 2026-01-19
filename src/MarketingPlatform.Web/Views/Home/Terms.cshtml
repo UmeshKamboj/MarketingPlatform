@@ -47,19 +47,9 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .back-home-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
     </style>
 </head>
 <body>
-    <a href="@Url.Action("Index", "Home")" class="btn btn-light back-home-btn shadow">
-        <i class="bi bi-house-door"></i> Back to Home
-    </a>
-
     <div class="page-header">
         <div class="container">
             <h1 class="display-4 fw-bold">@(Model?.Title ?? "Terms of Service")</h1>

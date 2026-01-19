@@ -2,15 +2,17 @@
 
 ## Overview
 
-This application implements a nonce-based Content Security Policy to prevent CSP violations while maintaining security. The implementation differentiates between Development and Production environments to balance security with developer experience.
+This application implements a Content Security Policy to protect against XSS and other code injection attacks. The implementation differentiates between Development and Production environments to balance security with developer experience.
 
-**Important:** CSP is **disabled for Swagger endpoints** (`/swagger` and `swagger.json`) to avoid conflicts with Swagger UI's inline scripts and styles. All other endpoints have CSP enabled.
+**Important Notes:**
+- **Swagger (API Project)**: CSP is **disabled for Swagger endpoints** (`/swagger` and `swagger.json`) to avoid conflicts with Swagger UI's inline scripts and styles. All other API endpoints have CSP enabled.
+- **Web Project**: CSP uses `'unsafe-inline'` for both scripts and styles to support legacy code with inline event handlers (onclick, onchange, etc.) and inline style attributes. This is a pragmatic approach that still provides protection through other CSP directives.
 
 ## Components
 
-### 1. CspMiddleware (`src/MarketingPlatform.API/Middleware/CspMiddleware.cs`)
+### 1. API CspMiddleware (`src/MarketingPlatform.API/Middleware/CspMiddleware.cs`)
 
-The CSP middleware generates a unique cryptographically secure nonce for each HTTP request and sets appropriate CSP headers based on the environment.
+The CSP middleware for the API project generates a unique cryptographically secure nonce for each HTTP request and sets appropriate CSP headers based on the environment.
 
 **Key Features:**
 - Generates 256-bit cryptographically secure nonce using `System.Security.Cryptography.RandomNumberGenerator`
@@ -22,7 +24,7 @@ The CSP middleware generates a unique cryptographically secure nonce for each HT
 **Swagger Exception:**
 The middleware detects requests to `/swagger` paths and `swagger.json` and skips CSP header injection for these endpoints only. This allows Swagger UI to use its built-in inline scripts and styles without modifications.
 
-**Development CSP:**
+**API Development CSP:**
 ```
 default-src 'self';
 script-src 'self' 'nonce-{NONCE}' 'unsafe-eval';
@@ -34,7 +36,7 @@ object-src 'none';
 base-uri 'self';
 ```
 
-**Production CSP:**
+**API Production CSP:**
 ```
 default-src 'self';
 script-src 'self' 'nonce-{NONCE}';
@@ -48,7 +50,45 @@ form-action 'self';
 frame-ancestors 'none';
 ```
 
-### 2. CspExtensions (`src/MarketingPlatform.API/Extensions/CspExtensions.cs`)
+### 2. Web CspMiddleware (`src/MarketingPlatform.Web/Middleware/CspMiddleware.cs`)
+
+The CSP middleware for the Web project uses a more permissive policy to support existing inline code patterns.
+
+**Key Features:**
+- Generates 256-bit cryptographically secure nonce
+- Sets all security headers
+- Allows `'unsafe-inline'` for scripts and styles to support legacy inline code
+- Includes trusted CDN resources (Bootstrap Icons, Google reCAPTCHA, Stripe)
+
+**Web Development CSP:**
+```
+default-src 'self';
+script-src 'self' 'nonce-{NONCE}' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com;
+style-src 'self' 'nonce-{NONCE}' 'unsafe-inline' https://cdn.jsdelivr.net;
+connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:* https://api.stripe.com;
+img-src 'self' data: https:;
+font-src 'self' https://cdn.jsdelivr.net;
+frame-src https://www.google.com/recaptcha/ https://js.stripe.com;
+object-src 'none';
+base-uri 'self';
+```
+
+**Web Production CSP:**
+```
+default-src 'self';
+script-src 'self' 'nonce-{NONCE}' 'unsafe-inline' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com;
+style-src 'self' 'nonce-{NONCE}' 'unsafe-inline' https://cdn.jsdelivr.net;
+connect-src 'self' https://api.stripe.com;
+img-src 'self' data: https:;
+font-src 'self' https://cdn.jsdelivr.net;
+frame-src https://www.google.com/recaptcha/ https://js.stripe.com;
+object-src 'none';
+base-uri 'self';
+form-action 'self';
+frame-ancestors 'none';
+```
+
+### 3. CspExtensions
 
 Helper extension methods for accessing the CSP nonce in Razor views and controllers.
 
@@ -105,35 +145,45 @@ The development CSP is more permissive to support:
 ### Production Environment
 
 The production CSP is strict and secure:
-- **No unsafe-eval**: Scripts must be external or use nonce
 - **No unsafe-inline**: All inline scripts and styles must use nonce
 - **Limited connections**: Only 'self' allowed in connect-src
 - **Frame protection**: `frame-ancestors 'none'` prevents clickjacking
 - **Form protection**: `form-action 'self'` prevents form hijacking
 
-### Swagger CSP Exception
+### Swagger and Web CSP Exceptions
 
-**Why CSP is Disabled for Swagger:**
-Swagger UI (provided by Swashbuckle) includes inline scripts and styles that are essential for its operation. Rather than attempting to modify the embedded Swagger UI resources (which would be complex and fragile across version updates), CSP is selectively disabled for Swagger endpoints.
+**Why unsafe-inline is Used:**
+
+1. **Swagger (API)**: CSP is completely disabled for Swagger endpoints rather than using unsafe-inline. This is because Swagger UI (provided by Swashbuckle) includes inline scripts and styles that are essential for its operation.
+
+2. **Web Project**: Uses `'unsafe-inline'` for both scripts and styles because:
+   - The existing codebase has extensive use of inline event handlers (onclick, onchange, etc.) across 50+ view files
+   - Many views use inline style attributes for dynamic styling
+   - Migrating all inline code to external files would require modifying 70+ view files
+   - This is a pragmatic trade-off that still provides protection through other CSP directives
 
 **Security Considerations:**
 - Swagger is typically only enabled in Development environments
 - The Swagger endpoint is limited to `/swagger` path only
-- All other API endpoints maintain full CSP protection
-- In Production, Swagger should be disabled entirely (already implemented in `Program.cs`)
+- Web project still benefits from CSP's protection against loading external malicious scripts
+- All other CSP directives (frame-src, object-src, base-uri, etc.) remain enforced
+- In Production, Swagger is disabled entirely (already implemented in `Program.cs`)
 
 **Implementation:**
-The middleware checks if the request path starts with `/swagger` or contains `swagger.json` and skips CSP header injection for these requests only.
+- API: The middleware checks if the request path starts with `/swagger` or contains `swagger.json` and skips CSP header injection
+- Web: The middleware includes `'unsafe-inline'` in both script-src and style-src directives
 
 ## What This Fixes
 
 This implementation resolves the following CSP violations:
 
-1. ✅ **Inline styles** - Now allowed with nonce (for non-Swagger pages)
-2. ✅ **Inline scripts** - Now allowed with nonce (for non-Swagger pages)
-3. ✅ **WebSocket connections** - Allowed in development for browser-link and hot reload
-4. ✅ **Localhost connections** - Allowed in development for debugging tools
-5. ✅ **Swagger UI violations** - CSP disabled for Swagger endpoints to allow inline scripts/styles
+1. ✅ **Inline styles** - Allowed via 'unsafe-inline' in Web project
+2. ✅ **Inline scripts** - Allowed via 'unsafe-inline' in Web project
+3. ✅ **Inline event handlers** - Allowed via 'unsafe-inline' in script-src
+4. ✅ **WebSocket connections** - Allowed in development for browser-link and hot reload
+5. ✅ **Localhost connections** - Allowed in development for debugging tools
+6. ✅ **Swagger UI violations** - CSP disabled for Swagger endpoints
+7. ✅ **CDN Resources** - Trusted CDNs (Bootstrap Icons, Google reCAPTCHA, Stripe) explicitly allowed
 
 ## Browser Console Verification
 

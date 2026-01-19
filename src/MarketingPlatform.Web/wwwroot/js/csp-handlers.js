@@ -549,7 +549,15 @@
     }
 
     function togglePermission(roleId, permission) {
-        const checkbox = event.target;
+        // Get the checkbox from the current click event context
+        const checkboxes = document.querySelectorAll(`input[data-role-id="${roleId}"][data-permission="${permission}"]`);
+        const checkbox = checkboxes.length > 0 ? checkboxes[0] : null;
+        
+        if (!checkbox) {
+            console.error('Checkbox not found for role and permission');
+            return;
+        }
+        
         fetch(`/Roles/TogglePermission`, {
             method: 'POST',
             headers: {
