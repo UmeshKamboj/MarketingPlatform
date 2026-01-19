@@ -150,6 +150,11 @@ builder.Services.AddScoped<IPlatformSettingService, PlatformSettingService>();
 builder.Services.AddScoped<IFeatureToggleService, FeatureToggleService>();
 builder.Services.AddScoped<IComplianceRuleService, ComplianceRuleService>();
 
+// Chat Services
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
+
 // Scheduling & Automation Services
 builder.Services.AddScoped<ICampaignSchedulerService, CampaignSchedulerService>();
 builder.Services.AddScoped<IWorkflowService, WorkflowService>();
@@ -243,11 +248,15 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() ?? new[] { "https://localhost:7061" })
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials(); // Required for SignalR
     });
 });
 
 builder.Services.AddControllers();
+
+// Add SignalR
+builder.Services.AddSignalR();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -365,6 +374,9 @@ app.UseCors("AllowWebApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Map SignalR hubs
+app.MapHub<MarketingPlatform.API.Hubs.ChatHub>("/hubs/chat");
 
 // Configure recurring jobs for rate limit resets using service provider
 using (var scope = app.Services.CreateScope())
