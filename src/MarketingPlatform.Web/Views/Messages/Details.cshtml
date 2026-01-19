@@ -140,13 +140,13 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <button class="btn btn-outline-primary" onclick="resendMessage()">
+                            <button class="btn btn-outline-primary" data-action="resend-message">
                                 <i class="bi bi-arrow-repeat"></i> Resend to Failed
                             </button>
-                            <button class="btn btn-outline-secondary" onclick="duplicateMessage()">
+                            <button class="btn btn-outline-secondary" data-action="duplicate-message">
                                 <i class="bi bi-files"></i> Duplicate Message
                             </button>
-                            <button class="btn btn-outline-info" onclick="exportReport()">
+                            <button class="btn btn-outline-info" data-action="export-report">
                                 <i class="bi bi-download"></i> Export Report
                             </button>
                         </div>
@@ -160,134 +160,9 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script nonce="@Context.GetCspNonce()">
-        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
-        const messageId = window.location.pathname.split('/').pop();
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            loadMessageDetails();
-        });
-
-        async function loadMessageDetails() {
-            try {
-                const mockMessage = {
-                    id: messageId,
-                    subject: 'Flash Sale Alert',
-                    channel: 'SMS',
-                    status: 'Sent',
-                    campaignName: 'Flash Deals',
-                    sentAt: '2024-03-20 09:15:00',
-                    content: 'FLASH SALE! Get 50% off today only. Shop now: https://example.com/sale',
-                    stats: {
-                        recipients: 5230,
-                        delivered: 5227,
-                        opened: 4156,
-                        clicked: 1456,
-                        bounced: 3,
-                        failed: 0
-                    },
-                    deliveryDetails: [
-                        { recipient: '+1234567890', status: 'Delivered', deliveredAt: '2024-03-20 09:15:23', openedAt: '2024-03-20 09:16:45' },
-                        { recipient: '+1234567891', status: 'Delivered', deliveredAt: '2024-03-20 09:15:24', openedAt: '2024-03-20 09:18:12' },
-                        { recipient: '+1234567892', status: 'Delivered', deliveredAt: '2024-03-20 09:15:25', openedAt: null },
-                        { recipient: '+1234567893', status: 'Failed', deliveredAt: null, openedAt: null },
-                        { recipient: '+1234567894', status: 'Delivered', deliveredAt: '2024-03-20 09:15:27', openedAt: '2024-03-20 09:20:34' }
-                    ]
-                };
-                
-                populateDetails(mockMessage);
-                renderDeliveryTable(mockMessage.deliveryDetails);
-                createPerformanceChart(mockMessage.stats);
-                
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('messageDetails').style.display = 'block';
-            } catch (error) {
-                document.getElementById('loading').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-            }
-        }
-
-        function populateDetails(message) {
-            document.getElementById('statRecipients').textContent = message.stats.recipients.toLocaleString();
-            document.getElementById('statDelivered').textContent = message.stats.delivered.toLocaleString();
-            document.getElementById('statOpened').textContent = message.stats.opened ? message.stats.opened.toLocaleString() : 'N/A';
-            document.getElementById('statClicked').textContent = message.stats.clicked.toLocaleString();
-            
-            document.getElementById('messageSubject').textContent = message.subject;
-            
-            const channelColors = { SMS: 'success', MMS: 'info', Email: 'primary' };
-            document.getElementById('messageChannel').innerHTML = 
-                `<span class="badge bg-${channelColors[message.channel]}">${message.channel}</span>`;
-            
-            const statusColors = { Sent: 'success', Pending: 'warning', Failed: 'danger' };
-            document.getElementById('messageStatus').innerHTML = 
-                `<span class="badge bg-${statusColors[message.status]}">${message.status}</span>`;
-            
-            document.getElementById('messageCampaign').textContent = message.campaignName;
-            document.getElementById('messageSentAt').textContent = message.sentAt;
-            document.getElementById('messageContent').textContent = message.content;
-        }
-
-        function renderDeliveryTable(details) {
-            const tbody = document.querySelector('#deliveryTable tbody');
-            let html = '';
-            
-            details.forEach(detail => {
-                const statusColors = { Delivered: 'success', Failed: 'danger', Pending: 'warning' };
-                html += `
-                    <tr>
-                        <td>${detail.recipient}</td>
-                        <td><span class="badge bg-${statusColors[detail.status]}">${detail.status}</span></td>
-                        <td><small>${detail.deliveredAt || 'N/A'}</small></td>
-                        <td><small>${detail.openedAt || 'N/A'}</small></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewRecipient('${detail.recipient}')">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = html;
-        }
-
-        function createPerformanceChart(stats) {
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Delivered', 'Opened', 'Clicked', 'Failed'],
-                    datasets: [{
-                        data: [stats.delivered, stats.opened || 0, stats.clicked, stats.failed],
-                        backgroundColor: ['#198754', '#0dcaf0', '#ffc107', '#dc3545']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
-                }
-            });
-        }
-
-        function viewRecipient(phone) {
-            alert(`View details for ${phone} (Demo)`);
-        }
-
-        function resendMessage() {
-            if (confirm('Resend this message to failed recipients?')) {
-                alert('Message resent! (Demo)');
-            }
-        }
-
-        function duplicateMessage() {
-            if (confirm('Create a copy of this message?')) {
-                window.location.href = '/Messages/Compose';
-            }
-        }
-
-        function exportReport() {
-            alert('Exporting report... (Demo)');
-        }
+        window.messagesDetailsConfig = {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl'
+        };
     </script>
+    <script src="~/js/messages-details.js" asp-append-version="true"></script>
 }
