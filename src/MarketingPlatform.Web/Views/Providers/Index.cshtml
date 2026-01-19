@@ -3,25 +3,98 @@
 }
 
 <div class="container-fluid">
+    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-hdd-network"></i> Communication Providers</h2>
-        <a href="@Url.Action("Create", "Providers")" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add Provider
+        <div>
+            <h2 class="mb-1 fw-bold"><i class="bi bi-hdd-network-fill text-primary me-2"></i>Communication Providers</h2>
+            <p class="text-muted mb-0">Manage SMS, MMS, and Email service providers</p>
+        </div>
+        <a href="@Url.Action("Create", "Providers")" class="btn btn-primary btn-lg shadow-sm">
+            <i class="bi bi-plus-circle me-2"></i>Add Provider
         </a>
     </div>
 
-    <div class="card">
-        <div class="card-header">
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card stat-primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Total Providers</div>
+                    </div>
+                    <div class="text-primary fs-2"><i class="bi bi-hdd-network"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-success">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                    <div class="text-success fs-2"><i class="bi bi-check-circle-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-info">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-value">0%</div>
+                        <div class="stat-label">Avg Health</div>
+                    </div>
+                    <div class="text-info fs-2"><i class="bi bi-activity"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-warning">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Messages Sent</div>
+                    </div>
+                    <div class="text-warning fs-2"><i class="bi bi-send-fill"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom-0">
             <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#all">All</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#sms">SMS</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#mms">MMS</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#email">Email</a></li>
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#all"><i class="bi bi-list-ul me-1"></i>All</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#sms"><i class="bi bi-phone me-1"></i>SMS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#mms"><i class="bi bi-image me-1"></i>MMS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#email"><i class="bi bi-envelope me-1"></i>Email</a>
+                </li>
             </ul>
         </div>
-        <div class="card-body">
-            <div id="providers-list">
-                <div class="text-center py-5"><div class="spinner-border"></div></div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="providersTable" class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Health</th>
+                            <th>Messages</th>
+                            <th class="no-export text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -29,91 +102,9 @@
 
 @section Scripts {
     <script nonce="@Context.GetCspNonce()">
-        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
-        
-        document.addEventListener('DOMContentLoaded', () => loadProviders());
-
-        async function loadProviders(type = 'all') {
-            try {
-                const mockProviders = [
-                    { id: 1, name: 'Twilio SMS', type: 'SMS', status: 'Active', health: 99.8, messagesCount: 125000, isDefault: true },
-                    { id: 2, name: 'MessageBird SMS', type: 'SMS', status: 'Active', health: 98.5, messagesCount: 45000, isDefault: false },
-                    { id: 3, name: 'Twilio MMS', type: 'MMS', status: 'Active', health: 99.2, messagesCount: 8900, isDefault: true },
-                    { id: 4, name: 'SendGrid', type: 'Email', status: 'Active', health: 99.9, messagesCount: 456000, isDefault: true },
-                    { id: 5, name: 'AWS SES', type: 'Email', status: 'Inactive', health: 0, messagesCount: 0, isDefault: false }
-                ];
-                
-                let filtered = type === 'all' ? mockProviders : mockProviders.filter(p => p.type === type.toUpperCase());
-                renderProviders(filtered);
-            } catch (error) {
-                document.getElementById('providers-list').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-            }
-        }
-
-        function renderProviders(providers) {
-            const container = document.getElementById('providers-list');
-            
-            if (!providers || providers.length === 0) {
-                container.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No providers found.</div>';
-                return;
-            }
-
-            let html = '<div class="table-responsive"><table class="table table-hover">';
-            html += '<thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Health</th><th>Messages</th><th>Default</th><th>Actions</th></tr></thead><tbody>';
-
-            providers.forEach(provider => {
-                const typeColors = { SMS: 'success', MMS: 'info', Email: 'primary' };
-                const statusColors = { Active: 'success', Inactive: 'secondary' };
-                const healthColor = provider.health >= 99 ? 'success' : provider.health >= 95 ? 'warning' : 'danger';
-                
-                html += `<tr>
-                    <td><strong>${provider.name}</strong></td>
-                    <td><span class="badge bg-${typeColors[provider.type]}">${provider.type}</span></td>
-                    <td><span class="badge bg-${statusColors[provider.status]}">${provider.status}</span></td>
-                    <td><span class="badge bg-${healthColor}">${provider.health}%</span></td>
-                    <td>${provider.messagesCount.toLocaleString()}</td>
-                    <td>${provider.isDefault ? '<i class="bi bi-star-fill text-warning"></i>' : ''}</td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary" onclick="viewHealth(${provider.id})"><i class="bi bi-activity"></i></button>
-                            <button class="btn btn-outline-secondary" onclick="editProvider(${provider.id})"><i class="bi bi-pencil"></i></button>
-                            <button class="btn btn-outline-info" onclick="testProvider(${provider.id})"><i class="bi bi-play"></i></button>
-                            <button class="btn btn-outline-danger" onclick="deleteProvider(${provider.id})"><i class="bi bi-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
-
-        function viewHealth(id) {
-            window.location.href = `/Providers/Health/${id}`;
-        }
-
-        function editProvider(id) {
-            window.location.href = `/Providers/Edit/${id}`;
-        }
-
-        function testProvider(id) {
-            if (confirm('Send a test message through this provider?')) {
-                alert('Test message sent! (Demo)');
-            }
-        }
-
-        function deleteProvider(id) {
-            if (confirm('Delete this provider?')) {
-                alert('Provider deleted! (Demo)');
-                loadProviders();
-            }
-        }
-
-        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-            tab.addEventListener('shown.bs.tab', function(e) {
-                const type = e.target.getAttribute('href').substring(1);
-                loadProviders(type);
-            });
-        });
+        window.providersConfig = {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl'
+        };
     </script>
+    <script src="~/js/providers-index.js" asp-append-version="true"></script>
 }

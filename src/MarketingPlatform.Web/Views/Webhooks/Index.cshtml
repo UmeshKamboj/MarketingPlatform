@@ -3,25 +3,71 @@
 }
 
 <div class="container-fluid">
+    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-broadcast"></i> Webhooks</h2>
-        <a href="@Url.Action("Create", "Webhooks")" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create Webhook
+        <div>
+            <h2 class="mb-1 fw-bold"><i class="bi bi-broadcast-pin text-primary me-2"></i>Webhooks</h2>
+            <p class="text-muted mb-0">Manage webhook integrations and event notifications</p>
+        </div>
+        <a href="@Url.Action("Create", "Webhooks")" class="btn btn-primary btn-lg shadow-sm">
+            <i class="bi bi-plus-circle me-2"></i>Create Webhook
         </a>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <div class="input-group w-50">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" id="searchInput" placeholder="Search webhooks...">
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card stat-primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Total Webhooks</div>
+                    </div>
+                    <div class="text-primary fs-2"><i class="bi bi-broadcast"></i></div>
+                </div>
             </div>
         </div>
-        <div class="card-body">
-            <div id="webhooks-list">
-                <div class="text-center py-5">
-                    <div class="spinner-border" role="status"></div>
+        <div class="col-md-4">
+            <div class="stat-card stat-success">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                    <div class="text-success fs-2"><i class="bi bi-check-circle-fill"></i></div>
                 </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card stat-info">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-value">0%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                    <div class="text-info fs-2"><i class="bi bi-graph-up-arrow"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="webhooksTable" class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>URL</th>
+                            <th>Events</th>
+                            <th>Status</th>
+                            <th>Success Rate</th>
+                            <th class="no-export text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -29,80 +75,9 @@
 
 @section Scripts {
     <script nonce="@Context.GetCspNonce()">
-        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            loadWebhooks();
-            document.getElementById('searchInput').addEventListener('input', loadWebhooks);
-        });
-
-        async function loadWebhooks() {
-            try {
-                const mockWebhooks = [
-                    { id: 1, name: 'Campaign Status Updates', url: 'https://api.example.com/webhooks/campaign', events: ['CampaignStarted', 'CampaignCompleted'], isActive: true, deliveryCount: 1245, failureCount: 3 },
-                    { id: 2, name: 'Message Delivery Events', url: 'https://api.example.com/webhooks/delivery', events: ['MessageDelivered', 'MessageFailed'], isActive: true, deliveryCount: 25890, failureCount: 45 },
-                    { id: 3, name: 'Opt-Out Notifications', url: 'https://api.example.com/webhooks/optout', events: ['ContactOptedOut'], isActive: false, deliveryCount: 456, failureCount: 0 }
-                ];
-                
-                renderWebhooks(mockWebhooks);
-            } catch (error) {
-                document.getElementById('webhooks-list').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-            }
-        }
-
-        function renderWebhooks(webhooks) {
-            const container = document.getElementById('webhooks-list');
-            
-            if (!webhooks || webhooks.length === 0) {
-                container.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No webhooks found.</div>';
-                return;
-            }
-
-            let html = '<div class="table-responsive"><table class="table table-hover">';
-            html += '<thead><tr><th>Name</th><th>URL</th><th>Events</th><th>Status</th><th>Success Rate</th><th>Actions</th></tr></thead><tbody>';
-
-            webhooks.forEach(webhook => {
-                const successRate = ((webhook.deliveryCount - webhook.failureCount) / webhook.deliveryCount * 100).toFixed(1);
-                html += `<tr>
-                    <td><strong>${webhook.name}</strong></td>
-                    <td><small class="text-muted">${webhook.url}</small></td>
-                    <td><span class="badge bg-secondary">${webhook.events.length} events</span></td>
-                    <td>${webhook.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td>
-                    <td>${successRate}%<br><small class="text-muted">${webhook.deliveryCount} sent</small></td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary" onclick="viewLogs(${webhook.id})"><i class="bi bi-journal-text"></i></button>
-                            <button class="btn btn-outline-secondary" onclick="editWebhook(${webhook.id})"><i class="bi bi-pencil"></i></button>
-                            <button class="btn btn-outline-info" onclick="testWebhook(${webhook.id})"><i class="bi bi-play"></i></button>
-                            <button class="btn btn-outline-danger" onclick="deleteWebhook(${webhook.id})"><i class="bi bi-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
-
-        function viewLogs(id) {
-            window.location.href = `/Webhooks/Logs/${id}`;
-        }
-
-        function editWebhook(id) {
-            window.location.href = `/Webhooks/Edit/${id}`;
-        }
-
-        function testWebhook(id) {
-            if (confirm('Send a test webhook request?')) {
-                alert('Test webhook sent! (Demo)');
-            }
-        }
-
-        function deleteWebhook(id) {
-            if (confirm('Delete this webhook?')) {
-                alert('Webhook deleted! (Demo)');
-                loadWebhooks();
-            }
-        }
+        window.webhooksConfig = {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl'
+        };
     </script>
+    <script src="~/js/webhooks-index.js" asp-append-version="true"></script>
 }
