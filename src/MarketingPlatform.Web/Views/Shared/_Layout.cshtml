@@ -127,6 +127,7 @@
                                 <li><a class="dropdown-item" asp-controller="SuperAdmin" asp-action="AuditLogs"><i class="bi bi-journal-text"></i> Audit Logs</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" asp-controller="LandingPageConfig" asp-action="Index"><i class="bi bi-layout-text-window"></i> Landing Page Config</a></li>
+                                <li><a class="dropdown-item" asp-controller="PageContent" asp-action="Index"><i class="bi bi-file-text"></i> Privacy & Terms Pages</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -195,7 +196,7 @@
                     <h6 class="fw-bold">Legal</h6>
                     <ul class="list-unstyled small">
                         <li><a asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-muted">Privacy Policy</a></li>
-                        <li><a href="#" class="text-decoration-none text-muted">Terms of Service</a></li>
+                        <li><a asp-controller="Home" asp-action="Terms" class="text-decoration-none text-muted">Terms of Service</a></li>
                     </ul>
                 </div>
             </div>
