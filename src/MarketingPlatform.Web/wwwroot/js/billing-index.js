@@ -119,7 +119,7 @@ function initBillingTable() {
     });
 }
 
-function viewInvoice(id) { window.location.href = `/Billing/Invoice/${id}`; }
+function viewInvoice(id) { window.location.href = AppUrls.billing?.invoice ? AppUrls.billing.invoice(id) : `/Billing/Invoice/${id}`; }
 
 function downloadInvoice(id) {
     showNotification('Downloading invoice...', 'info');
@@ -127,5 +127,5 @@ function downloadInvoice(id) {
 }
 
 function payInvoice(id) {
-    window.location.href = `/Billing/Pay/${id}`;
+    window.location.href = AppUrls.billing?.pay ? AppUrls.billing.pay(id) : `/Billing/Pay/${id}`;
 }

@@ -66,7 +66,7 @@ function initMessagesTable() {
                 if (xhr.status === 401) {
                     showNotification('Session expired. Please log in again.', 'error');
                     setTimeout(() => {
-                        window.location.href = '/Auth/Login';
+                        window.location.href = AppUrls.auth.login;
                     }, 2000);
                 }
             }
@@ -323,7 +323,7 @@ function setupChannelFilter() {
  * View message details
  */
 function viewMessageDetails(id) {
-    window.location.href = `/Messages/Details/${id}`;
+    window.location.href = AppUrls.messages?.details ? AppUrls.messages.details(id) : `/Messages/Details/${id}`;
 }
 
 /**
@@ -357,7 +357,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = '/Auth/Login';
+            window.location.href = AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');

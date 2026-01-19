@@ -146,8 +146,8 @@ function setupTabHandlers() {
     });
 }
 
-function viewWorkflow(id) { window.location.href = `/Workflows/Details/${id}`; }
-function editWorkflow(id) { window.location.href = `/Workflows/Edit/${id}`; }
+function viewWorkflow(id) { window.location.href = AppUrls.workflows?.details ? AppUrls.workflows.details(id) : `/Workflows/Details/${id}`; }
+function editWorkflow(id) { window.location.href = AppUrls.workflows?.edit ? AppUrls.workflows.edit(id) : `/Workflows/Edit/${id}`; }
 
 function activateWorkflow(id) {
     confirmAction('Activate this workflow?', function() {

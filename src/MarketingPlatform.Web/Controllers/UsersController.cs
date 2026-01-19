@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for user management and profile
 /// </summary>
+[Authorize]
 public class UsersController : Controller
 {
     private readonly ILogger<UsersController> _logger;

@@ -219,21 +219,21 @@ function initRolesTable() {
  * Create new role
  */
 function createRole() {
-    window.location.href = '/Roles/Create';
+    window.location.href = AppUrls.roles?.create || '/Roles/Create';
 }
 
 /**
  * View role details
  */
 function viewRole(id) {
-    window.location.href = `/Roles/Details/${id}`;
+    window.location.href = AppUrls.roles?.details ? AppUrls.roles.details(id) : `/Roles/Details/${id}`;
 }
 
 /**
  * Edit role
  */
 function editRole(id) {
-    window.location.href = `/Roles/Edit/${id}`;
+    window.location.href = AppUrls.roles?.edit ? AppUrls.roles.edit(id) : `/Roles/Edit/${id}`;
 }
 
 /**
@@ -267,7 +267,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = '/Auth/Login';
+            window.location.href = AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for SMS keyword campaigns management
 /// </summary>
+[Authorize]
 public class KeywordsController : Controller
 {
     private readonly ILogger<KeywordsController> _logger;

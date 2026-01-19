@@ -65,7 +65,7 @@ function initCampaignsTable() {
                 if (xhr.status === 401) {
                     showNotification('Session expired. Please log in again.', 'error');
                     setTimeout(() => {
-                        window.location.href = '/Auth/Login';
+                        window.location.href = AppUrls.auth.login;
                     }, 2000);
                 } else if (xhr.status === 0) {
                     showNotification('Network error. Please check your connection.', 'error');
@@ -344,7 +344,7 @@ function setupTabHandlers() {
  * Navigate to campaign details page
  */
 function viewCampaign(id) {
-    window.location.href = `/Campaigns/Details/${id}`;
+    window.location.href = AppUrls.campaigns.details ? AppUrls.campaigns.details(id) : `/Campaigns/Details/${id}`;
 }
 
 /**
@@ -498,7 +498,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = '/Auth/Login';
+            window.location.href = AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');
