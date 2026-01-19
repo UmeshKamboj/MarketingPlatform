@@ -24,6 +24,15 @@ body {
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
+/* Forgot Password Card Styles */
+.forgot-card {
+    max-width: 450px;
+    width: 100%;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
 /* Register Card Styles */
 .register-card {
     max-width: 600px;
