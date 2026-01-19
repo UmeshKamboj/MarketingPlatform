@@ -126,53 +126,9 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script nonce="@Context.GetCspNonce()">
-        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            initCharts();
-        });
-
-        function initCharts() {
-            // Performance Chart
-            const ctx1 = document.getElementById('performanceChart').getContext('2d');
-            new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    datasets: [{
-                        label: 'Open Rate',
-                        data: [38, 42, 41, 45],
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                    }, {
-                        label: 'Click Rate',
-                        data: [15, 18, 17, 20],
-                        borderColor: 'rgb(255, 99, 132)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true
-                }
-            });
-            
-            // Channel Chart
-            const ctx2 = document.getElementById('channelChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Email', 'SMS', 'MMS'],
-                    datasets: [{
-                        data: [65, 25, 10],
-                        backgroundColor: ['#0d6efd', '#198754', '#0dcaf0']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true
-                }
-            });
-        }
+        window.analyticsConfig = {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl'
+        };
     </script>
+    <script src="~/js/analytics-index.js" asp-append-version="true"></script>
 }
