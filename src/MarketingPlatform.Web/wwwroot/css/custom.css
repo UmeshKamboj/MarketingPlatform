@@ -58,6 +58,427 @@
 }
 
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+/* ========== HERO SECTION ANIMATIONS ========== */
+
+/* Hero Section with Animated Background */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 600px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated Background Pattern */
+.hero-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.1;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+    animation: patternMove 20s ease-in-out infinite;
+}
+
+@keyframes patternMove {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+}
+
+/* Gradient Text Animation */
+.text-gradient {
+    background: linear-gradient(90deg, #fff 0%, #a8edea 50%, #fed6e3 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+}
+
+/* Hero Title Animation */
+.hero-title {
+    animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Button Hover Scale Effect */
+.hover-scale {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Dashboard Mockup */
+.dashboard-mockup {
+    animation: floatDashboard 6s ease-in-out infinite;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes floatDashboard {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.mockup-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Floating Message Icons */
+.floating-element {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.floating-1 {
+    top: 10%;
+    right: 10%;
+    animation: float1 4s ease-in-out infinite;
+}
+
+.floating-2 {
+    bottom: 20%;
+    right: 5%;
+    animation: float2 5s ease-in-out infinite;
+}
+
+.floating-3 {
+    top: 50%;
+    right: -5%;
+    animation: float3 6s ease-in-out infinite;
+}
+
+@keyframes float1 {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(10deg); }
+}
+
+@keyframes float2 {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-40px) rotate(-10deg); }
+}
+
+@keyframes float3 {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    50% { transform: translateX(-30px) translateY(-30px); }
+}
+
+/* ========== FEATURES SECTION ========== */
+
+/* Feature Card with Hover Effect */
+.feature-card {
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card:hover::before {
+    transform: scaleX(1);
+}
+
+/* Feature Icon Animation */
+.feature-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.feature-icon-bg {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.feature-icon-lg {
+    font-size: 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.1; }
+    50% { transform: scale(1.2); opacity: 0.2; }
+}
+
+/* ========== STATS SECTION WITH ANIMATION ========== */
+
+.stats-section {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.stats-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 10px);
+    opacity: 0.5;
+}
+
+.stat-item-enhanced {
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.stat-item-enhanced:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Counter Animation */
+.counter {
+    display: inline-block;
+}
+
+/* ========== TESTIMONIALS SECTION ========== */
+
+.testimonial-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.testimonial-card::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 20px;
+    width: 80px;
+    height: 80px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='0' y='80' font-size='120' fill='%23667eea' opacity='0.1' font-family='Georgia,serif'%3E%22%3C/text%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    speak: none;
+    aria-hidden: true;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.testimonial-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 24px;
+}
+
+/* ========== CTA SECTION ========== */
+
+.cta-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+    animation: ctaPatternMove 15s ease-in-out infinite;
+}
+
+@keyframes ctaPatternMove {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+}
+
+/* ========== MESSAGE ANIMATION (SMS/Email Theme) ========== */
+
+/* Animated message bubbles in hero */
+.hero-image-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+/* Message send animation */
+@keyframes messageSend {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.8);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+}
+
+/* Create animated message elements */
+.message-animation {
+    position: absolute;
+    width: 200px;
+    height: 60px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    animation: messageSend 4s ease-in-out infinite;
+}
+
+.message-animation-1 {
+    top: 20%;
+    left: -10%;
+    animation-delay: 0s;
+}
+
+.message-animation-2 {
+    top: 50%;
+    right: -10%;
+    animation-delay: 2s;
+}
+
+.message-animation-3 {
+    bottom: 20%;
+    left: 10%;
+    animation-delay: 1s;
+}
+
+/* ========== SCROLL ANIMATIONS ========== */
+
+/* Fade in from bottom */
+[data-aos="fade-up"] {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-aos="fade-up"].aos-animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Fade in from right */
+[data-aos="fade-right"] {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-aos="fade-right"].aos-animate {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Fade in from left */
+[data-aos="fade-left"] {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-aos="fade-left"].aos-animate {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Zoom in */
+[data-aos="zoom-in"] {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-aos="zoom-in"].aos-animate {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ========== EXISTING STYLES ========== */
+
+.hero-image-placeholder {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
     background-color: var(--gray-50);
     color: var(--gray-800);
@@ -794,4 +1215,229 @@ body {
         box-shadow: none;
         border: 1px solid var(--gray-300);
     }
+}
+
+/* CSP Compliance: Externalized inline styles */
+
+/* Display utilities */
+.display-none {
+    display: none;
+}
+
+.display-block {
+    display: block;
+}
+
+/* Cursor utilities */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Icon sizing */
+.icon-large {
+    font-size: 2rem;
+}
+
+.icon-xlarge {
+    font-size: 3rem;
+}
+
+.icon-opacity-3 {
+    opacity: 0.3;
+}
+
+.icon-opacity-5 {
+    opacity: 0.5;
+}
+
+.icon-opacity-7 {
+    opacity: 0.7;
+}
+
+/* Margin and padding utilities beyond Bootstrap defaults */
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+/* Chart and visualization containers */
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+/* Badge utility for token/placeholder */
+.token-badge {
+    cursor: pointer;
+    user-select: none;
+}
+
+.token-badge:hover {
+    opacity: 0.8;
+}
+
+/* Email preview styling */
+.email-preview-container {
+    border: 1px solid #dee2e6;
+    padding: 20px;
+    background-color: #ffffff;
+    min-height: 400px;
+}
+
+/* SMS/MMS preview styling */
+.sms-preview-container {
+    max-width: 375px;
+    margin: 0 auto;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #f8f9fa;
+}
+
+/* Conditional field display */
+.conditional-field {
+    display: none;
+}
+
+.conditional-field.show {
+    display: block;
+}
+
+/* Provider status indicators */
+.provider-status-active {
+    color: #28a745;
+}
+
+.provider-status-inactive {
+    color: #dc3545;
+}
+
+/* Pricing tier cards */
+.pricing-card {
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.pricing-card:hover {
+    border-color: #007bff;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.pricing-card.featured {
+    border-color: #007bff;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Feature list styling */
+.feature-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.feature-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.feature-list li:last-child {
+    border-bottom: none;
+}
+
+/* Workflow node styling */
+.workflow-node {
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+}
+
+.workflow-node.active {
+    background-color: #e7f1ff;
+    border-color: #0056b3;
+}
+
+/* Analytics chart wrappers */
+.analytics-chart-wrapper {
+    position: relative;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Loading spinners and overlays */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.hidden {
+    display: none;
+}
+
+/* Success/Error message styling */
+.message-success {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.message-error {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* Table enhancements */
+.table-hover tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Modal custom sizing */
+.modal-xlarge {
+    max-width: 90%;
+}
+
+/* Form wizard steps */
+.wizard-step {
+    display: none;
+}
+
+.wizard-step.active {
+    display: block;
+}
+
+/* Color picker input */
+.color-picker-input {
+    width: 100px;
+    height: 40px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Preview iframe wrapper */
+.preview-iframe-wrapper {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.preview-iframe-wrapper iframe {
+    width: 100%;
+    border: none;
+    min-height: 500px;
 }

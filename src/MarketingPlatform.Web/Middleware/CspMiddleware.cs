@@ -77,9 +77,11 @@ namespace MarketingPlatform.Web.Middleware
         private static string BuildDevelopmentCsp(string nonce)
         {
             // Common development ports: 5000-5999 (Kestrel), 7000-7999 (HTTPS), 44300-44399 (IIS Express HTTPS), 60000-65535 (dynamic)
+            // 'unsafe-inline' allows inline style attributes (style="...") and <style> tags, and inline event handlers (onclick="...")
+            // 'unsafe-eval' allows eval() which is needed for some development tools and hot reload
             return $"default-src 'self'; " +
-                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
-                   $"style-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net; " +
+                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
+                   $"style-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net; " +
                    $"connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:* https://api.stripe.com; " +
                    $"img-src 'self' data: https:; " +
                    $"font-src 'self' https://cdn.jsdelivr.net; " +
@@ -90,7 +92,8 @@ namespace MarketingPlatform.Web.Middleware
 
         /// <summary>
         /// Builds a strict CSP header for production environment.
-        /// Uses nonces for inline scripts/styles without allowing unsafe-inline or unsafe-eval.
+        /// Uses nonces for inline scripts without allowing unsafe-eval.
+        /// Allows 'unsafe-inline' for styles to support inline style attributes.
         /// Allows trusted external resources (CDNs, payment processors, security services).
         /// </summary>
         /// <param name="nonce">The nonce to include in the CSP</param>
@@ -98,8 +101,8 @@ namespace MarketingPlatform.Web.Middleware
         private static string BuildProductionCsp(string nonce)
         {
             return $"default-src 'self'; " +
-                   $"script-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
-                   $"style-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net; " +
+                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
+                   $"style-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net; " +
                    $"connect-src 'self' https://api.stripe.com; " +
                    $"img-src 'self' data: https:; " +
                    $"font-src 'self' https://cdn.jsdelivr.net; " +

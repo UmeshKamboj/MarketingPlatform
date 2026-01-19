@@ -27,6 +27,10 @@ namespace MarketingPlatform.API.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // Skip CSP for Swagger endpoints to avoid conflicts with Swagger UI inline scripts/styles
+            var path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+            var isSwaggerRequest = path.StartsWith("/swagger") || path.Contains("swagger.json");
+            
             // Generate a cryptographically secure nonce for this request
             var nonce = GenerateNonce();
             
@@ -42,15 +46,23 @@ namespace MarketingPlatform.API.Middleware
             context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
             context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
             
-            // Set CSP header based on environment
-            var cspHeader = _environment.IsDevelopment()
-                ? BuildDevelopmentCsp(nonce)
-                : BuildProductionCsp(nonce);
-            
-            context.Response.Headers.Append("Content-Security-Policy", cspHeader);
-            
-            _logger.LogDebug("CSP header set with nonce: {Nonce} for environment: {Environment}", 
-                nonce, _environment.EnvironmentName);
+            // Only apply CSP to non-Swagger endpoints
+            if (!isSwaggerRequest)
+            {
+                // Set CSP header based on environment
+                var cspHeader = _environment.IsDevelopment()
+                    ? BuildDevelopmentCsp(nonce)
+                    : BuildProductionCsp(nonce);
+                
+                context.Response.Headers.Append("Content-Security-Policy", cspHeader);
+                
+                _logger.LogDebug("CSP header set with nonce: {Nonce} for environment: {Environment}", 
+                    nonce, _environment.EnvironmentName);
+            }
+            else
+            {
+                _logger.LogDebug("CSP disabled for Swagger endpoint: {Path}", path);
+            }
 
             await _next(context);
         }

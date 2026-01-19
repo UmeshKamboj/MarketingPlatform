@@ -307,6 +307,9 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 // Rate limiting middleware (before authentication)
 app.UseMiddleware<RateLimitingMiddleware>();
 
+// Enable static files for custom resources
+app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
