@@ -2,6 +2,10 @@
     ViewData["Title"] = "Create SMS Keyword";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/keywords.css" asp-append-version="true" />
+}
+
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="bi bi-hash"></i> Create SMS Keyword</h2>
@@ -90,9 +94,9 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-end gap-2">
+                        <div class="action-button-group">
                             <button type="button" class="btn btn-secondary" onclick="window.location.href='/Keywords/Index'">Cancel</button>
-                            <button type="button" class="btn btn-outline-primary" onclick="previewKeyword()">
+                            <button type="button" class="btn btn-outline-primary" id="previewBtn">
                                 <i class="bi bi-eye"></i> Preview Response
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -171,70 +175,9 @@
 
 @section Scripts {
     <script nonce="@Context.GetCspNonce()">
-        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
-        
-        document.getElementById('keyword').addEventListener('input', function(e) {
-            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        });
-
-        document.getElementById('autoResponse').addEventListener('input', function() {
-            const count = this.value.length;
-            document.getElementById('charCount').textContent = `${count}/160 characters`;
-            if (count > 160) {
-                document.getElementById('charCount').classList.add('text-danger');
-            } else {
-                document.getElementById('charCount').classList.remove('text-danger');
-            }
-        });
-
-        function previewKeyword() {
-            const shortCode = document.getElementById('shortCode').value;
-            const message = document.getElementById('autoResponse').value;
-            
-            if (!shortCode || !message) {
-                alert('Please fill in short code and auto-response message to preview.');
-                return;
-            }
-            
-            document.getElementById('previewShortCode').textContent = shortCode;
-            document.getElementById('previewMessage').textContent = message;
-            
-            const modal = new bootstrap.Modal(document.getElementById('previewModal'));
-            modal.show();
-        }
-
-        document.getElementById('keywordForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const keyword = document.getElementById('keyword').value;
-            if (keyword.length < 2) {
-                alert('Keyword must be at least 2 characters long.');
-                return;
-            }
-            
-            const autoResponse = document.getElementById('autoResponse').value;
-            if (autoResponse.length > 160) {
-                alert('Auto-response message exceeds 160 characters. Please shorten it.');
-                return;
-            }
-            
-            try {
-                const data = {
-                    keyword: keyword,
-                    shortCode: document.getElementById('shortCode').value,
-                    campaignId: document.getElementById('campaignId').value || null,
-                    autoResponseMessage: autoResponse,
-                    requireDoubleOptIn: document.getElementById('doubleOptIn').checked,
-                    trackClicks: document.getElementById('trackClicks').checked,
-                    tags: document.getElementById('tags').value,
-                    isActive: document.getElementById('isActive').checked
-                };
-                
-                alert('Keyword created successfully! (Demo)');
-                window.location.href = '/Keywords/Index';
-            } catch (error) {
-                alert('Failed to create keyword: ' + error.message);
-            }
-        });
+        window.keywordsConfig = {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl'
+        };
     </script>
+    <script src="~/js/keywords-create.js" asp-append-version="true"></script>
 }
