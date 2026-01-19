@@ -354,7 +354,7 @@
     async function loadChatHistory() {
         try {
             const apiUrl = window.AppUrls ? 
-                window.AppUrls.buildApiUrl(window.AppUrls.api.chat.getHistory(chatState.chatRoomId)) : 
+                window.AppUrls.buildApiUrl(window.AppUrls.api.chat.getMessages(chatState.chatRoomId)) : 
                 `/api/chat/rooms/${chatState.chatRoomId}/messages`;
             const response = await fetch(apiUrl);
             const result = await response.json();

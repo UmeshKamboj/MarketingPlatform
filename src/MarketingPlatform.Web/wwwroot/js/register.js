@@ -1,5 +1,4 @@
 // Register.js - Registration flow with OTP verification
-
 let registrationData = {};
 let countdownInterval;
 
