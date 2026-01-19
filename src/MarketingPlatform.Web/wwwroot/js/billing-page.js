@@ -3,8 +3,6 @@
  * Handles subscription display, invoice management, and payment methods
  */
 
-// Get configuration and token
-const apiBaseUrl = (window.billingConfig && window.billingConfig.apiBaseUrl) || '/api';
 const token = localStorage.getItem('token');
 
 // Initialize when DOM is ready
@@ -18,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 async function loadSubscription() {
     try {
-        const response = await fetch(`${apiBaseUrl}/billing/subscription`, {
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.billing.subscription), {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -46,6 +44,9 @@ async function loadSubscription() {
  * @param {Object} subscription - Subscription data
  */
 function displaySubscription(subscription) {
+    const container = document.getElementById('currentSubscription');
+    if (!container) return;
+    
     const html = `
         <div class="row">
             <div class="col-md-8">
@@ -80,19 +81,26 @@ function displaySubscription(subscription) {
             </div>
         </div>
     `;
-    document.getElementById('currentSubscription').innerHTML = html;
+    container.innerHTML = html;
 
     // Update quick stats
-    if (subscription.nextBillingDate) {
-        document.getElementById('nextBillingDate').textContent = new Date(subscription.nextBillingDate).toLocaleDateString();
+    const nextBillingEl = document.getElementById('nextBillingDate');
+    if (nextBillingEl && subscription.nextBillingDate) {
+        nextBillingEl.textContent = new Date(subscription.nextBillingDate).toLocaleDateString();
     }
-    document.getElementById('amountDue').textContent = `$${subscription.amount.toFixed(2)}`;
+    const amountDueEl = document.getElementById('amountDue');
+    if (amountDueEl) {
+        amountDueEl.textContent = `$${subscription.amount.toFixed(2)}`;
+    }
 }
 
 /**
  * Display no subscription message
  */
 function displayNoSubscription() {
+    const container = document.getElementById('currentSubscription');
+    if (!container) return;
+    
     const html = `
         <div class="text-center py-5">
             <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
@@ -103,7 +111,7 @@ function displayNoSubscription() {
             </a>
         </div>
     `;
-    document.getElementById('currentSubscription').innerHTML = html;
+    container.innerHTML = html;
 }
 
 /**
@@ -111,7 +119,7 @@ function displayNoSubscription() {
  */
 async function loadRecentInvoices() {
     try {
-        const response = await fetch(`${apiBaseUrl}/billing/invoices`, {
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.billing.invoices), {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -139,6 +147,9 @@ async function loadRecentInvoices() {
  * @param {Array} invoices - Array of invoice objects
  */
 function displayInvoices(invoices) {
+    const container = document.getElementById('recentInvoices');
+    if (!container) return;
+    
     const html = `
         <div class="table-responsive">
             <table class="table table-hover">
@@ -173,18 +184,21 @@ function displayInvoices(invoices) {
             </table>
         </div>
     `;
-    document.getElementById('recentInvoices').innerHTML = html;
+    container.innerHTML = html;
 }
 
 /**
  * Display no invoices message
  */
 function displayNoInvoices() {
-    document.getElementById('recentInvoices').innerHTML = `
-        <div class="text-center py-3 text-muted">
-            <i class="bi bi-receipt"></i> No invoices yet
-        </div>
-    `;
+    const container = document.getElementById('recentInvoices');
+    if (container) {
+        container.innerHTML = `
+            <div class="text-center py-3 text-muted">
+                <i class="bi bi-receipt"></i> No invoices yet
+            </div>
+        `;
+    }
 }
 
 /**
@@ -212,7 +226,7 @@ async function cancelSubscription() {
     const reason = prompt('Please provide a reason for cancellation (optional):');
     
     try {
-        const response = await fetch(`${apiBaseUrl}/billing/cancel`, {
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.billing.cancel), {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -264,7 +278,7 @@ function addPaymentMethod() {
  * @param {string} invoiceId - Invoice ID
  */
 function downloadInvoice(invoiceId) {
-    window.open(`${apiBaseUrl}/billing/invoices/${invoiceId}/download`, '_blank');
+    window.open(window.AppUrls.buildApiUrl(window.AppUrls.api.billing.downloadInvoice(invoiceId)), '_blank');
 }
 
 // Make functions available globally for event handlers

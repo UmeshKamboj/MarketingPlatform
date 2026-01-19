@@ -3,8 +3,6 @@
  * Handles analytics dashboard with Chart.js visualizations
  */
 
-// Global variables
-const apiBaseUrl = window.analyticsConfig?.apiBaseUrl || '/api';
 let performanceChart;
 let channelChart;
 
@@ -18,7 +16,7 @@ $(document).ready(function() {
  */
 function loadAnalyticsData() {
     $.ajax({
-        url: apiBaseUrl + '/analytics/dashboard',
+        url: window.AppUrls.buildApiUrl(window.AppUrls.api.analytics.dashboard),
         method: 'GET',
         headers: getAjaxHeaders(),
         success: function(response) {
@@ -41,17 +39,21 @@ function updateDashboardStats(data) {
     if (!data) return;
     
     // Update stat cards if data is available
-    if (data.totalMessages !== undefined) {
-        $('#totalMessages').text(formatNumber(data.totalMessages));
+    const totalMessagesEl = document.getElementById('totalMessages');
+    if (totalMessagesEl && data.totalMessages !== undefined) {
+        totalMessagesEl.textContent = formatNumber(data.totalMessages);
     }
-    if (data.deliveryRate !== undefined) {
-        $('#deliveryRate').text(data.deliveryRate + '%');
+    const deliveryRateEl = document.getElementById('deliveryRate');
+    if (deliveryRateEl && data.deliveryRate !== undefined) {
+        deliveryRateEl.textContent = data.deliveryRate + '%';
     }
-    if (data.openRate !== undefined) {
-        $('#openRate').text(data.openRate + '%');
+    const openRateEl = document.getElementById('openRate');
+    if (openRateEl && data.openRate !== undefined) {
+        openRateEl.textContent = data.openRate + '%';
     }
-    if (data.clickRate !== undefined) {
-        $('#clickRate').text(data.clickRate + '%');
+    const clickRateEl = document.getElementById('clickRate');
+    if (clickRateEl && data.clickRate !== undefined) {
+        clickRateEl.textContent = data.clickRate + '%';
     }
 }
 
@@ -226,7 +228,7 @@ function refreshAnalytics() {
  */
 function exportAnalytics(format) {
     $.ajax({
-        url: `${apiBaseUrl}/analytics/export?format=${format}`,
+        url: window.AppUrls.buildUrl(window.AppUrls.buildApiUrl(window.AppUrls.api.analytics.export.campaignPerformanceCsv), { format: format }),
         method: 'GET',
         headers: getAjaxHeaders(),
         success: function(response) {
@@ -256,7 +258,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = AppUrls.auth.login;
+            window.location.href = window.AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to view analytics', 'error');

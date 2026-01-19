@@ -41,62 +41,78 @@ function setupEventListeners() {
 }
 
 async function loadKeyword() {
+    const loadingEl = document.getElementById('loading');
+    const formEl = document.getElementById('keywordForm');
+    
     try {
-        // Mock data for demonstration
-        const mockKeyword = {
-            id: keywordId,
-            keyword: 'JOIN',
-            shortCode: '12345',
-            campaignId: '1',
-            autoResponseMessage: 'Welcome! You\'re now subscribed to our updates. Reply STOP to unsubscribe.',
-            requireDoubleOptIn: false,
-            trackClicks: true,
-            tags: 'promotion, signup',
-            isActive: true,
-            stats: {
-                totalMessages: 1247,
-                optIns: 1180,
-                optOuts: 67,
-                successRate: '94.6%'
-            },
-            recentActivity: [
-                { date: '2024-03-20 14:30', event: 'New opt-in', phone: '+1234567890' },
-                { date: '2024-03-20 13:15', event: 'New opt-in', phone: '+1234567891' },
-                { date: '2024-03-20 11:45', event: 'Opt-out', phone: '+1234567892' },
-                { date: '2024-03-20 10:20', event: 'New opt-in', phone: '+1234567893' },
-                { date: '2024-03-19 16:30', event: 'New opt-in', phone: '+1234567894' }
-            ]
-        };
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.keywords.get(keywordId)), {
+            method: 'GET',
+            headers: getAjaxHeaders()
+        });
         
-        populateForm(mockKeyword);
-        updateStats(mockKeyword.stats);
-        renderRecentActivity(mockKeyword.recentActivity);
+        if (!response.ok) {
+            throw new Error('Failed to load keyword');
+        }
         
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('keywordForm').style.display = 'block';
+        const result = await response.json();
+        const keyword = result.data || result;
+        
+        populateForm(keyword);
+        updateStats(keyword.stats || {});
+        renderRecentActivity(keyword.recentActivity || []);
+        
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (formEl) formEl.style.display = 'block';
     } catch (error) {
-        document.getElementById('loading').innerHTML = `<div class="alert alert-danger">Error loading keyword: ${error.message}</div>`;
+        console.error('Error loading keyword:', error);
+        if (loadingEl) {
+            loadingEl.innerHTML = `<div class="alert alert-danger">Error loading keyword: ${error.message}</div>`;
+        }
     }
 }
 
 function populateForm(keyword) {
-    document.getElementById('keyword').value = keyword.keyword;
-    document.getElementById('shortCode').value = keyword.shortCode;
-    document.getElementById('campaignId').value = keyword.campaignId || '';
-    document.getElementById('autoResponse').value = keyword.autoResponseMessage;
-    document.getElementById('doubleOptIn').checked = keyword.requireDoubleOptIn;
-    document.getElementById('trackClicks').checked = keyword.trackClicks;
-    document.getElementById('tags').value = keyword.tags || '';
-    document.getElementById('isActive').checked = keyword.isActive;
+    const fields = [
+        { id: 'keyword', value: keyword.keyword || keyword.keywordText },
+        { id: 'shortCode', value: keyword.shortCode },
+        { id: 'campaignId', value: keyword.campaignId },
+        { id: 'autoResponse', value: keyword.autoResponseMessage || keyword.responseMessage },
+        { id: 'tags', value: keyword.tags }
+    ];
+    
+    fields.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (element) element.value = field.value || '';
+    });
+    
+    const doubleOptInEl = document.getElementById('doubleOptIn');
+    if (doubleOptInEl) doubleOptInEl.checked = keyword.requireDoubleOptIn || false;
+    
+    const trackClicksEl = document.getElementById('trackClicks');
+    if (trackClicksEl) trackClicksEl.checked = keyword.trackClicks !== false;
+    
+    const isActiveEl = document.getElementById('isActive');
+    if (isActiveEl) isActiveEl.checked = keyword.isActive !== false;
     
     updateCharCount();
 }
 
 function updateStats(stats) {
-    document.getElementById('statTotal').textContent = stats.totalMessages.toLocaleString();
-    document.getElementById('statOptIns').textContent = stats.optIns.toLocaleString();
-    document.getElementById('statOptOuts').textContent = stats.optOuts.toLocaleString();
-    document.getElementById('statRate').textContent = stats.successRate;
+    if (!stats) return;
+    
+    const statElements = [
+        { id: 'statTotal', value: stats.totalMessages },
+        { id: 'statOptIns', value: stats.optIns },
+        { id: 'statOptOuts', value: stats.optOuts },
+        { id: 'statRate', value: stats.successRate }
+    ];
+    
+    statElements.forEach(({ id, value }) => {
+        const element = document.getElementById(id);
+        if (element && value !== undefined) {
+            element.textContent = typeof value === 'number' ? value.toLocaleString() : value;
+        }
+    });
 }
 
 function renderRecentActivity(activities) {
@@ -128,36 +144,60 @@ function renderRecentActivity(activities) {
 }
 
 function updateCharCount() {
-    const count = document.getElementById('autoResponse').value.length;
-    const counter = document.getElementById('charCount');
-    counter.textContent = `${count}/160 characters`;
-    counter.classList.toggle('text-danger', count > 160);
+    const autoResponseEl = document.getElementById('autoResponse');
+    const counterEl = document.getElementById('charCount');
+    
+    if (!autoResponseEl || !counterEl) return;
+    
+    const count = autoResponseEl.value.length;
+    counterEl.textContent = `${count}/160 characters`;
+    counterEl.classList.toggle('text-danger', count > 160);
 }
 
 function previewKeyword() {
-    const shortCode = document.getElementById('shortCode').value;
-    const message = document.getElementById('autoResponse').value;
+    const shortCodeEl = document.getElementById('shortCode');
+    const messageEl = document.getElementById('autoResponse');
+    
+    const shortCode = shortCodeEl ? shortCodeEl.value : '';
+    const message = messageEl ? messageEl.value : '';
     
     if (!shortCode || !message) {
         showNotification('Please fill in short code and auto-response message to preview.', 'warning');
         return;
     }
     
-    document.getElementById('previewShortCode').textContent = shortCode;
-    document.getElementById('previewMessage').textContent = message;
+    const previewShortCodeEl = document.getElementById('previewShortCode');
+    if (previewShortCodeEl) previewShortCodeEl.textContent = shortCode;
     
-    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
-    modal.show();
+    const previewMessageEl = document.getElementById('previewMessage');
+    if (previewMessageEl) previewMessageEl.textContent = message;
+    
+    const modalElement = document.getElementById('previewModal');
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
 }
 
 async function deleteKeyword() {
     if (!confirm('Are you sure you want to delete this keyword? This action cannot be undone.')) return;
     
     try {
-        showNotification('Keyword deleted successfully! (Demo)', 'success');
-        setTimeout(() => {
-            window.location.href = '/Keywords/Index';
-        }, 1000);
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.keywords.delete(keywordId)), {
+            method: 'DELETE',
+            headers: getAjaxHeaders()
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && (result.success || result.isSuccess)) {
+            showNotification('Keyword deleted successfully!', 'success');
+            setTimeout(() => {
+                window.location.href = window.AppUrls.keywords?.index || '/Keywords/Index';
+            }, 1000);
+        } else {
+            showNotification('Failed to delete keyword: ' + (result.message || 'Unknown error'), 'error');
+        }
     } catch (error) {
         showNotification('Failed to delete keyword: ' + error.message, 'error');
     }
@@ -166,17 +206,41 @@ async function deleteKeyword() {
 async function handleSubmit(e) {
     e.preventDefault();
     
-    const autoResponse = document.getElementById('autoResponse').value;
-    if (autoResponse.length > 160) {
+    const autoResponseEl = document.getElementById('autoResponse');
+    if (autoResponseEl && autoResponseEl.value.length > 160) {
         showNotification('Auto-response message exceeds 160 characters.', 'error');
         return;
     }
     
+    const data = {
+        id: keywordId,
+        keywordText: document.getElementById('keyword')?.value,
+        shortCode: document.getElementById('shortCode')?.value,
+        campaignId: document.getElementById('campaignId')?.value || null,
+        responseMessage: autoResponseEl?.value,
+        requireDoubleOptIn: document.getElementById('doubleOptIn')?.checked || false,
+        trackClicks: document.getElementById('trackClicks')?.checked || false,
+        tags: document.getElementById('tags')?.value || '',
+        isActive: document.getElementById('isActive')?.checked || false
+    };
+    
     try {
-        showNotification('Keyword updated successfully! (Demo)', 'success');
-        setTimeout(() => {
-            window.location.href = '/Keywords/Index';
-        }, 1000);
+        const response = await fetch(window.AppUrls.buildApiUrl(window.AppUrls.api.keywords.update(keywordId)), {
+            method: 'PUT',
+            headers: getAjaxHeaders(),
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && (result.success || result.isSuccess)) {
+            showNotification('Keyword updated successfully!', 'success');
+            setTimeout(() => {
+                window.location.href = window.AppUrls.keywords?.index || '/Keywords/Index';
+            }, 1000);
+        } else {
+            showNotification('Failed to update keyword: ' + (result.message || 'Unknown error'), 'error');
+        }
     } catch (error) {
         showNotification('Failed to update keyword: ' + error.message, 'error');
     }

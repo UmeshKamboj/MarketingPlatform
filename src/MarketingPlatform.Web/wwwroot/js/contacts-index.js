@@ -3,11 +3,9 @@
  * Handles contact listing with server-side pagination, filtering, and actions
  */
 
-// Global variables
 let contactsTable;
 let currentGroup = null;
 let currentStatus = null;
-const apiBaseUrl = window.contactsConfig?.apiBaseUrl || '/api';
 
 // Initialize on document ready
 $(document).ready(function() {
@@ -27,7 +25,7 @@ function initContactsTable() {
         
         // AJAX configuration
         ajax: {
-            url: apiBaseUrl + '/contacts',
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.contacts.list),
             type: 'POST',
             headers: getAjaxHeaders(),
             data: function(d) {
@@ -225,9 +223,14 @@ function initContactsTable() {
     });
     
     // Setup select all checkbox
-    $('#selectAll').on('click', function() {
-        $('.contact-checkbox').prop('checked', this.checked);
-    });
+    const selectAllEl = document.getElementById('selectAll');
+    if (selectAllEl) {
+        selectAllEl.addEventListener('click', function() {
+            document.querySelectorAll('.contact-checkbox').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+    }
 }
 
 /**
@@ -255,7 +258,7 @@ function setupFilters() {
  */
 function loadContactGroups() {
     $.ajax({
-        url: apiBaseUrl + '/contact-groups',
+        url: window.AppUrls.buildApiUrl(window.AppUrls.api.contactGroups.list),
         method: 'GET',
         headers: getAjaxHeaders(),
         success: function(response) {
@@ -282,7 +285,7 @@ function loadContactGroups() {
 function deleteContact(id) {
     confirmAction('Are you sure you want to delete this contact?', function() {
         $.ajax({
-            url: `${apiBaseUrl}/contacts/${id}`,
+            url: window.AppUrls.buildApiUrl(window.AppUrls.api.contacts.delete(id)),
             method: 'DELETE',
             headers: getAjaxHeaders(),
             success: function(response) {
@@ -310,7 +313,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = AppUrls.auth.login;
+            window.location.href = window.AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');
