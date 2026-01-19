@@ -395,25 +395,103 @@ using (var scope = app.Services.CreateScope())
 
 app.MapControllers();
 
-// Database seeding
+// Database initialization with comprehensive error handling
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         
-        await context.Database.MigrateAsync();
-        await DbInitializer.SeedAsync(context, userManager, roleManager);
+        logger.LogInformation("Starting database initialization...");
         
-        Log.Information("Database migrated and seeded successfully");
+        // Test database connection
+        logger.LogInformation("Testing database connection...");
+        var canConnect = await context.Database.CanConnectAsync();
+        if (!canConnect)
+        {
+            logger.LogError("Cannot connect to the database. Please check your connection string and ensure SQL Server is running.");
+            throw new InvalidOperationException("Database connection failed");
+        }
+        logger.LogInformation("Database connection successful.");
+        
+        // Apply pending migrations
+        logger.LogInformation("Applying database migrations...");
+        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+        var pendingMigrationsList = pendingMigrations.ToList();
+        
+        if (pendingMigrationsList.Any())
+        {
+            logger.LogInformation("Found {Count} pending migrations: {Migrations}", 
+                pendingMigrationsList.Count, 
+                string.Join(", ", pendingMigrationsList));
+            
+            await context.Database.MigrateAsync();
+            
+            logger.LogInformation("All migrations applied successfully.");
+        }
+        else
+        {
+            logger.LogInformation("No pending migrations found. Database is up to date.");
+        }
+        
+        // Verify migrations were applied
+        var appliedMigrations = await context.Database.GetAppliedMigrationsAsync();
+        logger.LogInformation("Total applied migrations: {Count}", appliedMigrations.Count());
+        
+        // Ensure all required tables exist
+        logger.LogInformation("Verifying required tables exist...");
+        var requiredTables = new[] 
+        { 
+            "AspNetUsers", "AspNetRoles", "CustomRoles", "CustomUserRoles",
+            "SubscriptionPlans", "PlatformSettings", "PageContents",
+            "MessageProviders", "ChannelRoutingConfigs", "PricingModels"
+        };
+        
+        foreach (var tableName in requiredTables)
+        {
+            try
+            {
+                // Use FormattableString to safely parameterize the query
+                var query = $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {{0}}";
+                var count = await context.Database.SqlQueryRaw<int>(
+                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {0}", tableName).FirstOrDefaultAsync();
+                
+                if (count == 0)
+                {
+                    logger.LogWarning("Required table '{TableName}' may not exist.", tableName);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning("Could not verify table '{TableName}': {Error}", tableName, ex.Message);
+            }
+        }
+        logger.LogInformation("Table verification completed.");
+        
+        // Seed initial data
+        logger.LogInformation("Starting data seeding...");
+        await DbInitializer.SeedAsync(context, userManager, roleManager, logger);
+        
+        Log.Information("Database initialization completed successfully.");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        logger.LogCritical(ex, "A critical error occurred during database initialization. Application startup may fail.");
+        
+        // Log specific error details
+        if (ex.InnerException != null)
+        {
+            logger.LogError("Inner exception: {InnerException}", ex.InnerException.Message);
+        }
+        
+        // In production, you might want to prevent the application from starting
+        // if database initialization fails. For now, we'll log and continue.
+        // throw; // Uncomment to halt application startup on database errors
     }
 }
 

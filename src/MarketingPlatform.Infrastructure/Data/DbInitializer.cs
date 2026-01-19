@@ -1,27 +1,86 @@
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace MarketingPlatform.Infrastructure.Data
 {
     public static class DbInitializer
     {
-        public static async Task SeedAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger? logger = null)
         {
-            // Seed Identity Roles
-            string[] identityRoles = { "Admin", "User", "Manager", "SuperAdmin" };
-            foreach (var role in identityRoles)
+            logger?.LogInformation("Starting database seeding process...");
+
+            try
             {
-                if (!await roleManager.RoleExistsAsync(role))
+                await SeedIdentityRolesAsync(roleManager, logger);
+                await SeedCustomRolesAsync(context, logger);
+                await SeedUsersAsync(context, userManager, roleManager, logger);
+                await SeedSubscriptionPlansAsync(context, logger);
+                await SeedMessageProvidersAsync(context, logger);
+                await SeedChannelRoutingConfigsAsync(context, logger);
+                await SeedPricingModelsAsync(context, logger);
+                await SeedLandingPageSettingsAsync(context, logger);
+                await SeedPageContentAsync(context, logger);
+
+                logger?.LogInformation("Database seeding completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "An error occurred during database seeding.");
+                throw;
+            }
+        }
+
+        private static async Task SeedIdentityRolesAsync(RoleManager<IdentityRole> roleManager, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding Identity roles...");
+
+            try
+            {
+                // Seed Identity Roles
+                string[] identityRoles = { "Admin", "User", "Manager", "SuperAdmin" };
+                foreach (var role in identityRoles)
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        var result = await roleManager.CreateAsync(new IdentityRole(role));
+                        if (result.Succeeded)
+                        {
+                            logger?.LogInformation("Identity role '{Role}' created successfully.", role);
+                        }
+                        else
+                        {
+                            logger?.LogWarning("Failed to create Identity role '{Role}': {Errors}", 
+                                role, string.Join(", ", result.Errors.Select(e => e.Description)));
+                        }
+                    }
+                    else
+                    {
+                        logger?.LogInformation("Identity role '{Role}' already exists.", role);
+                    }
                 }
             }
-
-            // Seed Custom Roles with Permissions
-            if (!context.CustomRoles.Any())
+            catch (Exception ex)
             {
-                var customRoles = new List<Role>
+                logger?.LogError(ex, "Error seeding Identity roles.");
+                throw;
+            }
+        }
+
+        private static async Task SeedCustomRolesAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding custom roles...");
+
+            try
+            {
+
+                // Seed Custom Roles with Permissions
+                if (!context.CustomRoles.Any())
+                {
+                    logger?.LogInformation("Creating custom roles...");
+
+                    var customRoles = new List<Role>
                 {
                     new Role
                     {
@@ -93,19 +152,40 @@ namespace MarketingPlatform.Infrastructure.Data
                         IsActive = true,
                         CreatedAt = DateTime.UtcNow
                     }
-                };
+                    };
 
-                context.CustomRoles.AddRange(customRoles);
-                await context.SaveChangesAsync();
+                    context.CustomRoles.AddRange(customRoles);
+                    await context.SaveChangesAsync();
+                    logger?.LogInformation("Successfully created {Count} custom roles.", customRoles.Count);
+                }
+                else
+                {
+                    logger?.LogInformation("Custom roles already exist.");
+                }
             }
-
-            // Seed Default Admin User
-            var adminEmail = "admin@marketingplatform.com";
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
-            
-            if (adminUser == null)
+            catch (Exception ex)
             {
-                adminUser = new ApplicationUser
+                logger?.LogError(ex, "Error seeding custom roles.");
+                throw;
+            }
+        }
+
+        private static async Task SeedUsersAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding users...");
+
+            try
+            {
+
+                // Seed Default Admin User
+                var adminEmail = "admin@marketingplatform.com";
+                var adminUser = await userManager.FindByEmailAsync(adminEmail);
+                
+                if (adminUser == null)
+                {
+                    logger?.LogInformation("Creating default admin user...");
+
+                    adminUser = new ApplicationUser
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
@@ -114,85 +194,126 @@ namespace MarketingPlatform.Infrastructure.Data
                     LastName = "User",
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
-                };
-
-                var result = await userManager.CreateAsync(adminUser, "Admin@123456");
-                
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
-                    
-                    // Assign SuperAdmin custom role
-                    var superAdminRole = context.CustomRoles.FirstOrDefault(r => r.Name == "SuperAdmin");
-                    if (superAdminRole != null)
-                    {
-                        var userRole = new Core.Entities.UserRole
-                        {
-                            UserId = adminUser.Id,
-                            RoleId = superAdminRole.Id,
-                            AssignedAt = DateTime.UtcNow,
-                            AssignedBy = "System"
-                        };
-                        context.CustomUserRoles.Add(userRole);
-                        await context.SaveChangesAsync();
-                    }
-                }
-            }
-
-            // Seed Additional Test Users
-            var testUsers = new List<(string email, string password, string firstName, string lastName, string role)>
-            {
-                ("manager@marketingplatform.com", "Manager@123456", "John", "Manager", "Manager"),
-                ("user@marketingplatform.com", "User@123456", "Jane", "User", "User"),
-                ("analyst@marketingplatform.com", "Analyst@123456", "Bob", "Analyst", "Analyst"),
-                ("viewer@marketingplatform.com", "Viewer@123456", "Alice", "Viewer", "Viewer")
-            };
-
-            foreach (var (email, password, firstName, lastName, role) in testUsers)
-            {
-                var existingUser = await userManager.FindByEmailAsync(email);
-                if (existingUser == null)
-                {
-                    var newUser = new ApplicationUser
-                    {
-                        UserName = email,
-                        Email = email,
-                        EmailConfirmed = true,
-                        FirstName = firstName,
-                        LastName = lastName,
-                        IsActive = true,
-                        CreatedAt = DateTime.UtcNow
                     };
 
-                    var result = await userManager.CreateAsync(newUser, password);
+                    var result = await userManager.CreateAsync(adminUser, "Admin@123456");
                     
                     if (result.Succeeded)
                     {
-                        await userManager.AddToRoleAsync(newUser, role);
+                        logger?.LogInformation("Admin user created successfully.");
                         
-                        // Assign custom role
-                        var customRole = context.CustomRoles.FirstOrDefault(r => r.Name == role);
-                        if (customRole != null)
+                        await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
+                        
+                        // Assign SuperAdmin custom role
+                        var superAdminRole = context.CustomRoles.FirstOrDefault(r => r.Name == "SuperAdmin");
+                        if (superAdminRole != null)
                         {
                             var userRole = new Core.Entities.UserRole
                             {
-                                UserId = newUser.Id,
-                                RoleId = customRole.Id,
+                                UserId = adminUser.Id,
+                                RoleId = superAdminRole.Id,
                                 AssignedAt = DateTime.UtcNow,
                                 AssignedBy = "System"
                             };
                             context.CustomUserRoles.Add(userRole);
+                            await context.SaveChangesAsync();
+                            logger?.LogInformation("Admin user assigned to SuperAdmin role.");
                         }
                     }
+                    else
+                    {
+                        logger?.LogWarning("Failed to create admin user: {Errors}", 
+                            string.Join(", ", result.Errors.Select(e => e.Description)));
+                    }
                 }
-            }
-            
-            await context.SaveChangesAsync();
+                else
+                {
+                    logger?.LogInformation("Admin user already exists.");
+                }
 
-            // Seed Subscription Plans
-            if (!context.SubscriptionPlans.Any())
+                // Seed Additional Test Users
+                var testUsers = new List<(string email, string password, string firstName, string lastName, string role)>
+                {
+                    ("manager@marketingplatform.com", "Manager@123456", "John", "Manager", "Manager"),
+                    ("user@marketingplatform.com", "User@123456", "Jane", "User", "User"),
+                    ("analyst@marketingplatform.com", "Analyst@123456", "Bob", "Analyst", "Analyst"),
+                    ("viewer@marketingplatform.com", "Viewer@123456", "Alice", "Viewer", "Viewer")
+                };
+
+                logger?.LogInformation("Creating {Count} test users...", testUsers.Count);
+
+                foreach (var (email, password, firstName, lastName, role) in testUsers)
+                {
+                    var existingUser = await userManager.FindByEmailAsync(email);
+                    if (existingUser == null)
+                    {
+                        var newUser = new ApplicationUser
+                        {
+                            UserName = email,
+                            Email = email,
+                            EmailConfirmed = true,
+                            FirstName = firstName,
+                            LastName = lastName,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        var result = await userManager.CreateAsync(newUser, password);
+                        
+                        if (result.Succeeded)
+                        {
+                            logger?.LogInformation("Test user '{Email}' created successfully.", email);
+                            
+                            await userManager.AddToRoleAsync(newUser, role);
+                            
+                            // Assign custom role
+                            var customRole = context.CustomRoles.FirstOrDefault(r => r.Name == role);
+                            if (customRole != null)
+                            {
+                                var userRole = new Core.Entities.UserRole
+                                {
+                                    UserId = newUser.Id,
+                                    RoleId = customRole.Id,
+                                    AssignedAt = DateTime.UtcNow,
+                                    AssignedBy = "System"
+                                };
+                                context.CustomUserRoles.Add(userRole);
+                            }
+                        }
+                        else
+                        {
+                            logger?.LogWarning("Failed to create test user '{Email}': {Errors}", 
+                                email, string.Join(", ", result.Errors.Select(e => e.Description)));
+                        }
+                    }
+                    else
+                    {
+                        logger?.LogInformation("Test user '{Email}' already exists.", email);
+                    }
+                }
+                
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
             {
-                var plans = new List<SubscriptionPlan>
+                logger?.LogError(ex, "Error seeding users.");
+                throw;
+            }
+        }
+
+        private static async Task SeedSubscriptionPlansAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding subscription plans...");
+
+            try
+            {
+
+                // Seed Subscription Plans
+                if (!context.SubscriptionPlans.Any())
+                {
+                    logger?.LogInformation("Creating subscription plans...");
+
+                    var plans = new List<SubscriptionPlan>
                 {
                     new SubscriptionPlan
                     {
@@ -242,16 +363,37 @@ namespace MarketingPlatform.Infrastructure.Data
                         ShowOnLanding = true, // Display on landing page
                         CreatedAt = DateTime.UtcNow
                     }
-                };
+                    };
 
-                context.SubscriptionPlans.AddRange(plans);
-                await context.SaveChangesAsync();
+                    context.SubscriptionPlans.AddRange(plans);
+                    await context.SaveChangesAsync();
+                    logger?.LogInformation("Successfully created {Count} subscription plans.", plans.Count);
+                }
+                else
+                {
+                    logger?.LogInformation("Subscription plans already exist.");
+                }
             }
-
-            // Seed Message Providers
-            if (!context.MessageProviders.Any())
+            catch (Exception ex)
             {
-                var providers = new List<MessageProvider>
+                logger?.LogError(ex, "Error seeding subscription plans.");
+                throw;
+            }
+        }
+
+        private static async Task SeedMessageProvidersAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding message providers...");
+
+            try
+            {
+
+                // Seed Message Providers
+                if (!context.MessageProviders.Any())
+                {
+                    logger?.LogInformation("Creating message providers...");
+
+                    var providers = new List<MessageProvider>
                 {
                     new MessageProvider
                     {
@@ -271,16 +413,37 @@ namespace MarketingPlatform.Infrastructure.Data
                         HealthStatus = HealthStatus.Unknown,
                         CreatedAt = DateTime.UtcNow
                     }
-                };
+                    };
 
-                context.MessageProviders.AddRange(providers);
-                await context.SaveChangesAsync();
+                    context.MessageProviders.AddRange(providers);
+                    await context.SaveChangesAsync();
+                    logger?.LogInformation("Successfully created {Count} message providers.", providers.Count);
+                }
+                else
+                {
+                    logger?.LogInformation("Message providers already exist.");
+                }
             }
-
-            // Seed Channel Routing Configurations
-            if (!context.ChannelRoutingConfigs.Any())
+            catch (Exception ex)
             {
-                var routingConfigs = new List<ChannelRoutingConfig>
+                logger?.LogError(ex, "Error seeding message providers.");
+                throw;
+            }
+        }
+
+        private static async Task SeedChannelRoutingConfigsAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding channel routing configurations...");
+
+            try
+            {
+
+                // Seed Channel Routing Configurations
+                if (!context.ChannelRoutingConfigs.Any())
+                {
+                    logger?.LogInformation("Creating channel routing configurations...");
+
+                    var routingConfigs = new List<ChannelRoutingConfig>
                 {
                     new ChannelRoutingConfig
                     {
@@ -327,16 +490,37 @@ namespace MarketingPlatform.Infrastructure.Data
                         Priority = 1,
                         CreatedAt = DateTime.UtcNow
                     }
-                };
+                    };
 
-                context.ChannelRoutingConfigs.AddRange(routingConfigs);
-                await context.SaveChangesAsync();
+                    context.ChannelRoutingConfigs.AddRange(routingConfigs);
+                    await context.SaveChangesAsync();
+                    logger?.LogInformation("Successfully created {Count} channel routing configurations.", routingConfigs.Count);
+                }
+                else
+                {
+                    logger?.LogInformation("Channel routing configurations already exist.");
+                }
             }
-
-            // Seed Pricing Models for Landing Page
-            if (!context.PricingModels.Any())
+            catch (Exception ex)
             {
-                var pricingModels = new List<PricingModel>
+                logger?.LogError(ex, "Error seeding channel routing configurations.");
+                throw;
+            }
+        }
+
+        private static async Task SeedPricingModelsAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding pricing models...");
+
+            try
+            {
+
+                // Seed Pricing Models for Landing Page
+                if (!context.PricingModels.Any())
+                {
+                    logger?.LogInformation("Creating pricing models...");
+
+                    var pricingModels = new List<PricingModel>
                 {
                     new PricingModel
                     {
@@ -377,16 +561,37 @@ namespace MarketingPlatform.Infrastructure.Data
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     }
-                };
+                    };
 
-                context.PricingModels.AddRange(pricingModels);
-                await context.SaveChangesAsync();
+                    context.PricingModels.AddRange(pricingModels);
+                    await context.SaveChangesAsync();
+                    logger?.LogInformation("Successfully created {Count} pricing models.", pricingModels.Count);
+                }
+                else
+                {
+                    logger?.LogInformation("Pricing models already exist.");
+                }
             }
-
-            // Seed Landing Page Configuration Settings
-            if (!context.PlatformSettings.Any(s => s.Category == "LandingPage"))
+            catch (Exception ex)
             {
-                var landingPageSettings = new List<PlatformSetting>
+                logger?.LogError(ex, "Error seeding pricing models.");
+                throw;
+            }
+        }
+
+        private static async Task SeedLandingPageSettingsAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding landing page settings...");
+
+            try
+            {
+
+                // Seed Landing Page Configuration Settings
+                if (!context.PlatformSettings.Any(s => s.Category == "LandingPage"))
+                {
+                    logger?.LogInformation("Creating landing page settings...");
+
+                    var landingPageSettings = new List<PlatformSetting>
                 {
                     // Hero Section Settings
                     new PlatformSetting
@@ -883,10 +1088,179 @@ namespace MarketingPlatform.Infrastructure.Data
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     }
-                };
+                    };
 
-                context.PlatformSettings.AddRange(landingPageSettings);
+                    context.PlatformSettings.AddRange(landingPageSettings);
+                    await context.SaveChangesAsync();
+                    logger?.LogInformation("Successfully created {Count} landing page settings.", landingPageSettings.Count);
+                }
+                else
+                {
+                    logger?.LogInformation("Landing page settings already exist.");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Error seeding landing page settings.");
+                throw;
+            }
+        }
+
+        private static async Task SeedPageContentAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding page content (Privacy Policy and Terms of Service)...");
+
+            try
+            {
+                // Seed Privacy Policy if it doesn't exist
+                var existingPrivacy = context.PageContents.FirstOrDefault(p => p.PageKey == "privacy-policy");
+                if (existingPrivacy == null)
+                {
+                    logger?.LogInformation("Creating Privacy Policy page content...");
+
+                    var privacy = new PageContent
+                    {
+                        PageKey = "privacy-policy",
+                        Title = "Privacy Policy",
+                        MetaDescription = "Learn how we collect, use, and protect your personal information.",
+                        Content = @"
+<h2>1. Information We Collect</h2>
+<p>We collect information that you provide directly to us, including:</p>
+<ul>
+    <li>Name and contact information (email address, phone number)</li>
+    <li>Account credentials</li>
+    <li>Payment information</li>
+    <li>Communication preferences</li>
+    <li>Campaign and marketing data</li>
+</ul>
+
+<h2>2. How We Use Your Information</h2>
+<p>We use the information we collect to:</p>
+<ul>
+    <li>Provide, maintain, and improve our services</li>
+    <li>Process transactions and send related information</li>
+    <li>Send technical notices, updates, security alerts, and support messages</li>
+    <li>Respond to your comments, questions, and customer service requests</li>
+    <li>Monitor and analyze trends, usage, and activities</li>
+</ul>
+
+<h2>3. Data Security</h2>
+<p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized or unlawful processing, accidental loss, destruction, or damage. This includes encryption of sensitive data, regular security assessments, and access controls.</p>
+
+<h2>4. Data Retention</h2>
+<p>We retain your personal data for as long as necessary to provide our services, comply with legal obligations, resolve disputes, and enforce our agreements.</p>
+
+<h2>5. Your Rights</h2>
+<p>You have the right to:</p>
+<ul>
+    <li>Access your personal data</li>
+    <li>Correct inaccurate data</li>
+    <li>Request deletion of your data</li>
+    <li>Object to processing of your data</li>
+    <li>Request data portability</li>
+    <li>Withdraw consent at any time</li>
+</ul>
+
+<h2>6. Contact Us</h2>
+<p>If you have any questions about this Privacy Policy or our data practices, please contact us at privacy@marketingplatform.com</p>
+
+<p><em>Last updated: January 2024</em></p>
+",
+                        IsPublished = true,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    context.PageContents.Add(privacy);
+                    logger?.LogInformation("Privacy Policy page content created.");
+                }
+                else
+                {
+                    logger?.LogInformation("Privacy Policy already exists.");
+                }
+
+                // Seed Terms of Service if it doesn't exist
+                var existingTerms = context.PageContents.FirstOrDefault(p => p.PageKey == "terms-of-service");
+                if (existingTerms == null)
+                {
+                    logger?.LogInformation("Creating Terms of Service page content...");
+
+                    var terms = new PageContent
+                    {
+                        PageKey = "terms-of-service",
+                        Title = "Terms of Service",
+                        MetaDescription = "Read our terms of service and user agreement.",
+                        Content = @"
+<h2>1. Acceptance of Terms</h2>
+<p>By accessing and using Marketing Platform (""the Service""), you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these terms, please do not use the Service.</p>
+
+<h2>2. Use License</h2>
+<p>Permission is granted to access and use the Service for legitimate business purposes. This license shall automatically terminate if you violate any of these restrictions.</p>
+
+<h2>3. Account Terms</h2>
+<p>When you create an account with us, you must provide accurate and complete information. You are responsible for:</p>
+<ul>
+    <li>Maintaining the security of your account and password</li>
+    <li>All activities that occur under your account</li>
+    <li>Immediately notifying us of any unauthorized use</li>
+    <li>Ensuring your use complies with all applicable laws</li>
+</ul>
+
+<h2>4. Service Availability</h2>
+<p>We strive to provide a reliable service, but we do not guarantee that:</p>
+<ul>
+    <li>The Service will be uninterrupted, timely, secure, or error-free</li>
+    <li>Any errors or defects will be corrected</li>
+    <li>The Service is free of viruses or other harmful components</li>
+</ul>
+
+<h2>5. Prohibited Uses</h2>
+<p>You may not use our Service:</p>
+<ul>
+    <li>For any unlawful purpose or to violate any laws</li>
+    <li>To send spam, unsolicited messages, or illegal content</li>
+    <li>To transmit malware or other harmful code</li>
+    <li>To interfere with or disrupt the Service or servers</li>
+    <li>To impersonate any person or entity</li>
+</ul>
+
+<h2>6. Intellectual Property</h2>
+<p>The Service and its original content, features, and functionality are owned by Marketing Platform and are protected by international copyright, trademark, and other intellectual property laws.</p>
+
+<h2>7. Termination</h2>
+<p>We may terminate or suspend your account and access to the Service immediately, without prior notice or liability, for any reason, including if you breach these Terms.</p>
+
+<h2>8. Limitation of Liability</h2>
+<p>In no event shall Marketing Platform be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service.</p>
+
+<h2>9. Changes to Terms</h2>
+<p>We reserve the right to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect.</p>
+
+<h2>10. Contact Information</h2>
+<p>If you have any questions about these Terms, please contact us at legal@marketingplatform.com</p>
+
+<p><em>Last updated: January 2024</em></p>
+",
+                        IsPublished = true,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    context.PageContents.Add(terms);
+                    logger?.LogInformation("Terms of Service page content created.");
+                }
+                else
+                {
+                    logger?.LogInformation("Terms of Service already exists.");
+                }
+
                 await context.SaveChangesAsync();
+                logger?.LogInformation("Page content seeding completed.");
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Error seeding page content.");
+                throw;
             }
         }
     }

@@ -1,6 +1,7 @@
 using MarketingPlatform.Infrastructure.Data;
 using MarketingPlatform.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace MarketingPlatform.Web
 {
@@ -10,21 +11,23 @@ namespace MarketingPlatform.Web
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var logger = scope.ServiceProvider.GetService<ILogger<Program>>();
 
-            // Ensure database is created
-            await context.Database.EnsureCreatedAsync();
-
-            // Check if page content already exists
-            var existingPrivacy = await context.PageContents
-                .FirstOrDefaultAsync(p => p.PageKey == "privacy-policy");
-            
-            var existingTerms = await context.PageContents
-                .FirstOrDefaultAsync(p => p.PageKey == "terms-of-service");
-
-            // Seed Privacy Policy if it doesn't exist
-            if (existingPrivacy == null)
+            try
             {
-                var privacy = new PageContent
+                // Check if page content already exists
+                var existingPrivacy = await context.PageContents
+                    .FirstOrDefaultAsync(p => p.PageKey == "privacy-policy");
+                
+                var existingTerms = await context.PageContents
+                    .FirstOrDefaultAsync(p => p.PageKey == "terms-of-service");
+
+                // Seed Privacy Policy if it doesn't exist
+                if (existingPrivacy == null)
+                {
+                    logger?.LogInformation("Creating Privacy Policy page content...");
+
+                    var privacy = new PageContent
                 {
                     PageKey = "privacy-policy",
                     Title = "Privacy Policy",
@@ -75,15 +78,22 @@ namespace MarketingPlatform.Web
                     IsPublished = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
-                };
+                    };
 
-                context.PageContents.Add(privacy);
-            }
+                    context.PageContents.Add(privacy);
+                    logger?.LogInformation("Privacy Policy page content created.");
+                }
+                else
+                {
+                    logger?.LogInformation("Privacy Policy already exists.");
+                }
 
-            // Seed Terms of Service if it doesn't exist
-            if (existingTerms == null)
-            {
-                var terms = new PageContent
+                // Seed Terms of Service if it doesn't exist
+                if (existingTerms == null)
+                {
+                    logger?.LogInformation("Creating Terms of Service page content...");
+
+                    var terms = new PageContent
                 {
                     PageKey = "terms-of-service",
                     Title = "Terms of Service",
@@ -142,13 +152,25 @@ namespace MarketingPlatform.Web
                     IsPublished = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
-                };
+                    };
 
-                context.PageContents.Add(terms);
+                    context.PageContents.Add(terms);
+                    logger?.LogInformation("Terms of Service page content created.");
+                }
+                else
+                {
+                    logger?.LogInformation("Terms of Service already exists.");
+                }
+
+                // Save changes
+                await context.SaveChangesAsync();
+                logger?.LogInformation("Page content seeding completed successfully.");
             }
-
-            // Save changes
-            await context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Error occurred while seeding page content.");
+                throw;
+            }
         }
     }
 }

@@ -86,17 +86,63 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Seed initial page content
+// Database initialization
 using (var scope = app.Services.CreateScope())
 {
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
     try
     {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        
+        logger.LogInformation("Starting database initialization for Web application...");
+        
+        // Test database connection
+        logger.LogInformation("Testing database connection...");
+        var canConnect = await context.Database.CanConnectAsync();
+        if (!canConnect)
+        {
+            logger.LogError("Cannot connect to the database. Please check your connection string and ensure SQL Server is running.");
+            throw new InvalidOperationException("Database connection failed");
+        }
+        logger.LogInformation("Database connection successful.");
+        
+        // Apply pending migrations
+        logger.LogInformation("Checking for pending migrations...");
+        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+        var pendingMigrationsList = pendingMigrations.ToList();
+        
+        if (pendingMigrationsList.Any())
+        {
+            logger.LogInformation("Found {Count} pending migrations. Applying...", pendingMigrationsList.Count);
+            await context.Database.MigrateAsync();
+            logger.LogInformation("Migrations applied successfully.");
+        }
+        else
+        {
+            logger.LogInformation("No pending migrations. Database is up to date.");
+        }
+        
+        // Seed page content (Privacy Policy and Terms of Service)
+        logger.LogInformation("Seeding page content...");
         await DatabaseSeeder.SeedPageContentAsync(scope.ServiceProvider);
+        logger.LogInformation("Page content seeding completed.");
+        
+        logger.LogInformation("Database initialization for Web application completed successfully.");
     }
     catch (Exception ex)
     {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding page content.");
+        logger.LogError(ex, "An error occurred during database initialization.");
+        
+        // Log specific error details
+        if (ex.InnerException != null)
+        {
+            logger.LogError("Inner exception: {InnerException}", ex.InnerException.Message);
+        }
+        
+        // Continue running even if seeding fails (tables should exist from API)
+        // throw; // Uncomment to halt application on database errors
     }
 }
 
