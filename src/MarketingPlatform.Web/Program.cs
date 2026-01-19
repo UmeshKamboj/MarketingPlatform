@@ -8,6 +8,7 @@ using MarketingPlatform.Application.Services;
 using MarketingPlatform.Core.Interfaces.Repositories;
 using MarketingPlatform.Infrastructure.Repositories;
 using MarketingPlatform.Web;
+using MarketingPlatform.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+// Content Security Policy Middleware with nonce-based inline script/style support
+// This middleware generates a unique nonce per request and sets CSP headers
+// Development: Permissive CSP to allow hot reload, browser-link, WebSockets
+// Production: Strict nonce-based CSP for security
+app.UseMiddleware<CspMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

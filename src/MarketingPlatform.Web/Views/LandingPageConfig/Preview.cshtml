@@ -31,7 +31,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function toggleDevice(device) {
             const frame = document.getElementById('previewFrame');
             const sizes = {

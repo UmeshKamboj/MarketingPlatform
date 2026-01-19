@@ -96,7 +96,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         const apiBaseUrl = '@ViewBag.ApiBaseUrl';
         const token = localStorage.getItem('token');
 

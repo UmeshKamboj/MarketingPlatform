@@ -56,7 +56,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function activateWorkflow() {
             alert('Workflow activated! (Demo)');
         }

@@ -89,7 +89,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function createRole() {
             window.location.href = '/Roles/Create';
         }

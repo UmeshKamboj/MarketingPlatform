@@ -190,7 +190,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         const apiBaseUrl = '@ViewBag.ApiBaseUrl';
         const keywordId = window.location.pathname.split('/').pop();
         

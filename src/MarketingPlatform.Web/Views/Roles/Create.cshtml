@@ -109,7 +109,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         document.getElementById('roleForm').addEventListener('submit', function(e) {
             e.preventDefault();
             alert('Role created successfully! (Demo)');

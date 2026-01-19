@@ -85,7 +85,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.GetCspNonce()">
         function deleteRole() {
             if (confirm('Are you sure you want to delete this role?')) {
                 alert('Role deleted! (Demo)');
