@@ -475,7 +475,7 @@
 
     function sendMessage(id) {
         if (confirm('Send this message now?')) {
-            fetch(AppUrls.messages?.send ? AppUrls.messages.send : `/Messages/Send/${id}`, {
+            fetch(AppUrls.messages?.send ? AppUrls.messages.send(id) : `/Messages/Send/${id}`, {
                 method: 'POST'
             })
             .then(response => response.json())

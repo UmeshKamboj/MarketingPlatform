@@ -140,7 +140,7 @@ function setupTypeFilter() {
     });
 }
 
-function viewEntries(id) { window.location.href = AppUrls.suppression.entries(id); }
+function viewEntries(id) { window.location.href = AppUrls.suppression?.entries ? AppUrls.suppression.entries(id) : `/Suppression/Entries/${id}`; }
 function editList(id) { window.location.href = AppUrls.suppression?.edit ? AppUrls.suppression.edit(id) : `/Suppression/Edit/${id}`; }
 
 function exportList(id) {
