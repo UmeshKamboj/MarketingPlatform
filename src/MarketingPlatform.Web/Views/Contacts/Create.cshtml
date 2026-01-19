@@ -102,12 +102,10 @@
 
 @section Scripts {
     <script nonce="@Context.GetCspNonce()">
-        const apiBaseUrl = '@ViewBag.ApiBaseUrl';
-        
-        document.getElementById('contactForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            alert('Contact created successfully! (Demo)');
-            window.location.href = '/Contacts/Index';
-        });
+        window.contactsConfig = {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl',
+            contactId: null
+        };
     </script>
+    <script src="~/js/contacts-create.js" asp-append-version="true"></script>
 }
