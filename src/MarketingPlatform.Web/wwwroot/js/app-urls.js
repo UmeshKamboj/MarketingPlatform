@@ -612,7 +612,7 @@ const AppUrls = {
             syncCampaign: (campaignId) => `/api/integration/crm/sync-campaign/${campaignId}`
         },
         
-        // ========== 15. CHAT ==========
+        // ========== 15. CHAT API ==========
         
         chat: {
             rooms: '/api/chat/rooms',
@@ -626,8 +626,7 @@ const AppUrls = {
             sendMessage: '/api/chat/messages',
             sendTranscript: (id) => `/api/chat/rooms/${id}/send-transcript`,
             unreadCount: (employeeId) => `/api/chat/unread-count/${employeeId}`,
-            markRead: (id) => `/api/chat/rooms/${id}/mark-read`,
-            hubUrl: '/hubs/chat'
+            markRead: (id) => `/api/chat/rooms/${id}/mark-read`
         },
         
         // ========== 16. PLATFORM SETTINGS & ADMIN ==========
@@ -704,6 +703,12 @@ const AppUrls = {
         health: {
             check: '/api/health'
         }
+    },
+    
+    // ==================== SIGNALR HUBS ====================
+    
+    hubs: {
+        chat: '/hubs/chat'
     }
 };
 
@@ -735,6 +740,29 @@ AppUrls.buildApiUrl = function(apiPath) {
     
     // Handle function results (like AppUrls.api.campaigns.get(5))
     const path = typeof apiPath === 'function' ? apiPath() : apiPath;
+    
+    // Remove leading slash from path if present
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    
+    // If baseUrl is empty, just return the path with leading slash
+    if (!baseUrl) {
+        return '/' + cleanPath;
+    }
+    
+    // Remove trailing slash from baseUrl if present
+    const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
+    
+    // Combine base URL and path
+    return cleanBaseUrl + '/' + cleanPath;
+};
+
+// Helper function to build full Hub URL
+// SignalR hubs should NOT use buildApiUrl as they have different routing
+AppUrls.buildHubUrl = function(hubPath) {
+    const baseUrl = AppUrls.getApiBaseUrl();
+    
+    // Handle function results
+    const path = typeof hubPath === 'function' ? hubPath() : hubPath;
     
     // Remove leading slash from path if present
     const cleanPath = path.startsWith('/') ? path.substring(1) : path;

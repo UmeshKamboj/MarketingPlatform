@@ -183,9 +183,8 @@ function initializeOtpForm() {
             verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
         }
         try {
-            // Build full API URL using AppUrls helper
             const verifyUrl = window.AppUrls ? 
-                window.AppUrls.buildApiUrl('/api/auth/verify-email') : 
+                window.AppUrls.buildApiUrl(window.AppUrls.api.auth.verifyEmail) : 
                 '/api/auth/verify-email';
             
             const response = await fetch(verifyUrl, {
@@ -230,9 +229,8 @@ function initializeResendOtp() {
         btn.disabled = true;
         btn.textContent = 'Sending...';
         try {
-            // Build full API URL using AppUrls helper
             const resendUrl = window.AppUrls ? 
-                window.AppUrls.buildApiUrl('/api/auth/resend-otp') : 
+                window.AppUrls.buildApiUrl(window.AppUrls.api.auth.resendOtp) : 
                 '/api/auth/resend-otp';
             
             const response = await fetch(resendUrl, {

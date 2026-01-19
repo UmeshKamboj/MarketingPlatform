@@ -227,8 +227,18 @@ function refreshAnalytics() {
  * Export analytics data
  */
 function exportAnalytics(format) {
+    // Select the appropriate export endpoint based on format
+    let exportEndpoint;
+    if (format === 'csv') {
+        exportEndpoint = window.AppUrls.api.analytics.export.campaignPerformanceCsv;
+    } else if (format === 'excel') {
+        exportEndpoint = window.AppUrls.api.analytics.export.campaignPerformanceExcel;
+    } else {
+        exportEndpoint = window.AppUrls.api.analytics.export.campaignPerformanceCsv; // default
+    }
+    
     $.ajax({
-        url: window.AppUrls.buildUrl(window.AppUrls.buildApiUrl(window.AppUrls.api.analytics.export.campaignPerformanceCsv), { format: format }),
+        url: window.AppUrls.buildApiUrl(exportEndpoint),
         method: 'GET',
         headers: getAjaxHeaders(),
         success: function(response) {

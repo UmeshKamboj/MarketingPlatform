@@ -174,8 +174,8 @@
         }
 
         try {
-            // Build SignalR hub URL using AppUrls
-            const hubUrl = window.AppUrls ? window.AppUrls.buildApiUrl(window.AppUrls.api.chat.hubUrl) : '/hubs/chat';
+            // Build SignalR hub URL using dedicated hub helper
+            const hubUrl = window.AppUrls ? window.AppUrls.buildHubUrl(window.AppUrls.hubs.chat) : '/hubs/chat';
             
             chatState.connection = new signalR.HubConnectionBuilder()
                 .withUrl(hubUrl)
