@@ -82,6 +82,7 @@ namespace MarketingPlatform.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             // Apply all entity configurations from assembly
+            // This includes KeywordConfiguration which defines the Keyword -> Campaign foreign key relationship
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
             // Global query filters for soft delete

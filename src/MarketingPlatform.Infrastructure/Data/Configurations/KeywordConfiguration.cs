@@ -37,7 +37,7 @@ namespace MarketingPlatform.Infrastructure.Data.Configurations
             builder.HasOne(k => k.LinkedCampaign)
                 .WithMany()
                 .HasForeignKey(k => k.LinkedCampaignId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(k => k.OptInGroup)
                 .WithMany(cg => cg.Keywords)
