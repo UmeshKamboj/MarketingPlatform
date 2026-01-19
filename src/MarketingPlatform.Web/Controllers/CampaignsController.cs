@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
 
+[Authorize]
 public class CampaignsController : Controller
 {
     private readonly ILogger<CampaignsController> _logger;

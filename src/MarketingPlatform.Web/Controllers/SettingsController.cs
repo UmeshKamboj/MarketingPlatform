@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for platform settings and configuration
 /// </summary>
+[Authorize]
 public class SettingsController : Controller
 {
     private readonly ILogger<SettingsController> _logger;

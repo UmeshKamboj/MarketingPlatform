@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for managing message templates
 /// </summary>
+[Authorize]
 public class TemplatesController : Controller
 {
     private readonly ILogger<TemplatesController> _logger;

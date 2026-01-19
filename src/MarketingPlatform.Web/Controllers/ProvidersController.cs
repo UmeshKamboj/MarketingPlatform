@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for provider management (Super Admin)
 /// </summary>
+[Authorize]
 public class ProvidersController : Controller
 {
     private readonly ILogger<ProvidersController> _logger;

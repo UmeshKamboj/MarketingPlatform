@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for managing pricing plans and models
 /// </summary>
+[Authorize]
 public class PricingController : Controller
 {
     private readonly ILogger<PricingController> _logger;
