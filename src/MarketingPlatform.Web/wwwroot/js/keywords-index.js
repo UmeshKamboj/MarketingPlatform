@@ -245,14 +245,14 @@ function setupFilters() {
  * View keyword details
  */
 function viewKeyword(id) {
-    window.location.href = `/Keywords/Details/${id}`;
+    window.location.href = AppUrls.keywords?.details ? AppUrls.keywords.details(id) : `/Keywords/Details/${id}`;
 }
 
 /**
  * Edit keyword
  */
 function editKeyword(id) {
-    window.location.href = `/Keywords/Edit/${id}`;
+    window.location.href = AppUrls.keywords?.edit ? AppUrls.keywords.edit(id) : `/Keywords/Edit/${id}`;
 }
 
 /**
@@ -286,7 +286,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = '/Auth/Login';
+            window.location.href = AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');

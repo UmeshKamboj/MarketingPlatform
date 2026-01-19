@@ -200,11 +200,11 @@ function initWebhooksTable() {
 
 // Action functions
 function viewLogs(id) {
-    window.location.href = `/Webhooks/Logs/${id}`;
+    window.location.href = AppUrls.webhooks?.logs ? AppUrls.webhooks.logs(id) : `/Webhooks/Logs/${id}`;
 }
 
 function editWebhook(id) {
-    window.location.href = `/Webhooks/Edit/${id}`;
+    window.location.href = AppUrls.webhooks?.edit ? AppUrls.webhooks.edit(id) : `/Webhooks/Edit/${id}`;
 }
 
 function testWebhook(id) {

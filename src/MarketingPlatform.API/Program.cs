@@ -235,6 +235,18 @@ builder.Services.AddHangfireServer(options =>
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// CORS Configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWebApp", policy =>
+    {
+        policy.WithOrigins(builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() ?? new[] { "https://localhost:7061" })
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -347,6 +359,9 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
     Authorization = new[] { new HangfireDashboardAuthorizationFilter() },
     StatsPollingInterval = 30000 // Poll every 30 seconds instead of default to reduce DB load
 });
+
+// Enable CORS
+app.UseCors("AllowWebApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

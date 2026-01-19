@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for analytics and reporting
 /// </summary>
+[Authorize]
 public class AnalyticsController : Controller
 {
     private readonly ILogger<AnalyticsController> _logger;

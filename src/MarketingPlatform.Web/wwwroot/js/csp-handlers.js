@@ -328,7 +328,7 @@
 
     function startCampaign(id) {
         if (confirm('Are you sure you want to start this campaign?')) {
-            fetch(`/Campaigns/Start/${id}`, {
+            fetch(AppUrls.campaigns?.start ? AppUrls.campaigns.start(id) : `/Campaigns/Start/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -352,7 +352,7 @@
 
     function pauseCampaign(id) {
         if (confirm('Are you sure you want to pause this campaign?')) {
-            fetch(`/Campaigns/Pause/${id}`, {
+            fetch(AppUrls.campaigns?.pause ? AppUrls.campaigns.pause(id) : `/Campaigns/Pause/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -376,22 +376,22 @@
 
     function deleteCampaign(id) {
         if (confirm('Are you sure you want to delete this campaign? This action cannot be undone.')) {
-            window.location.href = `/Campaigns/Delete/${id}`;
+            window.location.href = AppUrls.campaigns?.delete ? AppUrls.campaigns.delete(id) : `/Campaigns/Delete/${id}`;
         }
     }
 
     function viewCampaignStats(id) {
-        window.location.href = `/Analytics/Campaigns?campaignId=${id}`;
+        window.location.href = AppUrls.analytics?.campaigns ? `${AppUrls.analytics.campaigns}?campaignId=${id}` : `/Analytics/Campaigns?campaignId=${id}`;
     }
 
     function deleteContact(id) {
         if (confirm('Are you sure you want to delete this contact?')) {
-            window.location.href = `/Contacts/Delete/${id}`;
+            window.location.href = AppUrls.contacts?.delete ? AppUrls.contacts.delete(id) : `/Contacts/Delete/${id}`;
         }
     }
 
     function addToGroup(contactId, groupId) {
-        fetch(`/Contacts/AddToGroup`, {
+        fetch(AppUrls.contacts?.addToGroup || `/Contacts/AddToGroup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -411,7 +411,7 @@
 
     function removeFromGroup(contactId, groupId) {
         if (confirm('Remove this contact from the group?')) {
-            fetch(`/Contacts/RemoveFromGroup`, {
+            fetch(AppUrls.contacts?.removeFromGroup || `/Contacts/RemoveFromGroup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -431,12 +431,12 @@
     }
 
     function viewContactDetails(id) {
-        window.location.href = `/Contacts/Details/${id}`;
+        window.location.href = AppUrls.contacts?.details ? AppUrls.contacts.details(id) : `/Contacts/Details/${id}`;
     }
 
     function loadTemplate(id) {
         if (id) {
-            fetch(`/Templates/Get/${id}`)
+            fetch(AppUrls.templates?.get ? AppUrls.templates.get(id) : `/Templates/Get/${id}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -469,13 +469,13 @@
 
     function deleteTemplate(id) {
         if (confirm('Are you sure you want to delete this template?')) {
-            window.location.href = `/Templates/Delete/${id}`;
+            window.location.href = AppUrls.templates?.delete ? AppUrls.templates.delete(id) : `/Templates/Delete/${id}`;
         }
     }
 
     function sendMessage(id) {
         if (confirm('Send this message now?')) {
-            fetch(`/Messages/Send/${id}`, {
+            fetch(AppUrls.messages?.send ? AppUrls.messages.send(id) : `/Messages/Send/${id}`, {
                 method: 'POST'
             })
             .then(response => response.json())
@@ -525,27 +525,27 @@
     }
 
     function viewMessageDetails(id) {
-        window.location.href = `/Messages/Details/${id}`;
+        window.location.href = AppUrls.messages?.details ? AppUrls.messages.details(id) : `/Messages/Details/${id}`;
     }
 
     function deleteUser(id) {
         if (confirm('Are you sure you want to delete this user?')) {
-            window.location.href = `/Users/Delete/${id}`;
+            window.location.href = AppUrls.users?.delete ? AppUrls.users.delete(id) : `/Users/Delete/${id}`;
         }
     }
 
     function editUser(id) {
-        window.location.href = `/Users/Edit/${id}`;
+        window.location.href = AppUrls.users?.edit ? AppUrls.users.edit(id) : `/Users/Edit/${id}`;
     }
 
     function deleteRole(id) {
         if (confirm('Are you sure you want to delete this role?')) {
-            window.location.href = `/Roles/Delete/${id}`;
+            window.location.href = AppUrls.roles?.delete ? AppUrls.roles.delete(id) : `/Roles/Delete/${id}`;
         }
     }
 
     function editRole(id) {
-        window.location.href = `/Roles/Edit/${id}`;
+        window.location.href = AppUrls.roles?.edit ? AppUrls.roles.edit(id) : `/Roles/Edit/${id}`;
     }
 
     function togglePermission(roleId, permission) {
@@ -558,7 +558,7 @@
             return;
         }
         
-        fetch(`/Roles/TogglePermission`, {
+        fetch(AppUrls.roles?.togglePermission || `/Roles/TogglePermission`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -580,26 +580,26 @@
 
     function deleteKeyword(id) {
         if (confirm('Are you sure you want to delete this keyword?')) {
-            window.location.href = `/Keywords/Delete/${id}`;
+            window.location.href = AppUrls.keywords?.delete ? AppUrls.keywords.delete(id) : `/Keywords/Delete/${id}`;
         }
     }
 
     function editKeyword(id) {
-        window.location.href = `/Keywords/Edit/${id}`;
+        window.location.href = AppUrls.keywords?.edit ? AppUrls.keywords.edit(id) : `/Keywords/Edit/${id}`;
     }
 
     function viewKeywordAnalytics(id) {
-        window.location.href = `/Keywords/Analytics/${id}`;
+        window.location.href = AppUrls.keywords?.analytics ? AppUrls.keywords.analytics(id) : `/Keywords/Analytics/${id}`;
     }
 
     function deleteWebhook(id) {
         if (confirm('Are you sure you want to delete this webhook?')) {
-            window.location.href = `/Webhooks/Delete/${id}`;
+            window.location.href = AppUrls.webhooks?.delete ? AppUrls.webhooks.delete(id) : `/Webhooks/Delete/${id}`;
         }
     }
 
     function testWebhook(id) {
-        fetch(`/Webhooks/Test/${id}`, {
+        fetch(AppUrls.webhooks?.test ? AppUrls.webhooks.test(id) : `/Webhooks/Test/${id}`, {
             method: 'POST'
         })
         .then(response => response.json())
@@ -609,18 +609,18 @@
     }
 
     function viewWebhookLogs(id) {
-        window.location.href = `/Webhooks/Logs/${id}`;
+        window.location.href = AppUrls.webhooks?.logs ? AppUrls.webhooks.logs(id) : `/Webhooks/Logs/${id}`;
     }
 
     function deleteWorkflow(id) {
         if (confirm('Are you sure you want to delete this workflow?')) {
-            window.location.href = `/Workflows/Delete/${id}`;
+            window.location.href = AppUrls.workflows?.delete ? AppUrls.workflows.delete(id) : `/Workflows/Delete/${id}`;
         }
     }
 
     function executeWorkflow(id) {
         if (confirm('Execute this workflow now?')) {
-            fetch(`/Workflows/Execute/${id}`, {
+            fetch(AppUrls.workflows?.execute ? AppUrls.workflows.execute(id) : `/Workflows/Execute/${id}`, {
                 method: 'POST'
             })
             .then(response => response.json())
@@ -646,22 +646,22 @@
 
     function deletePricingTier(id) {
         if (confirm('Are you sure you want to delete this pricing tier?')) {
-            window.location.href = `/Pricing/Delete/${id}`;
+            window.location.href = AppUrls.pricing?.delete ? AppUrls.pricing.delete(id) : `/Pricing/Delete/${id}`;
         }
     }
 
     function editPricingTier(id) {
-        window.location.href = `/Pricing/Edit/${id}`;
+        window.location.href = AppUrls.pricing?.edit ? AppUrls.pricing.edit(id) : `/Pricing/Edit/${id}`;
     }
 
     function deleteProvider(id) {
         if (confirm('Are you sure you want to delete this provider?')) {
-            window.location.href = `/Providers/Delete/${id}`;
+            window.location.href = AppUrls.providers?.delete ? AppUrls.providers.delete(id) : `/Providers/Delete/${id}`;
         }
     }
 
     function testProvider(id) {
-        fetch(`/Providers/Test/${id}`, {
+        fetch(AppUrls.providers?.test ? AppUrls.providers.test(id) : `/Providers/Test/${id}`, {
             method: 'POST'
         })
         .then(response => response.json())
@@ -671,7 +671,7 @@
     }
 
     function toggleProvider(id) {
-        fetch(`/Providers/Toggle/${id}`, {
+        fetch(AppUrls.providers?.toggle ? AppUrls.providers.toggle(id) : `/Providers/Toggle/${id}`, {
             method: 'POST'
         })
         .then(response => response.json())
@@ -686,7 +686,7 @@
 
     function deleteSuppression(id) {
         if (confirm('Are you sure you want to delete this suppression entry?')) {
-            window.location.href = `/Suppression/Delete/${id}`;
+            window.location.href = AppUrls.suppression?.delete ? AppUrls.suppression.delete(id) : `/Suppression/Delete/${id}`;
         }
     }
 
@@ -696,7 +696,7 @@
 
     function deleteUrl(id) {
         if (confirm('Are you sure you want to delete this URL?')) {
-            window.location.href = `/Urls/Delete/${id}`;
+            window.location.href = AppUrls.urls?.delete ? AppUrls.urls.delete(id) : `/Urls/Delete/${id}`;
         }
     }
 
@@ -707,23 +707,23 @@
     }
 
     function viewUrlAnalytics(id) {
-        window.location.href = `/Urls/Analytics/${id}`;
+        window.location.href = AppUrls.urls?.analytics ? AppUrls.urls.analytics(id) : `/Urls/Analytics/${id}`;
     }
 
     function subscribePlan(planId) {
-        window.location.href = `/Billing/Subscribe/${planId}`;
+        window.location.href = AppUrls.billing?.subscribe ? AppUrls.billing.subscribe(planId) : `/Billing/Subscribe/${planId}`;
     }
 
     function cancelSubscription() {
         if (confirm('Are you sure you want to cancel your subscription?')) {
-            window.location.href = `/Billing/Cancel`;
+            window.location.href = AppUrls.billing?.cancel || `/Billing/Cancel`;
         }
     }
 
     function exportReport(format) {
         const params = new URLSearchParams(window.location.search);
         params.set('format', format);
-        window.location.href = `/Analytics/Export?${params.toString()}`;
+        window.location.href = AppUrls.analytics?.export ? `${AppUrls.analytics.export}?${params.toString()}` : `/Analytics/Export?${params.toString()}`;
     }
 
     function refreshAnalytics() {
@@ -738,7 +738,7 @@
     }
 
     function viewAuditLog(id) {
-        window.location.href = `/SuperAdmin/AuditLog/${id}`;
+        window.location.href = AppUrls.superAdmin?.auditLog ? AppUrls.superAdmin.auditLog(id) : `/SuperAdmin/AuditLog/${id}`;
     }
 
     function addMenuItem() {

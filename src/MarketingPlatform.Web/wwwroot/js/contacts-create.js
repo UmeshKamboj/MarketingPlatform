@@ -31,7 +31,7 @@ function loadContactData() {
         error: function(xhr) {
             handleAjaxError(xhr, 'Failed to load contact data');
             setTimeout(() => {
-                window.location.href = '/Contacts/Index';
+                window.location.href = AppUrls.contacts?.index || '/Contacts/Index';
             }, 2000);
         }
     });
@@ -114,7 +114,7 @@ function submitForm(formData) {
                 
                 // Redirect after short delay
                 setTimeout(() => {
-                    window.location.href = '/Contacts/Index';
+                    window.location.href = AppUrls.contacts?.index || '/Contacts/Index';
                 }, 1500);
             } else {
                 showNotification(response.message || 'Failed to save contact', 'error');
@@ -229,7 +229,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = '/Auth/Login';
+            window.location.href = AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');

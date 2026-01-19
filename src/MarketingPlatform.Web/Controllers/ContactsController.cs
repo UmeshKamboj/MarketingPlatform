@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for managing contacts and contact groups
 /// </summary>
+[Authorize]
 public class ContactsController : Controller
 {
     private readonly ILogger<ContactsController> _logger;

@@ -279,14 +279,14 @@ function legacyCopyToClipboard(text) {
  * View URL analytics
  */
 function viewAnalytics(id) {
-    window.location.href = `/Urls/Analytics/${id}`;
+    window.location.href = AppUrls.urls?.analytics ? AppUrls.urls.analytics(id) : `/Urls/Analytics/${id}`;
 }
 
 /**
  * Edit URL
  */
 function editUrl(id) {
-    window.location.href = `/Urls/Edit/${id}`;
+    window.location.href = AppUrls.urls?.edit ? AppUrls.urls.edit(id) : `/Urls/Edit/${id}`;
 }
 
 /**
@@ -320,7 +320,7 @@ function handleAjaxError(xhr, defaultMessage) {
     if (xhr.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
         setTimeout(() => {
-            window.location.href = '/Auth/Login';
+            window.location.href = AppUrls.auth.login;
         }, 2000);
     } else if (xhr.status === 403) {
         showNotification('You do not have permission to perform this action', 'error');

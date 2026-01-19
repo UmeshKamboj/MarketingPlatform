@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingPlatform.Web.Controllers;
@@ -5,6 +6,7 @@ namespace MarketingPlatform.Web.Controllers;
 /// <summary>
 /// Controller for suppression list and opt-out management
 /// </summary>
+[Authorize]
 public class SuppressionController : Controller
 {
     private readonly ILogger<SuppressionController> _logger;
