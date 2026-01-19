@@ -4,6 +4,7 @@ using MarketingPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarketingPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260119080146_AddChatEntities")]
+    partial class AddChatEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2584,6 +2587,9 @@ namespace MarketingPlatform.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedByUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("MetaDescription")
@@ -2591,8 +2597,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     b.Property<string>("PageKey")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -2603,10 +2608,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LastModifiedBy");
-
-                    b.HasIndex("PageKey")
-                        .IsUnique();
+                    b.HasIndex("LastModifiedByUserId");
 
                     b.ToTable("PageContents");
                 });
@@ -4430,7 +4432,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.ContactGroup", "ContactGroup")
                         .WithMany("Members")
                         .HasForeignKey("ContactGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MarketingPlatform.Core.Entities.Contact", "Contact")
@@ -4466,7 +4468,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.ContactTag", "ContactTag")
                         .WithMany("TagAssignments")
                         .HasForeignKey("ContactTagId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Contact");
@@ -4558,7 +4560,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                     b.HasOne("MarketingPlatform.Core.Entities.Campaign", "Campaign")
                         .WithMany()
                         .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MarketingPlatform.Core.Entities.Keyword", "Keyword")
@@ -4644,8 +4646,7 @@ namespace MarketingPlatform.Infrastructure.Migrations
                 {
                     b.HasOne("MarketingPlatform.Core.Entities.ApplicationUser", "LastModifiedByUser")
                         .WithMany()
-                        .HasForeignKey("LastModifiedBy")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("LastModifiedByUserId");
 
                     b.Navigation("LastModifiedByUser");
                 });
