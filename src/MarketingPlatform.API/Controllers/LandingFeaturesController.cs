@@ -126,14 +126,6 @@ namespace MarketingPlatform.API.Controllers
                 existing.DisplayOrder = feature.DisplayOrder;
                 existing.IsActive = feature.IsActive;
                 existing.ShowOnLanding = feature.ShowOnLanding;
-                existing.StatTitle1 = feature.StatTitle1;
-                existing.StatValue1 = feature.StatValue1;
-                existing.StatTitle2 = feature.StatTitle2;
-                existing.StatValue2 = feature.StatValue2;
-                existing.StatTitle3 = feature.StatTitle3;
-                existing.StatValue3 = feature.StatValue3;
-                existing.CallToActionText = feature.CallToActionText;
-                existing.CallToActionUrl = feature.CallToActionUrl;
 
                 // Update media and contact fields
                 existing.HeaderImageUrl = feature.HeaderImageUrl;
