@@ -138,40 +138,11 @@
         <div class="text-center text-muted mb-4">
             <small class="text-uppercase fw-semibold letter-spacing-1">Trusted by 5,000+ leading companies worldwide</small>
         </div>
-        <div class="row align-items-center justify-content-center g-4">
-            <div class="col-6 col-md-2 text-center">
-                <div class="company-logo-wrapper">
-                    <img src="/images/logos/company-1.svg"
-                         alt="Company 1"
-                         class="company-logo img-fluid grayscale-logo">
-                </div>
-            </div>
-            <div class="col-6 col-md-2 text-center">
-                <div class="company-logo-wrapper">
-                    <img src="/images/logos/company-2.svg"
-                         alt="Company 2"
-                         class="company-logo img-fluid grayscale-logo">
-                </div>
-            </div>
-            <div class="col-6 col-md-2 text-center">
-                <div class="company-logo-wrapper">
-                    <img src="/images/logos/company-3.svg"
-                         alt="Company 3"
-                         class="company-logo img-fluid grayscale-logo">
-                </div>
-            </div>
-            <div class="col-6 col-md-2 text-center">
-                <div class="company-logo-wrapper">
-                    <img src="/images/logos/company-4.svg"
-                         alt="Company 4"
-                         class="company-logo img-fluid grayscale-logo">
-                </div>
-            </div>
-            <div class="col-6 col-md-2 text-center">
-                <div class="company-logo-wrapper">
-                    <img src="/images/logos/company-5.svg"
-                         alt="Company 5"
-                         class="company-logo img-fluid grayscale-logo">
+        <div id="trusted-companies-container" class="row align-items-center justify-content-center g-4">
+            <!-- Companies will be loaded dynamically -->
+            <div class="col-12 text-center">
+                <div class="spinner-border spinner-border-sm text-muted" role="status">
+                    <span class="visually-hidden">Loading companies...</span>
                 </div>
             </div>
         </div>
@@ -255,71 +226,12 @@
             <h2 class="display-4 fw-bold mb-3">What Our Customers Say</h2>
             <p class="lead text-muted">Join thousands of satisfied businesses worldwide</p>
         </div>
-        
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="testimonial-card">
-                    <div class="stars mb-3">
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                    </div>
-                    <p class="mb-4">"This platform has revolutionized our marketing campaigns. The ROI has been incredible, and the ease of use is unmatched."</p>
-                    <div class="d-flex align-items-center">
-                        <div class="testimonial-avatar bg-primary text-white">
-                            <i class="bi bi-person"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold">Sarah Johnson</div>
-                            <small class="text-muted">Marketing Director, TechCorp</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="testimonial-card">
-                    <div class="stars mb-3">
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                    </div>
-                    <p class="mb-4">"The analytics and automation features saved us countless hours. We've seen a 300% increase in customer engagement."</p>
-                    <div class="d-flex align-items-center">
-                        <div class="testimonial-avatar bg-success text-white">
-                            <i class="bi bi-person"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold">Mike Chen</div>
-                            <small class="text-muted">CEO, GrowthHub</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="testimonial-card">
-                    <div class="stars mb-3">
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <i class="bi bi-star-fill text-warning"></i>
-                    </div>
-                    <p class="mb-4">"Best marketing platform we've used. The multi-channel approach and detailed reporting give us complete control."</p>
-                    <div class="d-flex align-items-center">
-                        <div class="testimonial-avatar bg-info text-white">
-                            <i class="bi bi-person"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold">Emma Williams</div>
-                            <small class="text-muted">Founder, RetailPlus</small>
-                        </div>
-                    </div>
+
+        <div id="testimonials-container" class="row g-4">
+            <!-- Testimonials will be loaded dynamically -->
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading testimonials...</span>
                 </div>
             </div>
         </div>
@@ -654,5 +566,7 @@
     <script src="~/js/landing-page.js" asp-append-version="true"></script>
     <script src="~/js/landing-features.js" asp-append-version="true"></script>
     <script src="~/js/landing-faqs.js" asp-append-version="true"></script>
+    <script src="~/js/landing-testimonials.js" asp-append-version="true"></script>
+    <script src="~/js/landing-companies.js" asp-append-version="true"></script>
 }
 
