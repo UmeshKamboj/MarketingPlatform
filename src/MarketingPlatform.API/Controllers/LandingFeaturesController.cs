@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MarketingPlatform.Application.DTOs.Common;
-using MarketingPlatform.Infrastructure.Data;
+using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.API.Controllers
@@ -12,14 +11,14 @@ namespace MarketingPlatform.API.Controllers
     [Route("api/landingfeatures")]
     public class LandingFeaturesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ILandingFeatureService _landingFeatureService;
         private readonly ILogger<LandingFeaturesController> _logger;
 
         public LandingFeaturesController(
-            ApplicationDbContext context,
+            ILandingFeatureService landingFeatureService,
             ILogger<LandingFeaturesController> logger)
         {
-            _context = context;
+            _landingFeatureService = landingFeatureService;
             _logger = logger;
         }
 
@@ -31,14 +30,12 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var features = await _context.LandingFeatures
-                    .Where(f => f.IsActive && f.ShowOnLanding && !f.IsDeleted)
-                    .OrderBy(f => f.DisplayOrder)
-                    .ToListAsync();
+                var features = await _landingFeatureService.GetAllActiveAsync();
+                var featureList = features.ToList();
 
-                _logger.LogInformation("Retrieved {Count} landing features", features.Count);
+                _logger.LogInformation("Retrieved {Count} landing features", featureList.Count);
 
-                return Ok(ApiResponse<List<LandingFeature>>.SuccessResponse(features));
+                return Ok(ApiResponse<List<LandingFeature>>.SuccessResponse(featureList));
             }
             catch (Exception ex)
             {
@@ -57,8 +54,7 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var feature = await _context.LandingFeatures
-                    .FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
+                var feature = await _landingFeatureService.GetByIdAsync(id);
 
                 if (feature == null)
                     return NotFound(ApiResponse<LandingFeature>.ErrorResponse("Feature not found"));
@@ -83,14 +79,10 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                feature.CreatedAt = DateTime.UtcNow;
-                _context.LandingFeatures.Add(feature);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Created landing feature: {Title}", feature.Title);
+                var createdFeature = await _landingFeatureService.CreateAsync(feature);
 
                 return Ok(ApiResponse<LandingFeature>.SuccessResponse(
-                    feature,
+                    createdFeature,
                     "Feature created successfully"));
             }
             catch (Exception ex)
@@ -111,50 +103,15 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var existing = await _context.LandingFeatures
-                    .FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
-
-                if (existing == null)
-                    return NotFound(ApiResponse<LandingFeature>.ErrorResponse("Feature not found"));
-
-                // Update properties
-                existing.Title = feature.Title;
-                existing.ShortDescription = feature.ShortDescription;
-                existing.DetailedDescription = feature.DetailedDescription;
-                existing.IconClass = feature.IconClass;
-                existing.ColorClass = feature.ColorClass;
-                existing.DisplayOrder = feature.DisplayOrder;
-                existing.IsActive = feature.IsActive;
-                existing.ShowOnLanding = feature.ShowOnLanding;
-                existing.CallToActionText = feature.CallToActionText;
-                existing.CallToActionUrl = feature.CallToActionUrl;
-
-                // Update statistics (for detail page hero)
-                existing.StatTitle1 = feature.StatTitle1;
-                existing.StatValue1 = feature.StatValue1;
-                existing.StatTitle2 = feature.StatTitle2;
-                existing.StatValue2 = feature.StatValue2;
-                existing.StatTitle3 = feature.StatTitle3;
-                existing.StatValue3 = feature.StatValue3;
-
-                // Update media and contact fields
-                existing.HeaderImageUrl = feature.HeaderImageUrl;
-                existing.VideoUrl = feature.VideoUrl;
-                existing.GalleryImages = feature.GalleryImages;
-                existing.ContactName = feature.ContactName;
-                existing.ContactEmail = feature.ContactEmail;
-                existing.ContactPhone = feature.ContactPhone;
-                existing.ContactMessage = feature.ContactMessage;
-
-                existing.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Updated landing feature: {Title}", feature.Title);
+                var updatedFeature = await _landingFeatureService.UpdateAsync(id, feature);
 
                 return Ok(ApiResponse<LandingFeature>.SuccessResponse(
-                    existing,
+                    updatedFeature,
                     "Feature updated successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ApiResponse<LandingFeature>.ErrorResponse(ex.Message));
             }
             catch (Exception ex)
             {
@@ -174,20 +131,13 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var feature = await _context.LandingFeatures
-                    .FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
+                var result = await _landingFeatureService.DeleteAsync(id);
 
-                if (feature == null)
-                    return NotFound(ApiResponse<bool>.ErrorResponse("Feature not found"));
-
-                // Soft delete
-                feature.IsDeleted = true;
-                feature.UpdatedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Deleted landing feature: {Title}", feature.Title);
-
-                return Ok(ApiResponse<bool>.SuccessResponse(true, "Feature deleted successfully"));
+                return Ok(ApiResponse<bool>.SuccessResponse(result, "Feature deleted successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ApiResponse<bool>.ErrorResponse(ex.Message));
             }
             catch (Exception ex)
             {

@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MarketingPlatform.Application.DTOs.Common;
-using MarketingPlatform.Infrastructure.Data;
+using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.API.Controllers
@@ -12,14 +11,14 @@ namespace MarketingPlatform.API.Controllers
     [Route("api/usecases")]
     public class UseCasesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUseCaseService _useCaseService;
         private readonly ILogger<UseCasesController> _logger;
 
         public UseCasesController(
-            ApplicationDbContext context,
+            IUseCaseService useCaseService,
             ILogger<UseCasesController> logger)
         {
-            _context = context;
+            _useCaseService = useCaseService;
             _logger = logger;
         }
 
@@ -31,14 +30,12 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var useCases = await _context.UseCases
-                    .Where(u => u.IsActive && !u.IsDeleted)
-                    .OrderBy(u => u.DisplayOrder)
-                    .ToListAsync();
+                var useCases = await _useCaseService.GetAllActiveAsync();
+                var useCaseList = useCases.ToList();
 
-                _logger.LogInformation("Retrieved {Count} use cases", useCases.Count);
+                _logger.LogInformation("Retrieved {Count} use cases", useCaseList.Count);
 
-                return Ok(ApiResponse<List<UseCase>>.SuccessResponse(useCases));
+                return Ok(ApiResponse<List<UseCase>>.SuccessResponse(useCaseList));
             }
             catch (Exception ex)
             {
@@ -57,8 +54,7 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var useCase = await _context.UseCases
-                    .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
+                var useCase = await _useCaseService.GetByIdAsync(id);
 
                 if (useCase == null)
                     return NotFound(ApiResponse<UseCase>.ErrorResponse("Use case not found"));
@@ -82,12 +78,10 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var useCases = await _context.UseCases
-                    .Where(u => u.IsActive && !u.IsDeleted && u.Industry == industry)
-                    .OrderBy(u => u.DisplayOrder)
-                    .ToListAsync();
+                var useCases = await _useCaseService.GetByIndustryAsync(industry);
+                var useCaseList = useCases.ToList();
 
-                return Ok(ApiResponse<List<UseCase>>.SuccessResponse(useCases));
+                return Ok(ApiResponse<List<UseCase>>.SuccessResponse(useCaseList));
             }
             catch (Exception ex)
             {

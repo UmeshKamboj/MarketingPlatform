@@ -150,6 +150,14 @@ builder.Services.AddScoped<IPlatformSettingService, PlatformSettingService>();
 builder.Services.AddScoped<IFeatureToggleService, FeatureToggleService>();
 builder.Services.AddScoped<IComplianceRuleService, ComplianceRuleService>();
 
+// Landing Page Services
+builder.Services.AddScoped<IUseCaseService, UseCaseService>();
+builder.Services.AddScoped<ISecurityBadgeService, SecurityBadgeService>();
+builder.Services.AddScoped<ITestimonialService, TestimonialService>();
+builder.Services.AddScoped<ITrustedCompanyService, TrustedCompanyService>();
+builder.Services.AddScoped<ILandingFaqService, LandingFaqService>();
+builder.Services.AddScoped<ILandingFeatureService, LandingFeatureService>();
+
 // Chat Services
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();

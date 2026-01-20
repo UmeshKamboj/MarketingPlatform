@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MarketingPlatform.Application.DTOs.Common;
-using MarketingPlatform.Infrastructure.Data;
+using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.API.Controllers
@@ -12,14 +11,14 @@ namespace MarketingPlatform.API.Controllers
     [Route("api/landingfaqs")]
     public class LandingFaqsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ILandingFaqService _landingFaqService;
         private readonly ILogger<LandingFaqsController> _logger;
 
         public LandingFaqsController(
-            ApplicationDbContext context,
+            ILandingFaqService landingFaqService,
             ILogger<LandingFaqsController> logger)
         {
-            _context = context;
+            _landingFaqService = landingFaqService;
             _logger = logger;
         }
 
@@ -31,14 +30,12 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var faqs = await _context.LandingFaqs
-                    .Where(f => f.IsActive && f.ShowOnLanding && !f.IsDeleted)
-                    .OrderBy(f => f.DisplayOrder)
-                    .ToListAsync();
+                var faqs = await _landingFaqService.GetAllActiveAsync();
+                var faqList = faqs.ToList();
 
-                _logger.LogInformation("Retrieved {Count} landing FAQs", faqs.Count);
+                _logger.LogInformation("Retrieved {Count} landing FAQs", faqList.Count);
 
-                return Ok(ApiResponse<List<LandingFaq>>.SuccessResponse(faqs));
+                return Ok(ApiResponse<List<LandingFaq>>.SuccessResponse(faqList));
             }
             catch (Exception ex)
             {
@@ -58,8 +55,7 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var faq = await _context.LandingFaqs
-                    .FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
+                var faq = await _landingFaqService.GetByIdAsync(id);
 
                 if (faq == null)
                     return NotFound(ApiResponse<LandingFaq>.ErrorResponse("FAQ not found"));
@@ -84,14 +80,10 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                faq.CreatedAt = DateTime.UtcNow;
-                _context.LandingFaqs.Add(faq);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Created landing FAQ: {Question}", faq.Question);
+                var createdFaq = await _landingFaqService.CreateAsync(faq);
 
                 return Ok(ApiResponse<LandingFaq>.SuccessResponse(
-                    faq,
+                    createdFaq,
                     "FAQ created successfully"));
             }
             catch (Exception ex)
@@ -112,30 +104,15 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var existing = await _context.LandingFaqs
-                    .FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
-
-                if (existing == null)
-                    return NotFound(ApiResponse<LandingFaq>.ErrorResponse("FAQ not found"));
-
-                // Update properties
-                existing.Question = faq.Question;
-                existing.Answer = faq.Answer;
-                existing.IconClass = faq.IconClass;
-                existing.IconColor = faq.IconColor;
-                existing.DisplayOrder = faq.DisplayOrder;
-                existing.IsActive = faq.IsActive;
-                existing.ShowOnLanding = faq.ShowOnLanding;
-                existing.Category = faq.Category;
-                existing.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Updated landing FAQ: {Question}", faq.Question);
+                var updatedFaq = await _landingFaqService.UpdateAsync(id, faq);
 
                 return Ok(ApiResponse<LandingFaq>.SuccessResponse(
-                    existing,
+                    updatedFaq,
                     "FAQ updated successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ApiResponse<LandingFaq>.ErrorResponse(ex.Message));
             }
             catch (Exception ex)
             {
@@ -155,20 +132,13 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var faq = await _context.LandingFaqs
-                    .FirstOrDefaultAsync(f => f.Id == id && !f.IsDeleted);
+                var result = await _landingFaqService.DeleteAsync(id);
 
-                if (faq == null)
-                    return NotFound(ApiResponse<bool>.ErrorResponse("FAQ not found"));
-
-                // Soft delete
-                faq.IsDeleted = true;
-                faq.UpdatedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Deleted landing FAQ: {Question}", faq.Question);
-
-                return Ok(ApiResponse<bool>.SuccessResponse(true, "FAQ deleted successfully"));
+                return Ok(ApiResponse<bool>.SuccessResponse(result, "FAQ deleted successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ApiResponse<bool>.ErrorResponse(ex.Message));
             }
             catch (Exception ex)
             {

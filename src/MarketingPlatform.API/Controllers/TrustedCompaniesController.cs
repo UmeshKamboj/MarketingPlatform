@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MarketingPlatform.Application.DTOs.Common;
-using MarketingPlatform.Infrastructure.Data;
+using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.API.Controllers
@@ -12,14 +11,14 @@ namespace MarketingPlatform.API.Controllers
     [Route("api/trustedcompanies")]
     public class TrustedCompaniesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITrustedCompanyService _trustedCompanyService;
         private readonly ILogger<TrustedCompaniesController> _logger;
 
         public TrustedCompaniesController(
-            ApplicationDbContext context,
+            ITrustedCompanyService trustedCompanyService,
             ILogger<TrustedCompaniesController> logger)
         {
-            _context = context;
+            _trustedCompanyService = trustedCompanyService;
             _logger = logger;
         }
 
@@ -31,14 +30,12 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var companies = await _context.TrustedCompanies
-                    .Where(c => c.IsActive && !c.IsDeleted)
-                    .OrderBy(c => c.DisplayOrder)
-                    .ToListAsync();
+                var companies = await _trustedCompanyService.GetAllActiveAsync();
+                var companyList = companies.ToList();
 
-                _logger.LogInformation("Retrieved {Count} trusted companies", companies.Count);
+                _logger.LogInformation("Retrieved {Count} trusted companies", companyList.Count);
 
-                return Ok(ApiResponse<List<TrustedCompany>>.SuccessResponse(companies));
+                return Ok(ApiResponse<List<TrustedCompany>>.SuccessResponse(companyList));
             }
             catch (Exception ex)
             {
@@ -57,8 +54,7 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var company = await _context.TrustedCompanies
-                    .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
+                var company = await _trustedCompanyService.GetByIdAsync(id);
 
                 if (company == null)
                     return NotFound(ApiResponse<TrustedCompany>.ErrorResponse("Company not found"));
