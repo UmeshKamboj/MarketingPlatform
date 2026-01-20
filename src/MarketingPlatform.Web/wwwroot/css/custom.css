@@ -92,8 +92,15 @@ body {
 }
 
 /* Gradient Text Animation */
+.text-gradient-custom {
+    background: linear-gradient(129deg, #314ed0 0%, #4c3563 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    animation: gradientShift 3s ease infinite !important;
+}
 .text-gradient {
-    background: linear-gradient(90deg, #fff 0%, #a8edea 50%, #fed6e3 100%);
+    background: linear-gradient(90deg, #fff 0%, #a8edea 50%, #fed6e3 100%); 
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -226,7 +233,7 @@ body {
 }
 
 .feature-card:hover {
-    transform: translateY(-10px);
+    /*transform: translateY(-10px);*/
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
