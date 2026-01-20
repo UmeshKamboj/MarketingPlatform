@@ -40,6 +40,32 @@
 
 .flip-card-back {
     transform: rotateY(180deg);
+    overflow: hidden;
+}
+
+/* Better text handling on flip card back */
+.flip-card-back .overflow-auto {
+    max-height: 280px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.flip-card-back .overflow-auto::-webkit-scrollbar {
+    width: 4px;
+}
+
+.flip-card-back .overflow-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.flip-card-back .overflow-auto::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+}
+
+.flip-card-back .overflow-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* ========== FEATURE ICON CENTERING ========== */

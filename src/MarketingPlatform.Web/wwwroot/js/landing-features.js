@@ -102,50 +102,57 @@ function renderFeatures(features) {
 
                         <!-- Back Side -->
                         <div class="flip-card-back feature-card h-100 bg-${feature.colorClass} text-white">
-                            <div class="d-flex flex-column h-100">
+                            <div class="d-flex flex-column h-100 position-relative">
+                                <!-- Back Button at Top -->
                                 <div class="mb-3">
-                                    <h4 class="fw-bold mb-3">${escapeHtml(feature.title)}</h4>
-                                    <p class="mb-4 small">
-                                        ${escapeHtml(feature.detailedDescription)}
-                                    </p>
-                                </div>
-
-                                <!-- Stats -->
-                                <div class="row g-2 mb-4">
-                                    ${feature.statTitle1 ? `
-                                        <div class="col-4">
-                                            <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                <div class="fw-bold h5 mb-0">${escapeHtml(feature.statValue1)}</div>
-                                                <small class="opacity-90">${escapeHtml(feature.statTitle1)}</small>
-                                            </div>
-                                        </div>
-                                    ` : ''}
-                                    ${feature.statTitle2 ? `
-                                        <div class="col-4">
-                                            <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                <div class="fw-bold h5 mb-0">${escapeHtml(feature.statValue2)}</div>
-                                                <small class="opacity-90">${escapeHtml(feature.statTitle2)}</small>
-                                            </div>
-                                        </div>
-                                    ` : ''}
-                                    ${feature.statTitle3 ? `
-                                        <div class="col-4">
-                                            <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                <div class="fw-bold h5 mb-0">${escapeHtml(feature.statValue3)}</div>
-                                                <small class="opacity-90">${escapeHtml(feature.statTitle3)}</small>
-                                            </div>
-                                        </div>
-                                    ` : ''}
-                                </div>
-
-                                <!-- CTA Button -->
-                                <div class="mt-auto">
-                                    <a href="/features/${feature.id}" class="btn btn-light w-100 mb-2">
-                                        <i class="bi bi-eye"></i> View Details
-                                    </a>
-                                    <button class="btn btn-outline-light w-100 flip-back-trigger" data-feature-id="${feature.id}">
+                                    <button class="btn btn-outline-light btn-sm flip-back-trigger" data-feature-id="${feature.id}">
                                         <i class="bi bi-arrow-left"></i> Back
                                     </button>
+                                </div>
+
+                                <!-- Content -->
+                                <div class="flex-grow-1 overflow-auto mb-3">
+                                    <h4 class="fw-bold mb-3">${escapeHtml(feature.title)}</h4>
+                                    <p class="mb-3 small" style="line-height: 1.5;">
+                                        ${escapeHtml(feature.detailedDescription)}
+                                    </p>
+
+                                    <!-- Stats -->
+                                    ${feature.statTitle1 || feature.statTitle2 || feature.statTitle3 ? `
+                                        <div class="row g-2 mb-3">
+                                            ${feature.statTitle1 ? `
+                                                <div class="col-4">
+                                                    <div class="bg-white bg-opacity-20 rounded p-2 text-center">
+                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue1)}</div>
+                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle1)}</small>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            ${feature.statTitle2 ? `
+                                                <div class="col-4">
+                                                    <div class="bg-white bg-opacity-20 rounded p-2 text-center">
+                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue2)}</div>
+                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle2)}</small>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            ${feature.statTitle3 ? `
+                                                <div class="col-4">
+                                                    <div class="bg-white bg-opacity-20 rounded p-2 text-center">
+                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue3)}</div>
+                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle3)}</small>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    ` : ''}
+                                </div>
+
+                                <!-- View Details Button at Bottom -->
+                                <div class="mt-auto">
+                                    <a href="/features/${feature.id}" class="btn btn-light w-100">
+                                        <i class="bi bi-eye"></i> View Full Details
+                                    </a>
                                 </div>
                             </div>
                         </div>
