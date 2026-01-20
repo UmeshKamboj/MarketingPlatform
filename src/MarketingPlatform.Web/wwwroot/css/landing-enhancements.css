@@ -221,3 +221,38 @@
         animation: none;
     }
 }
+
+/* ========== AOS VISIBILITY FIX ========== */
+/* Ensure elements are visible even before AOS initializes */
+[data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+/* Let AOS handle animations after it loads */
+.aos-init[data-aos] {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.aos-init[data-aos].aos-animate {
+    opacity: 1;
+    transform: translateY(0);
+    transition-property: opacity, transform;
+}
+
+/* Feature cards should always be visible */
+#features-cards .col-md-6,
+#features-cards .col-lg-4 {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Ensure flip cards are visible */
+.flip-card-container,
+.flip-card,
+.flip-card-front,
+.feature-card {
+    opacity: 1 !important;
+    visibility: visible !important;
+}

@@ -165,7 +165,7 @@ function renderFeatures(features) {
     initializeFlipCards();
 
     // Re-initialize scroll animations for dynamically loaded content
-    reinitScrollAnimations();
+    
 }
 
 /**
@@ -203,6 +203,8 @@ function initializeFlipCards() {
     });
 
     console.log('Flip card interactions initialized with event delegation');
+
+    reinitScrollAnimations();
 }
 
 /**

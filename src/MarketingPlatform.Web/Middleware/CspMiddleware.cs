@@ -80,8 +80,8 @@ namespace MarketingPlatform.Web.Middleware
             // 'unsafe-inline' allows inline style attributes (style="...") and <style> tags, and inline event handlers (onclick="...")
             // 'unsafe-eval' allows eval() which is needed for some development tools and hot reload
             return $"default-src 'self'; " +
-                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.datatables.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
-                   $"style-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net; " +
+                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.datatables.net https://unpkg.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
+                   $"style-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://unpkg.com; " +
                    $"connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:* https://localhost:* https://api.stripe.com; " +
                    $"img-src 'self' data: https:; " +
                    $"font-src 'self' https://cdn.jsdelivr.net; " +
@@ -101,8 +101,8 @@ namespace MarketingPlatform.Web.Middleware
         private static string BuildProductionCsp(string nonce)
         {
             return $"default-src 'self'; " +
-                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
-                   $"style-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net; " +
+                   $"script-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://unpkg.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://js.stripe.com; " +
+                   $"style-src 'self' 'nonce-{nonce}' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://unpkg.com; " +
                    $"connect-src 'self' https://api.stripe.com; " +
                    $"img-src 'self' data: https:; " +
                    $"font-src 'self' https://cdn.jsdelivr.net; " +
