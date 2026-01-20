@@ -14,6 +14,10 @@
     }
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/feature-detail.css" asp-append-version="true" />
+}
+
 <!-- Feature Detail Hero Section -->
 <section class="feature-detail-hero position-relative overflow-hidden">
     @if (!string.IsNullOrEmpty(feature.HeaderImageUrl))
@@ -136,7 +140,7 @@
             <div class="col-lg-4">
                 <!-- Contact Card -->
                 <div class="sticky-sidebar">
-                    <div class="contact-card bg-@feature.ColorClass text-white rounded-4 p-4 shadow-lg" data-aos="fade-left">
+                    <div class="contact-card bg-@feature.ColorClass text-white rounded-4 p-4 shadow-lg mb-4" data-aos="fade-left">
                         <div class="text-center mb-4">
                             <div class="contact-icon-circle mx-auto mb-3">
                                 <i class="bi bi-headset"></i>
@@ -168,10 +172,10 @@
                                         <div class="contact-icon-sm me-3">
                                             <i class="bi bi-envelope-fill"></i>
                                         </div>
-                                        <div>
+                                        <div class="flex-grow-1" style="min-width: 0;">
                                             <small class="d-block opacity-75">Email</small>
                                             <a href="mailto:@feature.ContactEmail" class="text-white text-decoration-none">
-                                                <strong>@feature.ContactEmail</strong>
+                                                <strong class="text-truncate d-block">@feature.ContactEmail</strong>
                                             </a>
                                         </div>
                                     </div>
@@ -204,7 +208,7 @@
                                     <i class="bi bi-envelope-fill me-2"></i>Send Email
                                 </a>
                             }
-                            <a href="@Url.Action(" Register", "Auth")"
+                            <a href="@Url.Action("Register", "Auth")"
                                class="btn btn-outline-light btn-lg">
                                 <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
                             </a>
@@ -212,7 +216,7 @@
                     </div>
 
                     <!-- Feature Highlights -->
-                    <div class="highlights-card mt-4" data-aos="fade-left" data-aos-delay="100">
+                    <div class="highlights-card" data-aos="fade-left" data-aos-delay="100">
                         <h4 class="h5 fw-bold mb-3">
                             <i class="bi bi-star-fill text-warning me-2"></i>
                             Key Highlights
@@ -264,177 +268,6 @@
     </div>
 </section>
 
-@section Styles {
-    <style>
-        /* Hero Section */
-        .feature-detail-hero {
-            position: relative;
-            min-height: 60vh;
-            display: flex;
-            align-items: center;
-        }
-
-        .hero-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-size: cover;
-            background-position: center;
-            z-index: 0;
-        }
-
-        .hero-bg.bg-gradient-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .hero-bg.bg-gradient-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .hero-bg.bg-gradient-info {
-            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-        }
-
-        .hero-bg.bg-gradient-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-
-        .hero-bg.bg-gradient-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-
-        .hero-bg.bg-gradient-secondary {
-            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-        }
-
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1;
-        }
-
-        .min-vh-50 {
-            min-height: 50vh;
-        }
-
-        .feature-icon-hero {
-            font-size: 5rem;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .stat-box-hero {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* Content Cards */
-        .content-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Gallery */
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 16px;
-            cursor: pointer;
-        }
-
-        .gallery-item img {
-            transition: transform 0.3s ease;
-        }
-
-        .gallery-item:hover img {
-            transform: scale(1.05);
-        }
-
-        /* Contact Card */
-        .contact-card {
-            border: none;
-        }
-
-        .contact-icon-circle {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-        }
-
-        .contact-icon-sm {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .contact-item {
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .contact-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        /* Highlights Card */
-        .highlights-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 16px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Sticky Sidebar */
-        .sticky-sidebar {
-            position: sticky;
-            top: 20px;
-        }
-
-        /* Hover Effects */
-        .hover-zoom {
-            transition: transform 0.3s ease;
-        }
-
-        .hover-zoom:hover {
-            transform: scale(1.02);
-        }
-
-        /* Responsive */
-        @@media (max-width: 991.98px) {
-            .feature-icon-hero {
-                font-size: 3.5rem;
-            }
-
-            .sticky-sidebar {
-                position: relative;
-                top: 0;
-            }
-        }
-    </style>
-}
-
 @section Scripts {
     <script>
         // Load related features
@@ -469,6 +302,11 @@
                                 </a>
                             </div>
                         `).join('');
+
+                        // Reinitialize AOS for related features
+                        if (typeof AOS !== 'undefined') {
+                            AOS.refresh();
+                        }
                     } else {
                         container.innerHTML = '<div class="col-12"><p class="text-center text-muted">No other features available</p></div>';
                     }
