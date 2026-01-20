@@ -140,11 +140,9 @@ function renderFeatures(features) {
 
                                 <!-- CTA Button -->
                                 <div class="mt-auto">
-                                    ${feature.callToActionText && feature.callToActionUrl ? `
-                                        <a href="${escapeHtml(feature.callToActionUrl)}" class="btn btn-light w-100 mb-2">
-                                            ${escapeHtml(feature.callToActionText)} <i class="bi bi-arrow-right"></i>
-                                        </a>
-                                    ` : ''}
+                                    <a href="/features/${feature.id}" class="btn btn-light w-100 mb-2">
+                                        <i class="bi bi-eye"></i> View Details
+                                    </a>
                                     <button class="btn btn-outline-light w-100 flip-back-trigger" data-feature-id="${feature.id}">
                                         <i class="bi bi-arrow-left"></i> Back
                                     </button>

@@ -309,8 +309,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 60px;
   border-radius: 50%;
   opacity: 0.1;
-  top: -10px;
-  left: -10px;
+ 
 }
 
 .feature-icon-lg {

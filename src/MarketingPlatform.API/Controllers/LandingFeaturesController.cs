@@ -50,10 +50,9 @@ namespace MarketingPlatform.API.Controllers
         }
 
         /// <summary>
-        /// Get a specific landing feature by ID (SuperAdmin only)
+        /// Get a specific landing feature by ID (Public access for detail page)
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize(Roles = "SuperAdmin")]
         public async Task<ActionResult<ApiResponse<LandingFeature>>> GetById(int id)
         {
             try
@@ -135,6 +134,16 @@ namespace MarketingPlatform.API.Controllers
                 existing.StatValue3 = feature.StatValue3;
                 existing.CallToActionText = feature.CallToActionText;
                 existing.CallToActionUrl = feature.CallToActionUrl;
+
+                // Update media and contact fields
+                existing.HeaderImageUrl = feature.HeaderImageUrl;
+                existing.VideoUrl = feature.VideoUrl;
+                existing.GalleryImages = feature.GalleryImages;
+                existing.ContactName = feature.ContactName;
+                existing.ContactEmail = feature.ContactEmail;
+                existing.ContactPhone = feature.ContactPhone;
+                existing.ContactMessage = feature.ContactMessage;
+
                 existing.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();

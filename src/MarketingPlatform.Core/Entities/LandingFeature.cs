@@ -23,5 +23,16 @@ namespace MarketingPlatform.Core.Entities
         public string? StatValue3 { get; set; }
         public string? CallToActionText { get; set; }
         public string? CallToActionUrl { get; set; }
+
+        // Media for detail page
+        public string? HeaderImageUrl { get; set; } // Hero image for detail page
+        public string? VideoUrl { get; set; } // Video URL (YouTube, Vimeo, or direct)
+        public string? GalleryImages { get; set; } // JSON array of image URLs
+
+        // Contact information for detail page
+        public string? ContactName { get; set; }
+        public string? ContactEmail { get; set; }
+        public string? ContactPhone { get; set; }
+        public string? ContactMessage { get; set; } // Pre-filled message or description
     }
 }
