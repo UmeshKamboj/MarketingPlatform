@@ -242,61 +242,18 @@
 <section class="trust-badges-section py-5">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="badge bg-success bg-opacity-10  px-3 py-2 mb-3">
-                <i class="bi bi-shield-check"></i> Security & Compliance
+            <span class="badge px-4 py-2 mb-3" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-size: 0.875rem; font-weight: 600; letter-spacing: 1px;">
+                <i class="bi bi-shield-check me-2"></i>SECURITY & COMPLIANCE
             </span>
-            <h2 class="h3 fw-bold mb-3">Enterprise-Grade Security You Can Trust</h2>
-            <p class="text-muted">We take security and compliance seriously with industry-leading certifications</p>
+            <h2 class="display-4 fw-bold mb-3" style="color: #1f2937; line-height: 1.2;">Enterprise-Grade Security You Can Trust</h2>
+            <p class="lead text-muted" style="font-size: 1.1rem; max-width: 700px; margin: 0 auto;">We take security and compliance seriously with industry-leading certifications</p>
         </div>
 
-        <div class="row g-4 justify-content-center align-items-center">
-            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="100">
-                <div class="trust-badge-card p-4 h-100">
-                    <img src="/images/badges/gdpr.svg"
-                         alt="GDPR Compliant"
-                         class="trust-badge-img mb-3">
-                    <div class="fw-semibold text-dark">GDPR</div>
-                    <small class="text-muted">Compliant</small>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="200">
-                <div class="trust-badge-card p-4 h-100">
-                    <img src="/images/badges/iso-27001.svg"
-                         alt="ISO 27001"
-                         class="trust-badge-img mb-3">
-                    <div class="fw-semibold text-dark">ISO 27001</div>
-                    <small class="text-muted">Certified</small>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="300">
-                <div class="trust-badge-card p-4 h-100">
-                    <img src="/images/badges/soc2.svg"
-                         alt="SOC 2"
-                         class="trust-badge-img mb-3">
-                    <div class="fw-semibold text-dark">SOC 2</div>
-                    <small class="text-muted">Type II</small>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="400">
-                <div class="trust-badge-card p-4 h-100">
-                    <img src="/images/badges/hipaa.svg"
-                         alt="HIPAA"
-                         class="trust-badge-img mb-3">
-                    <div class="fw-semibold text-dark">HIPAA</div>
-                    <small class="text-muted">Compliant</small>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-3 col-lg-2 text-center" data-aos="zoom-in" data-aos-delay="500">
-                <div class="trust-badge-card p-4 h-100">
-                    <img src="/images/badges/ssl.svg"
-                         alt="SSL Encrypted"
-                         class="trust-badge-img mb-3">
-                    <div class="fw-semibold text-dark">256-bit SSL</div>
-                    <small class="text-muted">Encrypted</small>
+        <div class="row g-4 justify-content-center align-items-center" id="security-badges-container">
+            <!-- Security badges will be loaded dynamically -->
+            <div class="col-12 text-center">
+                <div class="spinner-border text-success" role="status">
+                    <span class="visually-hidden">Loading security badges...</span>
                 </div>
             </div>
         </div>
@@ -307,178 +264,35 @@
 <section class="use-cases-section py-5 my-5 bg-light">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="badge bg-info bg-opacity-10  px-3 py-2 mb-3">
-                <i class="bi bi-briefcase"></i> Use Cases
+            <span class="badge px-4 py-2 mb-3" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; font-size: 0.875rem; font-weight: 600; letter-spacing: 1px;">
+                <i class="bi bi-briefcase me-2"></i>USE CASES
             </span>
-            <h2 class="display-4 fw-bold mb-3">Built for Every Industry</h2>
-            <p class="lead text-muted">See how businesses like yours use our platform to grow</p>
+            <h2 class="display-4 fw-bold mb-3" style="color: #1f2937; line-height: 1.2;">Built for Every Industry</h2>
+            <p class="lead text-muted" style="font-size: 1.1rem; max-width: 700px; margin: 0 auto;">See how businesses like yours use our platform to grow</p>
         </div>
 
         <!-- Industry Tabs -->
         <ul class="nav nav-pills justify-content-center mb-5 industry-tabs" id="industryTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="ecommerce-tab" data-bs-toggle="pill" data-bs-target="#ecommerce" type="button" role="tab">
-                    <i class="bi bi-cart"></i> E-Commerce
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="healthcare-tab" data-bs-toggle="pill" data-bs-target="#healthcare" type="button" role="tab">
-                    <i class="bi bi-hospital"></i> Healthcare
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="realestate-tab" data-bs-toggle="pill" data-bs-target="#realestate" type="button" role="tab">
-                    <i class="bi bi-house"></i> Real Estate
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="retail-tab" data-bs-toggle="pill" data-bs-target="#retail" type="button" role="tab">
-                    <i class="bi bi-shop"></i> Retail
-                </button>
+            <!-- Tabs will be loaded dynamically -->
+            <li class="nav-item">
+                <span class="nav-link disabled">
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                    Loading...
+                </span>
             </li>
         </ul>
 
         <!-- Tab Content -->
         <div class="tab-content" id="industryTabContent">
-            <!-- E-Commerce -->
-            <div class="tab-pane fade show active" id="ecommerce" role="tabpanel">
-                <div class="row align-items-center g-4">
-                    <div class="col-lg-6" data-aos="fade-right">
-                        <div class="use-case-image-wrapper">
-                            <img src="/images/use-cases/ecommerce.svg" alt="E-Commerce Use Case" class="img-fluid rounded-4 shadow-lg">
-                        </div>
-                    </div>
-                    <div class="col-lg-6" data-aos="fade-left">
-                        <h3 class="fw-bold mb-4">Boost Online Sales with Targeted Campaigns</h3>
-                        <ul class="list-unstyled use-case-list">
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Cart Abandonment Recovery:</strong> Send automated SMS reminders to recover lost sales
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Order Updates:</strong> Keep customers informed with delivery notifications
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Flash Sale Alerts:</strong> Drive urgency with time-sensitive promotions
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Product Recommendations:</strong> Personalized offers based on purchase history
-                            </li>
-                        </ul>
-                        <div class="alert alert-light border">
-                            <strong class="text-primary">Case Study:</strong> E-commerce store increased revenue by 45% using cart abandonment campaigns
-                        </div>
-                    </div>
+            <!-- Content will be loaded dynamically -->
+            <div class="text-center py-5">
+                <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">Loading use cases...</span>
                 </div>
             </div>
-
-            <!-- Healthcare -->
-            <div class="tab-pane fade" id="healthcare" role="tabpanel">
-                <div class="row align-items-center g-4">
-                    <div class="col-lg-6" data-aos="fade-right">
-                        <div class="use-case-image-wrapper">
-                            <img src="/images/use-cases/healthcare.svg" alt="Healthcare Use Case" class="img-fluid rounded-4 shadow-lg">
-                        </div>
-                    </div>
-                    <div class="col-lg-6" data-aos="fade-left">
-                        <h3 class="fw-bold mb-4">Improve Patient Engagement & Care</h3>
-                        <ul class="list-unstyled use-case-list">
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Appointment Reminders:</strong> Reduce no-shows with automated SMS reminders
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Prescription Notifications:</strong> Alert patients when prescriptions are ready
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Health Tips:</strong> Send personalized wellness information
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Test Results:</strong> Securely notify patients of available results
-                            </li>
-                        </ul>
-                        <div class="alert alert-light border">
-                            <strong class="text-primary">Case Study:</strong> Medical practice reduced no-shows by 60% with appointment reminders
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Real Estate -->
-            <div class="tab-pane fade" id="realestate" role="tabpanel">
-                <div class="row align-items-center g-4">
-                    <div class="col-lg-6" data-aos="fade-right">
-                        <div class="use-case-image-wrapper">
-                            <img src="/images/use-cases/realestate.svg" alt="Real Estate Use Case" class="img-fluid rounded-4 shadow-lg">
-                        </div>
-                    </div>
-                    <div class="col-lg-6" data-aos="fade-left">
-                        <h3 class="fw-bold mb-4">Close More Deals Faster</h3>
-                        <ul class="list-unstyled use-case-list">
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>New Listing Alerts:</strong> Instantly notify buyers of properties matching their criteria
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Open House Reminders:</strong> Maximize attendance with timely notifications
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Price Drop Alerts:</strong> Re-engage interested buyers when prices change
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Market Updates:</strong> Keep clients informed with market insights
-                            </li>
-                        </ul>
-                        <div class="alert alert-light border">
-                            <strong class="text-primary">Case Study:</strong> Real estate agency increased showings by 35% with listing alerts
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Retail -->
-            <div class="tab-pane fade" id="retail" role="tabpanel">
-                <div class="row align-items-center g-4">
-                    <div class="col-lg-6" data-aos="fade-right">
-                        <div class="use-case-image-wrapper">
-                            <img src="/images/use-cases/retail.svg" alt="Retail Use Case" class="img-fluid rounded-4 shadow-lg">
-                        </div>
-                    </div>
-                    <div class="col-lg-6" data-aos="fade-left">
-                        <h3 class="fw-bold mb-4">Drive Foot Traffic & Repeat Business</h3>
-                        <ul class="list-unstyled use-case-list">
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Grand Opening Announcements:</strong> Generate buzz for new store openings
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Exclusive Offers:</strong> Reward loyal customers with VIP promotions
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Inventory Updates:</strong> Alert customers when popular items are back in stock
-                            </li>
-                            <li class="mb-3">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                <strong>Event Invitations:</strong> Fill your store with in-store event announcements
-                            </li>
-                        </ul>
-                        <div class="alert alert-light border">
-                            <strong class="text-primary">Case Study:</strong> Retail chain increased foot traffic by 50% with targeted promotions
-                        </div>
-                    </div>
-                </div>
-            </div>
+        </div>
+    </div>
+</section>
         </div>
     </div>
 </section>
@@ -568,5 +382,7 @@
     <script src="~/js/landing-faqs.js" asp-append-version="true"></script>
     <script src="~/js/landing-testimonials.js" asp-append-version="true"></script>
     <script src="~/js/landing-companies.js" asp-append-version="true"></script>
+    <script src="~/js/landing-usecases.js" asp-append-version="true"></script>
+    <script src="~/js/landing-security.js" asp-append-version="true"></script>
 }
 

@@ -179,7 +179,9 @@ function initializeFlipCards() {
             e.stopPropagation();
             const featureId = flipTrigger.getAttribute('data-feature-id');
             const card = document.getElementById(`feature-card-${featureId}`);
-            if (card) {
+            
+            // ONLY flip this specific card forward, don't touch other cards
+            if (card && !card.classList.contains('flipped')) {
                 console.log('Flipping card forward:', featureId);
                 card.classList.add('flipping');
                 card.classList.add('flipped');
@@ -191,7 +193,9 @@ function initializeFlipCards() {
             e.stopPropagation();
             const featureId = flipBackTrigger.getAttribute('data-feature-id');
             const card = document.getElementById(`feature-card-${featureId}`);
-            if (card) {
+            
+            // ONLY flip this specific card back, don't touch other cards
+            if (card && card.classList.contains('flipped')) {
                 console.log('Flipping card back:', featureId);
                 card.classList.add('flipping');
                 card.classList.remove('flipped');
