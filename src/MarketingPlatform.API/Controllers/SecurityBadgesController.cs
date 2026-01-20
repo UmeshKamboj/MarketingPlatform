@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MarketingPlatform.Application.DTOs.Common;
-using MarketingPlatform.Infrastructure.Data;
+using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.API.Controllers
@@ -11,14 +10,14 @@ namespace MarketingPlatform.API.Controllers
     [Route("api/securitybadges")]
     public class SecurityBadgesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ISecurityBadgeService _securityBadgeService;
         private readonly ILogger<SecurityBadgesController> _logger;
 
         public SecurityBadgesController(
-            ApplicationDbContext context,
+            ISecurityBadgeService securityBadgeService,
             ILogger<SecurityBadgesController> logger)
         {
-            _context = context;
+            _securityBadgeService = securityBadgeService;
             _logger = logger;
         }
 
@@ -31,14 +30,12 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var badges = await _context.SecurityBadges
-                    .Where(b => b.IsActive && b.ShowOnLanding && !b.IsDeleted)
-                    .OrderBy(b => b.DisplayOrder)
-                    .ToListAsync();
+                var badges = await _securityBadgeService.GetAllActiveAsync();
+                var badgeList = badges.ToList();
 
-                _logger.LogInformation("Retrieved {Count} security badges for landing page", badges.Count);
+                _logger.LogInformation("Retrieved {Count} security badges for landing page", badgeList.Count);
 
-                return Ok(ApiResponse<List<SecurityBadge>>.SuccessResponse(badges));
+                return Ok(ApiResponse<List<SecurityBadge>>.SuccessResponse(badgeList));
             }
             catch (Exception ex)
             {
@@ -58,8 +55,7 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var badge = await _context.SecurityBadges
-                    .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
+                var badge = await _securityBadgeService.GetByIdAsync(id);
 
                 if (badge == null)
                     return NotFound(ApiResponse<SecurityBadge>.ErrorResponse("Security badge not found"));
@@ -84,16 +80,10 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                badge.CreatedAt = DateTime.UtcNow;
-                badge.UpdatedAt = DateTime.UtcNow;
-
-                _context.SecurityBadges.Add(badge);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Created security badge: {Title}", badge.Title);
+                var createdBadge = await _securityBadgeService.CreateAsync(badge);
 
                 return Ok(ApiResponse<SecurityBadge>.SuccessResponse(
-                    badge,
+                    createdBadge,
                     "Security badge created successfully"));
             }
             catch (Exception ex)
@@ -114,28 +104,15 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var existingBadge = await _context.SecurityBadges
-                    .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
-
-                if (existingBadge == null)
-                    return NotFound(ApiResponse<SecurityBadge>.ErrorResponse("Security badge not found"));
-
-                existingBadge.Title = badge.Title;
-                existingBadge.Subtitle = badge.Subtitle;
-                existingBadge.IconUrl = badge.IconUrl;
-                existingBadge.Description = badge.Description;
-                existingBadge.DisplayOrder = badge.DisplayOrder;
-                existingBadge.IsActive = badge.IsActive;
-                existingBadge.ShowOnLanding = badge.ShowOnLanding;
-                existingBadge.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Updated security badge: {Title}", existingBadge.Title);
+                var updatedBadge = await _securityBadgeService.UpdateAsync(id, badge);
 
                 return Ok(ApiResponse<SecurityBadge>.SuccessResponse(
-                    existingBadge,
+                    updatedBadge,
                     "Security badge updated successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ApiResponse<SecurityBadge>.ErrorResponse(ex.Message));
             }
             catch (Exception ex)
             {
@@ -155,22 +132,15 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var badge = await _context.SecurityBadges
-                    .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
-
-                if (badge == null)
-                    return NotFound(ApiResponse<bool>.ErrorResponse("Security badge not found"));
-
-                badge.IsDeleted = true;
-                badge.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Deleted security badge: {Title}", badge.Title);
+                var result = await _securityBadgeService.DeleteAsync(id);
 
                 return Ok(ApiResponse<bool>.SuccessResponse(
-                    true,
+                    result,
                     "Security badge deleted successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ApiResponse<bool>.ErrorResponse(ex.Message));
             }
             catch (Exception ex)
             {

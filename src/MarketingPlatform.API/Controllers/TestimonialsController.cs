@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MarketingPlatform.Application.DTOs.Common;
-using MarketingPlatform.Infrastructure.Data;
+using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 
 namespace MarketingPlatform.API.Controllers
@@ -12,14 +11,14 @@ namespace MarketingPlatform.API.Controllers
     [Route("api/testimonials")]
     public class TestimonialsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITestimonialService _testimonialService;
         private readonly ILogger<TestimonialsController> _logger;
 
         public TestimonialsController(
-            ApplicationDbContext context,
+            ITestimonialService testimonialService,
             ILogger<TestimonialsController> logger)
         {
-            _context = context;
+            _testimonialService = testimonialService;
             _logger = logger;
         }
 
@@ -31,14 +30,12 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var testimonials = await _context.Testimonials
-                    .Where(t => t.IsActive && !t.IsDeleted)
-                    .OrderBy(t => t.DisplayOrder)
-                    .ToListAsync();
+                var testimonials = await _testimonialService.GetAllActiveAsync();
+                var testimonialList = testimonials.ToList();
 
-                _logger.LogInformation("Retrieved {Count} testimonials", testimonials.Count);
+                _logger.LogInformation("Retrieved {Count} testimonials", testimonialList.Count);
 
-                return Ok(ApiResponse<List<Testimonial>>.SuccessResponse(testimonials));
+                return Ok(ApiResponse<List<Testimonial>>.SuccessResponse(testimonialList));
             }
             catch (Exception ex)
             {
@@ -57,8 +54,7 @@ namespace MarketingPlatform.API.Controllers
         {
             try
             {
-                var testimonial = await _context.Testimonials
-                    .FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted);
+                var testimonial = await _testimonialService.GetByIdAsync(id);
 
                 if (testimonial == null)
                     return NotFound(ApiResponse<Testimonial>.ErrorResponse("Testimonial not found"));
