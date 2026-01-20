@@ -18,6 +18,14 @@ namespace MarketingPlatform.Core.Entities
         public string? CallToActionText { get; set; }
         public string? CallToActionUrl { get; set; }
 
+        // Statistics for detail page hero (not shown on flip cards)
+        public string? StatTitle1 { get; set; }
+        public string? StatValue1 { get; set; }
+        public string? StatTitle2 { get; set; }
+        public string? StatValue2 { get; set; }
+        public string? StatTitle3 { get; set; }
+        public string? StatValue3 { get; set; }
+
         // Media for detail page
         public string? HeaderImageUrl { get; set; } // Hero image for detail page
         public string? VideoUrl { get; set; } // Video URL (YouTube, Vimeo, or direct)

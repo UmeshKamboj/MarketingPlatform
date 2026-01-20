@@ -13,53 +13,12 @@ PRINT '========================================';
 PRINT '';
 
 -- ================================================================
--- STEP 1: Remove Stat Columns from LandingFeatures
+-- STEP 1: Keep Stat Columns in LandingFeatures (used in detail page hero)
 -- ================================================================
 
-PRINT 'Step 1: Removing stat columns from LandingFeatures...';
-
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-           WHERE TABLE_NAME = 'LandingFeatures' AND COLUMN_NAME = 'StatTitle1')
-BEGIN
-    ALTER TABLE [LandingFeatures] DROP COLUMN [StatTitle1];
-    PRINT '✓ Removed StatTitle1 column';
-END
-
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-           WHERE TABLE_NAME = 'LandingFeatures' AND COLUMN_NAME = 'StatValue1')
-BEGIN
-    ALTER TABLE [LandingFeatures] DROP COLUMN [StatValue1];
-    PRINT '✓ Removed StatValue1 column';
-END
-
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-           WHERE TABLE_NAME = 'LandingFeatures' AND COLUMN_NAME = 'StatTitle2')
-BEGIN
-    ALTER TABLE [LandingFeatures] DROP COLUMN [StatTitle2];
-    PRINT '✓ Removed StatTitle2 column';
-END
-
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-           WHERE TABLE_NAME = 'LandingFeatures' AND COLUMN_NAME = 'StatValue2')
-BEGIN
-    ALTER TABLE [LandingFeatures] DROP COLUMN [StatValue2];
-    PRINT '✓ Removed StatValue2 column';
-END
-
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-           WHERE TABLE_NAME = 'LandingFeatures' AND COLUMN_NAME = 'StatTitle3')
-BEGIN
-    ALTER TABLE [LandingFeatures] DROP COLUMN [StatTitle3];
-    PRINT '✓ Removed StatTitle3 column';
-END
-
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-           WHERE TABLE_NAME = 'LandingFeatures' AND COLUMN_NAME = 'StatValue3')
-BEGIN
-    ALTER TABLE [LandingFeatures] DROP COLUMN [StatValue3];
-    PRINT '✓ Removed StatValue3 column';
-END
-
+PRINT 'Step 1: Stat columns retained in LandingFeatures for detail page hero...';
+PRINT '✓ StatTitle1-3 and StatValue1-3 columns will be kept';
+PRINT '  (Used only in feature detail page hero, not in flip cards)';
 PRINT '';
 
 -- ================================================================

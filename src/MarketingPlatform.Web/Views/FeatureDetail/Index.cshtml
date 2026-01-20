@@ -41,6 +41,39 @@
                 </div>
                 <h1 class="display-3 fw-bold mb-4">@feature.Title</h1>
                 <p class="lead fs-4 mb-4">@feature.ShortDescription</p>
+
+                @if (feature.StatTitle1 != null || feature.StatTitle2 != null || feature.StatTitle3 != null)
+                {
+                    <div class="row g-3 justify-content-center">
+                        @if (feature.StatTitle1 != null)
+                        {
+                            <div class="col-md-4">
+                                <div class="stat-box-hero">
+                                    <div class="h2 fw-bold mb-0">@feature.StatValue1</div>
+                                    <small class="text-white-50">@feature.StatTitle1</small>
+                                </div>
+                            </div>
+                        }
+                        @if (feature.StatTitle2 != null)
+                        {
+                            <div class="col-md-4">
+                                <div class="stat-box-hero">
+                                    <div class="h2 fw-bold mb-0">@feature.StatValue2</div>
+                                    <small class="text-white-50">@feature.StatTitle2</small>
+                                </div>
+                            </div>
+                        }
+                        @if (feature.StatTitle3 != null)
+                        {
+                            <div class="col-md-4">
+                                <div class="stat-box-hero">
+                                    <div class="h2 fw-bold mb-0">@feature.StatValue3</div>
+                                    <small class="text-white-50">@feature.StatTitle3</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
