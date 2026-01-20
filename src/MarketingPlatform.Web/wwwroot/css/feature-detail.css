@@ -3,6 +3,15 @@
  * Beautiful styling for individual feature detail pages
  */
 
+/* ========== SMOOTH SCROLLING ========== */
+html {
+    scroll-behavior: smooth;
+}
+
+.smooth-link {
+    transition: all 0.3s ease-in-out;
+}
+
 /* ========== HERO SECTION ========== */
 .feature-detail-hero {
     position: relative;

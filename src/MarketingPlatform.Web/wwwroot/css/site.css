@@ -293,7 +293,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .feature-card:hover {
-  transform: translateY(-8px);
+/*  transform: translateY(-8px);*/
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
   border-color: transparent;
 }

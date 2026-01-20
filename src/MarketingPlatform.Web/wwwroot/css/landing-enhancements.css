@@ -3,6 +3,11 @@
  * Additional styles for improved landing page appearance
  */
 
+/* ========== SMOOTH SCROLLING ========== */
+html {
+    scroll-behavior: smooth;
+}
+
 /* ========== FLIP CARD STYLES ========== */
 .flip-card-container {
     perspective: 1000px;
