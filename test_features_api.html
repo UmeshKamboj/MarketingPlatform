@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Landing Features API</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .endpoint-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Landing Page API Tester</h1>
+        <p>This page tests the Landing Features and FAQs API endpoints</p>
+
+        <div id="status" class="status info">
+            Click "Test Features API" or "Test FAQs API" to begin
+        </div>
+
+        <div style="margin: 20px 0;">
+            <label><strong>API Base URL:</strong></label>
+            <input type="text" id="apiBaseUrl" class="endpoint-input" value="https://localhost:7001" placeholder="https://localhost:7001">
+            <small style="color: #666; display: block; margin-top: 5px;">
+                Update this if your API runs on a different port
+            </small>
+        </div>
+
+        <div>
+            <button onclick="testFeaturesAPI()">🎯 Test Features API</button>
+            <button onclick="testFaqsAPI()">❓ Test FAQs API</button>
+            <button onclick="testBothAPIs()">🚀 Test Both APIs</button>
+        </div>
+
+        <h2>📊 Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function getApiBaseUrl() {
+            return document.getElementById('apiBaseUrl').value.trim();
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status ${type}`;
+            statusEl.textContent = message;
+        }
+
+        function addResult(title, data, isError = false) {
+            const resultsEl = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.innerHTML = `
+                <h3 style="color: ${isError ? '#721c24' : '#155724'};">${title}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            resultsEl.appendChild(resultDiv);
+        }
+
+        async function testFeaturesAPI() {
+            updateStatus('Testing Features API...', 'info');
+            const resultsEl = document.getElementById('results');
+            resultsEl.innerHTML = '';
+
+            try {
+                const apiUrl = `${getApiBaseUrl()}/api/landingfeatures`;
+                console.log('Fetching from:', apiUrl);
+
+                const response = await fetch(apiUrl);
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success && data.data && data.data.length > 0) {
+                    updateStatus(`✅ SUCCESS! Found ${data.data.length} features`, 'success');
+                    addResult('✅ Features API Response', data);
+
+                    // Show summary
+                    const summary = data.data.map(f => `• ${f.title} (${f.colorClass})`).join('\n');
+                    addResult('📋 Features Summary', summary);
+                } else {
+                    updateStatus('⚠️ API returned empty data', 'error');
+                    addResult('⚠️ Empty Response', data);
+                }
+            } catch (error) {
+                updateStatus(`❌ ERROR: ${error.message}`, 'error');
+                addResult('❌ Error Details', {
+                    error: error.message,
+                    apiUrl: `${getApiBaseUrl()}/api/landingfeatures`,
+                    troubleshooting: [
+                        '1. Make sure API project is running',
+                        '2. Check the port number in API Base URL',
+                        '3. Run SQL script: add_landing_features.sql',
+                        '4. Check browser console (F12) for CORS errors'
+                    ]
+                }, true);
+            }
+        }
+
+        async function testFaqsAPI() {
+            updateStatus('Testing FAQs API...', 'info');
+            const resultsEl = document.getElementById('results');
+            resultsEl.innerHTML = '';
+
+            try {
+                const apiUrl = `${getApiBaseUrl()}/api/landingfaqs`;
+                console.log('Fetching from:', apiUrl);
+
+                const response = await fetch(apiUrl);
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success && data.data && data.data.length > 0) {
+                    updateStatus(`✅ SUCCESS! Found ${data.data.length} FAQs`, 'success');
+                    addResult('✅ FAQs API Response', data);
+
+                    // Show summary
+                    const summary = data.data.map(f => `• ${f.question}`).join('\n');
+                    addResult('📋 FAQs Summary', summary);
+                } else {
+                    updateStatus('⚠️ API returned empty data', 'error');
+                    addResult('⚠️ Empty Response', data);
+                }
+            } catch (error) {
+                updateStatus(`❌ ERROR: ${error.message}`, 'error');
+                addResult('❌ Error Details', {
+                    error: error.message,
+                    apiUrl: `${getApiBaseUrl()}/api/landingfaqs`,
+                    troubleshooting: [
+                        '1. Make sure API project is running',
+                        '2. Check the port number in API Base URL',
+                        '3. Run SQL script: add_landing_faqs.sql',
+                        '4. Check browser console (F12) for CORS errors'
+                    ]
+                }, true);
+            }
+        }
+
+        async function testBothAPIs() {
+            await testFeaturesAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testFaqsAPI();
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', function() {
+            console.log('API Tester loaded');
+            console.log('Update the API Base URL if your API runs on a different port');
+        });
+    </script>
+</body>
+</html>
