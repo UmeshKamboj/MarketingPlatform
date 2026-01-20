@@ -14,6 +14,10 @@ namespace MarketingPlatform.Core.Entities
         public bool IsActive { get; set; } = true;
         public bool ShowOnLanding { get; set; } = true;
 
+        // Call to action
+        public string? CallToActionText { get; set; }
+        public string? CallToActionUrl { get; set; }
+
         // Media for detail page
         public string? HeaderImageUrl { get; set; } // Hero image for detail page
         public string? VideoUrl { get; set; } // Video URL (YouTube, Vimeo, or direct)
