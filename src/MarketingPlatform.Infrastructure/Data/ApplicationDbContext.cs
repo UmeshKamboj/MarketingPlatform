@@ -85,6 +85,7 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<Testimonial> Testimonials => Set<Testimonial>();
         public DbSet<UseCase> UseCases => Set<UseCase>();
         public DbSet<TrustedCompany> TrustedCompanies => Set<TrustedCompany>();
+        public DbSet<SecurityBadge> SecurityBadges => Set<SecurityBadge>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
