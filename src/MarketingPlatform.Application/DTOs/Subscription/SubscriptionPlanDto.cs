@@ -21,6 +21,20 @@ namespace MarketingPlatform.Application.DTOs.Subscription
         public bool IsActive { get; set; }
         public bool IsVisible { get; set; }
         public bool ShowOnLanding { get; set; }
+        public string PlanCategory { get; set; } = string.Empty;
+        public bool IsMostPopular { get; set; }
+        public List<PlanFeatureDto>? PlanFeatures { get; set; }
         public DateTime CreatedAt { get; set; }
+    }
+
+    public class PlanFeatureDto
+    {
+        public int Id { get; set; }
+        public int FeatureId { get; set; }
+        public string FeatureName { get; set; } = string.Empty;
+        public string? FeatureDescription { get; set; }
+        public string? FeatureValue { get; set; }
+        public bool IsIncluded { get; set; }
+        public int DisplayOrder { get; set; }
     }
 }

@@ -78,6 +78,10 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<PageContent> PageContents => Set<PageContent>();
         public DbSet<ChatRoom> ChatRooms => Set<ChatRoom>();
         public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+        public DbSet<Feature> Features => Set<Feature>();
+        public DbSet<PlanFeatureMapping> PlanFeatureMappings => Set<PlanFeatureMapping>();
+        public DbSet<LandingFeature> LandingFeatures => Set<LandingFeature>();
+        public DbSet<LandingFaq> LandingFaqs => Set<LandingFaq>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

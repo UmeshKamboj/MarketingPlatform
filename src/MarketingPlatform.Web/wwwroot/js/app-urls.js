@@ -494,6 +494,22 @@ const AppUrls = {
             features: (id) => `/api/subscriptionplans/${id}/features`,
             eligibleUpgrades: (currentPlanId) => `/api/subscriptionplans/${currentPlanId}/eligible-upgrades`
         },
+
+        landingFeatures: {
+            list: '/api/landingfeatures',
+            get: (id) => `/api/landingfeatures/${id}`,
+            create: '/api/landingfeatures',
+            update: (id) => `/api/landingfeatures/${id}`,
+            delete: (id) => `/api/landingfeatures/${id}`
+        },
+
+        landingFaqs: {
+            list: '/api/landingfaqs',
+            get: (id) => `/api/landingfaqs/${id}`,
+            create: '/api/landingfaqs',
+            update: (id) => `/api/landingfaqs/${id}`,
+            delete: (id) => `/api/landingfaqs/${id}`
+        },
         
         pricing: {
             // Models
@@ -729,7 +745,7 @@ AppUrls.buildUrl = function(baseUrl, params = {}) {
 // Returns the base URL from appConfig (set in _Layout.cshtml from appsettings)
 AppUrls.getApiBaseUrl = function() {
     // Priority: appConfig (from appsettings) > fallback to empty string (same origin)
-    return window.authConfig?.apiBaseUrl || '' ;
+    return window.authConfig?.apiBaseUrl || window.appConfig?.apiBaseUrl ;
 };
 
 // Helper function to build full API URL by prepending base URL to a path

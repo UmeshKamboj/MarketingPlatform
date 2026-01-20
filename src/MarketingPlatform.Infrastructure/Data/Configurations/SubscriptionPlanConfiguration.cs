@@ -17,6 +17,9 @@ namespace MarketingPlatform.Infrastructure.Data.Configurations
             builder.Property(sp => sp.Description)
                 .HasMaxLength(500);
 
+            builder.Property(sp => sp.PlanCategory)
+                .HasMaxLength(200);
+
             builder.Property(sp => sp.PriceMonthly)
                 .HasPrecision(18, 2);
 

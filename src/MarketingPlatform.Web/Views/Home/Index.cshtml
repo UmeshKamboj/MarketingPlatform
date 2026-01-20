@@ -48,18 +48,49 @@
                             <div class="mockup-dot bg-success"></div>
                         </div>
                         <div class="mockup-content position-relative">
-                            <!-- Video Player -->
-                            <div class="demo-video-container rounded-3 overflow-hidden bg-dark position-relative">
-                                <video id="demoVideo" class="w-100" poster="/images/video-poster.jpg" controls>
-                                    <source src="/videos/product-demo.mp4" type="video/mp4">
-                                    <!-- Fallback to GIF if video not available -->
-                                    <img src="/images/product-demo.gif" alt="Product Demo" class="w-100">
-                                </video>
-                                <!-- Play button overlay -->
-                                <div class="video-play-overlay position-absolute top-50 start-50 translate-middle">
-                                    <button class="btn-play-video btn btn-light btn-lg rounded-circle shadow-lg" onclick="document.getElementById('demoVideo').play(); this.parentElement.style.display='none';">
-                                        <i class="bi bi-play-fill fs-2"></i>
-                                    </button>
+                            <!-- Demo Display - Animated Dashboard Preview -->
+                            <div class="demo-video-container rounded-3 overflow-hidden position-relative" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 400px;">
+                                <div class="demo-mockup-content p-4 text-white">
+                                    <!-- Dashboard Preview -->
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-4">
+                                            <div class="stat-box bg-white bg-opacity-20 rounded p-3 animate-fade-in" style="animation-delay: 0.1s;">
+                                                <div class="small opacity-75">Total Campaigns</div>
+                                                <div class="h3 fw-bold mb-0">24</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="stat-box bg-white bg-opacity-20 rounded p-3 animate-fade-in" style="animation-delay: 0.3s;">
+                                                <div class="small opacity-75">Messages Sent</div>
+                                                <div class="h3 fw-bold mb-0">45.2K</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="stat-box bg-white bg-opacity-20 rounded p-3 animate-fade-in" style="animation-delay: 0.5s;">
+                                                <div class="small opacity-75">Open Rate</div>
+                                                <div class="h3 fw-bold mb-0">98%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Features Preview -->
+                                    <div class="bg-white bg-opacity-10 rounded p-3 animate-slide-up" style="animation-delay: 0.7s;">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-envelope-fill me-2"></i>
+                                            <span class="small">Campaign: Summer Sale Launch</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-people-fill me-2"></i>
+                                            <span class="small">Target: 15,000 contacts</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-graph-up me-2"></i>
+                                            <span class="small">Status: Active - 92% delivered</span>
+                                        </div>
+                                    </div>
+                                    <!-- Central Icon -->
+                                    <div class="text-center mt-4 animate-pulse">
+                                        <i class="bi bi-rocket-takeoff" style="font-size: 4rem; opacity: 0.3;"></i>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Quick Stats Below Video -->
@@ -112,40 +143,35 @@
                 <div class="company-logo-wrapper">
                     <img src="/images/logos/company-1.svg"
                          alt="Company 1"
-                         class="company-logo img-fluid grayscale-logo"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 1%3C/text%3E%3C/svg%3E';">
+                         class="company-logo img-fluid grayscale-logo">
                 </div>
             </div>
             <div class="col-6 col-md-2 text-center">
                 <div class="company-logo-wrapper">
                     <img src="/images/logos/company-2.svg"
                          alt="Company 2"
-                         class="company-logo img-fluid grayscale-logo"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 2%3C/text%3E%3C/svg%3E';">
+                         class="company-logo img-fluid grayscale-logo">
                 </div>
             </div>
             <div class="col-6 col-md-2 text-center">
                 <div class="company-logo-wrapper">
                     <img src="/images/logos/company-3.svg"
                          alt="Company 3"
-                         class="company-logo img-fluid grayscale-logo"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 3%3C/text%3E%3C/svg%3E';">
+                         class="company-logo img-fluid grayscale-logo">
                 </div>
             </div>
             <div class="col-6 col-md-2 text-center">
                 <div class="company-logo-wrapper">
                     <img src="/images/logos/company-4.svg"
                          alt="Company 4"
-                         class="company-logo img-fluid grayscale-logo"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 4%3C/text%3E%3C/svg%3E';">
+                         class="company-logo img-fluid grayscale-logo">
                 </div>
             </div>
             <div class="col-6 col-md-2 text-center">
                 <div class="company-logo-wrapper">
                     <img src="/images/logos/company-5.svg"
                          alt="Company 5"
-                         class="company-logo img-fluid grayscale-logo"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2240%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22120%22 height=%2240%22 rx=%224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%239ca3af%22%3ECompany 5%3C/text%3E%3C/svg%3E';">
+                         class="company-logo img-fluid grayscale-logo">
                 </div>
             </div>
         </div>
@@ -156,119 +182,18 @@
 <section id="features" class="features-section py-5 my-5">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3">
-                <i class="bi bi-stars"></i> Features
+            <span class="badge px-4 py-2 mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 0.875rem; font-weight: 600; letter-spacing: 1px;">
+                <i class="bi bi-stars me-2"></i>FEATURES
             </span>
-            <h2 class="display-4 fw-bold mb-3">Powerful Features for Modern Marketing</h2>
-            <p class="lead text-muted">Everything you need to create, manage, and optimize your campaigns</p>
+            <h2 class="display-4 fw-bold mb-3" style="color: #1f2937; line-height: 1.2;">Powerful Features for Modern Marketing</h2>
+            <p class="lead text-muted" style="font-size: 1.1rem; max-width: 700px; margin: 0 auto;">Everything you need to create, manage, and optimize your campaigns</p>
         </div>
-        
-        <div class="row g-4">
-            <!-- Feature 1 -->
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper mb-4">
-                        <div class="feature-icon-bg bg-primary"></div>
-                        <i class="bi bi-broadcast feature-icon-lg text-primary"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">Multi-Channel Campaigns</h4>
-                    <p class="text-muted mb-4">
-                        Send SMS, MMS, and Email campaigns from one unified platform. 
-                        Reach your audience on their preferred channels with seamless integration.
-                    </p>
-                    <a href="#" class="text-primary fw-semibold text-decoration-none">
-                        Learn more <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
 
-            <!-- Feature 2 -->
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper mb-4">
-                        <div class="feature-icon-bg bg-success"></div>
-                        <i class="bi bi-graph-up-arrow feature-icon-lg text-success"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">Advanced Analytics</h4>
-                    <p class="text-muted mb-4">
-                        Track campaign performance in real-time with detailed analytics and reporting. 
-                        Make data-driven decisions to optimize your results and ROI.
-                    </p>
-                    <a href="#" class="text-success fw-semibold text-decoration-none">
-                        Learn more <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Feature 3 -->
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper mb-4">
-                        <div class="feature-icon-bg bg-info"></div>
-                        <i class="bi bi-clock-history feature-icon-lg text-info"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">Automation & Scheduling</h4>
-                    <p class="text-muted mb-4">
-                        Schedule campaigns in advance and automate your marketing workflows. 
-                        Save time, improve efficiency, and never miss an opportunity.
-                    </p>
-                    <a href="#" class="text-info fw-semibold text-decoration-none">
-                        Learn more <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Feature 4 -->
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper mb-4">
-                        <div class="feature-icon-bg bg-warning"></div>
-                        <i class="bi bi-people feature-icon-lg text-warning"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">Smart Contact Management</h4>
-                    <p class="text-muted mb-4">
-                        Organize your contacts with dynamic groups and tags. 
-                        Segment your audience intelligently for highly targeted messaging.
-                    </p>
-                    <a href="#" class="text-warning fw-semibold text-decoration-none">
-                        Learn more <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Feature 5 -->
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper mb-4">
-                        <div class="feature-icon-bg bg-danger"></div>
-                        <i class="bi bi-file-earmark-text feature-icon-lg text-danger"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">Template Library</h4>
-                    <p class="text-muted mb-4">
-                        Create reusable message templates with dynamic variables. 
-                        Personalize content at scale with our intuitive template engine.
-                    </p>
-                    <a href="#" class="text-danger fw-semibold text-decoration-none">
-                        Learn more <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Feature 6 -->
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper mb-4">
-                        <div class="feature-icon-bg bg-secondary"></div>
-                        <i class="bi bi-shield-check feature-icon-lg text-secondary"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">Compliance & Security</h4>
-                    <p class="text-muted mb-4">
-                        Stay compliant with GDPR, CAN-SPAM, and TCPA regulations. 
-                        Enterprise-grade security and encryption for your data.
-                    </p>
-                    <a href="#" class="text-secondary fw-semibold text-decoration-none">
-                        Learn more <i class="bi bi-arrow-right"></i>
-                    </a>
+        <div id="features-cards" class="row g-4">
+            <!-- Features will be loaded dynamically -->
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading features...</span>
                 </div>
             </div>
         </div>
@@ -324,7 +249,7 @@
 <section class="testimonials-section py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3">
+            <span class="badge bg-primary bg-opacity-10  px-3 py-2 mb-3">
                 <i class="bi bi-chat-quote"></i> Testimonials
             </span>
             <h2 class="display-4 fw-bold mb-3">What Our Customers Say</h2>
@@ -405,7 +330,7 @@
 <section class="trust-badges-section py-5">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 mb-3">
+            <span class="badge bg-success bg-opacity-10  px-3 py-2 mb-3">
                 <i class="bi bi-shield-check"></i> Security & Compliance
             </span>
             <h2 class="h3 fw-bold mb-3">Enterprise-Grade Security You Can Trust</h2>
@@ -417,8 +342,7 @@
                 <div class="trust-badge-card p-4 h-100">
                     <img src="/images/badges/gdpr.svg"
                          alt="GDPR Compliant"
-                         class="trust-badge-img mb-3"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%2310b981%22 stroke=%22%2310b981%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22white%22 font-weight=%22bold%22%3EGDPR%3C/text%3E%3C/svg%3E';">
+                         class="trust-badge-img mb-3">
                     <div class="fw-semibold text-dark">GDPR</div>
                     <small class="text-muted">Compliant</small>
                 </div>
@@ -428,8 +352,7 @@
                 <div class="trust-badge-card p-4 h-100">
                     <img src="/images/badges/iso-27001.svg"
                          alt="ISO 27001"
-                         class="trust-badge-img mb-3"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%234f46e5%22 stroke=%22%234f46e5%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2245%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2210%22 fill=%22white%22 font-weight=%22bold%22%3EISO%3C/text%3E%3Ctext x=%2250%25%22 y=%2258%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2210%22 fill=%22white%22 font-weight=%22bold%22%3E27001%3C/text%3E%3C/svg%3E';">
+                         class="trust-badge-img mb-3">
                     <div class="fw-semibold text-dark">ISO 27001</div>
                     <small class="text-muted">Certified</small>
                 </div>
@@ -439,8 +362,7 @@
                 <div class="trust-badge-card p-4 h-100">
                     <img src="/images/badges/soc2.svg"
                          alt="SOC 2"
-                         class="trust-badge-img mb-3"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%233b82f6%22 stroke=%22%233b82f6%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22white%22 font-weight=%22bold%22%3ESOC 2%3C/text%3E%3C/svg%3E';">
+                         class="trust-badge-img mb-3">
                     <div class="fw-semibold text-dark">SOC 2</div>
                     <small class="text-muted">Type II</small>
                 </div>
@@ -450,8 +372,7 @@
                 <div class="trust-badge-card p-4 h-100">
                     <img src="/images/badges/hipaa.svg"
                          alt="HIPAA"
-                         class="trust-badge-img mb-3"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%23f59e0b%22 stroke=%22%23f59e0b%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22white%22 font-weight=%22bold%22%3EHIPAA%3C/text%3E%3C/svg%3E';">
+                         class="trust-badge-img mb-3">
                     <div class="fw-semibold text-dark">HIPAA</div>
                     <small class="text-muted">Compliant</small>
                 </div>
@@ -461,8 +382,7 @@
                 <div class="trust-badge-card p-4 h-100">
                     <img src="/images/badges/ssl.svg"
                          alt="SSL Encrypted"
-                         class="trust-badge-img mb-3"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2238%22 fill=%22%2310b981%22 stroke=%22%2310b981%22 stroke-width=%222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22white%22 font-weight=%22bold%22%3ESSL%3C/text%3E%3C/svg%3E';">
+                         class="trust-badge-img mb-3">
                     <div class="fw-semibold text-dark">256-bit SSL</div>
                     <small class="text-muted">Encrypted</small>
                 </div>
@@ -475,7 +395,7 @@
 <section class="use-cases-section py-5 my-5 bg-light">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 mb-3">
+            <span class="badge bg-info bg-opacity-10  px-3 py-2 mb-3">
                 <i class="bi bi-briefcase"></i> Use Cases
             </span>
             <h2 class="display-4 fw-bold mb-3">Built for Every Industry</h2>
@@ -513,8 +433,7 @@
                 <div class="row align-items-center g-4">
                     <div class="col-lg-6" data-aos="fade-right">
                         <div class="use-case-image-wrapper">
-                            <img src="/images/use-cases/ecommerce.svg" alt="E-Commerce Use Case" class="img-fluid rounded-4 shadow-lg"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22600%22 height=%22400%22 rx=%2216%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%239ca3af%22%3EE-Commerce%3C/text%3E%3C/svg%3E';">
+                            <img src="/images/use-cases/ecommerce.svg" alt="E-Commerce Use Case" class="img-fluid rounded-4 shadow-lg">
                         </div>
                     </div>
                     <div class="col-lg-6" data-aos="fade-left">
@@ -549,8 +468,7 @@
                 <div class="row align-items-center g-4">
                     <div class="col-lg-6" data-aos="fade-right">
                         <div class="use-case-image-wrapper">
-                            <img src="/images/use-cases/healthcare.svg" alt="Healthcare Use Case" class="img-fluid rounded-4 shadow-lg"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22600%22 height=%22400%22 rx=%2216%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%239ca3af%22%3EHealthcare%3C/text%3E%3C/svg%3E';">
+                            <img src="/images/use-cases/healthcare.svg" alt="Healthcare Use Case" class="img-fluid rounded-4 shadow-lg">
                         </div>
                     </div>
                     <div class="col-lg-6" data-aos="fade-left">
@@ -585,8 +503,7 @@
                 <div class="row align-items-center g-4">
                     <div class="col-lg-6" data-aos="fade-right">
                         <div class="use-case-image-wrapper">
-                            <img src="/images/use-cases/realestate.svg" alt="Real Estate Use Case" class="img-fluid rounded-4 shadow-lg"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22600%22 height=%22400%22 rx=%2216%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%239ca3af%22%3EReal Estate%3C/text%3E%3C/svg%3E';">
+                            <img src="/images/use-cases/realestate.svg" alt="Real Estate Use Case" class="img-fluid rounded-4 shadow-lg">
                         </div>
                     </div>
                     <div class="col-lg-6" data-aos="fade-left">
@@ -621,8 +538,7 @@
                 <div class="row align-items-center g-4">
                     <div class="col-lg-6" data-aos="fade-right">
                         <div class="use-case-image-wrapper">
-                            <img src="/images/use-cases/retail.svg" alt="Retail Use Case" class="img-fluid rounded-4 shadow-lg"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22600%22 height=%22400%22 rx=%2216%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%239ca3af%22%3ERetail%3C/text%3E%3C/svg%3E';">
+                            <img src="/images/use-cases/retail.svg" alt="Retail Use Case" class="img-fluid rounded-4 shadow-lg">
                         </div>
                     </div>
                     <div class="col-lg-6" data-aos="fade-left">
@@ -659,11 +575,11 @@
 <section id="pricing" class="pricing-section py-5 my-5">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3">
-                <i class="bi bi-tag"></i> Pricing
+            <span class="badge px-4 py-2 mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 0.875rem; font-weight: 600; letter-spacing: 1px;">
+                <i class="bi bi-tag-fill me-2"></i>PRICING PLANS
             </span>
-            <h2 class="display-4 fw-bold mb-3">Simple, Transparent Pricing</h2>
-            <p class="lead text-muted">Choose the plan that fits your business needs. No hidden fees.</p>
+            <h2 class="display-4 fw-bold mb-3" style="color: #1f2937; line-height: 1.2;">Choose Your Perfect Plan</h2>
+            <p class="lead text-muted" style="font-size: 1.1rem; max-width: 700px; margin: 0 auto;">Flexible pricing to match your business needs. Start free, scale as you grow.</p>
         </div>
         
         <div id="pricing-plans" class="row g-4 justify-content-center">
@@ -671,6 +587,244 @@
             <div class="col-12 text-center">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading pricing plans...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Accordion Section -->
+<section class="faq-section py-5 my-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="badge px-4 py-2 mb-3" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; font-size: 0.875rem; font-weight: 600; letter-spacing: 1px;">
+                <i class="bi bi-question-circle-fill me-2"></i>FAQ
+            </span>
+            <h2 class="display-4 fw-bold mb-3" style="color: #1f2937; line-height: 1.2;">Frequently Asked Questions</h2>
+            <p class="lead text-muted" style="font-size: 1.1rem; max-width: 700px; margin: 0 auto;">Everything you need to know about our platform</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="accordion" id="faqAccordion">
+                    <div id="faq-accordion">
+                        <!-- FAQs will be loaded dynamically -->
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading FAQs...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- This closing div was at line 811, removing hardcoded content -->
+                <!-- <div class="accordion-item border-0 shadow-sm mb-3 rounded-3" data-aos="fade-up" data-aos-delay="100">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq1"
+                                    aria-expanded="false" aria-controls="faq1">
+                                <i class="bi bi-gift text-primary me-2"></i>
+                                What's included in the free trial?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>Our 14-day free trial gives you full access to all features of the Professional plan with no credit card required. You can:</p>
+                                <ul>
+                                    <li>Send up to 1,000 messages (SMS, MMS, and Email)</li>
+                                    <li>Create unlimited campaigns and templates</li>
+                                    <li>Access advanced analytics and A/B testing</li>
+                                    <li>Test all automation features</li>
+                                    <li>Get full support from our team</li>
+                                </ul>
+                                <p class="mb-0">No charges apply until you choose a paid plan after the trial period.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2: Platform Features -->
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded-3" data-aos="fade-up" data-aos-delay="200">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq2"
+                                    aria-expanded="false" aria-controls="faq2">
+                                <i class="bi bi-lightning text-warning me-2"></i>
+                                What channels does the platform support?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>Our platform supports multiple communication channels to reach your audience wherever they are:</p>
+                                <ul>
+                                    <li><strong>SMS (Text Messages):</strong> Instant delivery with 98% open rates</li>
+                                    <li><strong>MMS (Multimedia Messages):</strong> Send images, videos, and rich media</li>
+                                    <li><strong>Email Marketing:</strong> Professional email campaigns with templates</li>
+                                    <li><strong>Multi-Channel Campaigns:</strong> Combine channels for maximum impact</li>
+                                </ul>
+                                <p class="mb-0">All channels can be managed from a single dashboard with unified analytics.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3: Pricing and Billing -->
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded-3" data-aos="fade-up" data-aos-delay="300">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq3"
+                                    aria-expanded="false" aria-controls="faq3">
+                                <i class="bi bi-credit-card text-success me-2"></i>
+                                How does pricing work? Are there any hidden fees?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p><strong>No hidden fees. Ever.</strong> Our pricing is transparent and straightforward:</p>
+                                <ul>
+                                    <li>Monthly subscription based on your plan tier (Starter, Professional, Enterprise)</li>
+                                    <li>Message credits included with each plan</li>
+                                    <li>Additional messages available at predictable per-message rates</li>
+                                    <li>No setup fees, no cancellation fees</li>
+                                    <li>Pay-as-you-go option available for seasonal businesses</li>
+                                </ul>
+                                <p class="mb-0">You can upgrade, downgrade, or cancel anytime. Billing is monthly or annual (save 20% with annual billing).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4: Data Security -->
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded-3" data-aos="fade-up" data-aos-delay="400">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq4"
+                                    aria-expanded="false" aria-controls="faq4">
+                                <i class="bi bi-shield-check text-info me-2"></i>
+                                Is my data secure and compliant?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Absolutely. Security and compliance are our top priorities.</strong></p>
+                                <ul>
+                                    <li><strong>GDPR Compliant:</strong> Full compliance with European data protection regulations</li>
+                                    <li><strong>HIPAA Ready:</strong> For healthcare organizations handling patient data</li>
+                                    <li><strong>SOC 2 Type II Certified:</strong> Industry-standard security audits</li>
+                                    <li><strong>256-bit SSL Encryption:</strong> All data encrypted in transit and at rest</li>
+                                    <li><strong>ISO 27001 Certified:</strong> Information security management</li>
+                                </ul>
+                                <p class="mb-0">We also provide built-in consent management, opt-out handling, and audit trails for compliance.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5: Integration -->
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded-3" data-aos="fade-up" data-aos-delay="500">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq5"
+                                    aria-expanded="false" aria-controls="faq5">
+                                <i class="bi bi-puzzle text-danger me-2"></i>
+                                Can I integrate with my existing tools?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Yes! We integrate with popular platforms you already use:</strong></p>
+                                <ul>
+                                    <li><strong>CRM Systems:</strong> Salesforce, HubSpot, Zoho CRM</li>
+                                    <li><strong>E-commerce:</strong> Shopify, WooCommerce, Magento</li>
+                                    <li><strong>Automation:</strong> Zapier, Make (Integromat), native webhooks</li>
+                                    <li><strong>Analytics:</strong> Google Analytics, Mixpanel, Segment</li>
+                                    <li><strong>Custom Integration:</strong> RESTful API and webhooks for custom solutions</li>
+                                </ul>
+                                <p class="mb-0">Our API documentation is comprehensive, and our support team can help with integration questions.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 6: Support -->
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded-3" data-aos="fade-up" data-aos-delay="600">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq6"
+                                    aria-expanded="false" aria-controls="faq6">
+                                <i class="bi bi-headset text-primary me-2"></i>
+                                What kind of support do you offer?
+                            </button>
+                        </h2>
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p><strong>We're here to help 24/7:</strong></p>
+                                <ul>
+                                    <li><strong>Live Chat Support:</strong> Available 24/7 for all paid plans</li>
+                                    <li><strong>Email Support:</strong> Response within 2 hours during business hours</li>
+                                    <li><strong>Phone Support:</strong> Available for Professional and Enterprise plans</li>
+                                    <li><strong>Knowledge Base:</strong> Comprehensive guides and tutorials</li>
+                                    <li><strong>Video Training:</strong> On-demand webinars and training sessions</li>
+                                    <li><strong>Dedicated Account Manager:</strong> For Enterprise customers</li>
+                                </ul>
+                                <p class="mb-0">Our average response time is under 5 minutes during peak hours, and we maintain a 98% customer satisfaction rating.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 7: Migration -->
+                    <div class="accordion-item border-0 shadow-sm mb-3 rounded-3" data-aos="fade-up" data-aos-delay="700">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq7"
+                                    aria-expanded="false" aria-controls="faq7">
+                                <i class="bi bi-arrow-left-right text-success me-2"></i>
+                                How easy is it to migrate from another platform?
+                            </button>
+                        </h2>
+                        <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p><strong>We make migration simple and seamless:</strong></p>
+                                <ul>
+                                    <li><strong>Free Migration Assistance:</strong> Our team helps you import contacts, templates, and campaign history</li>
+                                    <li><strong>CSV Import:</strong> Bulk import contacts from any platform</li>
+                                    <li><strong>API Migration:</strong> Direct migration from major platforms (Mailchimp, Twilio, etc.)</li>
+                                    <li><strong>Template Recreation:</strong> We'll help recreate your existing templates</li>
+                                    <li><strong>Zero Downtime:</strong> Run campaigns on both platforms during transition</li>
+                                </ul>
+                                <p class="mb-0">Most customers complete migration in 1-3 days. Enterprise customers get a dedicated migration specialist.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 8: Campaign Performance -->
+                    <div class="accordion-item border-0 shadow-sm rounded-3" data-aos="fade-up" data-aos-delay="800">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faq8"
+                                    aria-expanded="false" aria-controls="faq8">
+                                <i class="bi bi-graph-up text-info me-2"></i>
+                                How can I track campaign performance?
+                            </button>
+                        </h2>
+                        <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Comprehensive analytics built into every campaign:</strong></p>
+                                <ul>
+                                    <li><strong>Real-Time Metrics:</strong> Delivery rates, open rates, click rates, conversions</li>
+                                    <li><strong>A/B Testing:</strong> Test subject lines, content, and send times automatically</li>
+                                    <li><strong>Engagement Tracking:</strong> See which links are clicked and when</li>
+                                    <li><strong>ROI Calculator:</strong> Track revenue generated per campaign</li>
+                                    <li><strong>Custom Reports:</strong> Export data in CSV, PDF, or via API</li>
+                                    <li><strong>Heatmaps:</strong> Visual representation of email engagement</li>
+                                </ul>
+                                <p class="mb-0">All analytics are available in real-time with historical data stored indefinitely.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Still have questions CTA -->
+                <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="900">
+                    <p class="text-muted mb-3">Still have questions?</p>
+                    <a href="/contact" class="btn btn-outline-primary btn-lg px-5 rounded-pill">
+                        <i class="bi bi-chat-dots"></i> Contact Our Team
+                    </a>
                 </div>
             </div>
         </div>
@@ -707,12 +861,8 @@
 </section>
 
 @section Scripts {
-    <script nonce="@Context.GetCspNonce()">
-        // Configuration object with nonce for CSP compliance
-        window.appConfig = { 
-            apiBaseUrl: '@ViewBag.ApiBaseUrl'
-        };
-    </script>
     <script src="~/js/landing-page.js" asp-append-version="true"></script>
+    <script src="~/js/landing-features.js" asp-append-version="true"></script>
+    <script src="~/js/landing-faqs.js" asp-append-version="true"></script>
 }
 

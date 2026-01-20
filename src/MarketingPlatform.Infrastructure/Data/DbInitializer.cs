@@ -17,7 +17,9 @@ namespace MarketingPlatform.Infrastructure.Data
                 await SeedIdentityRolesAsync(roleManager, logger);
                 await SeedCustomRolesAsync(context, logger);
                 await SeedUsersAsync(context, userManager, roleManager, logger);
+                await SeedFeaturesAsync(context, logger);
                 await SeedSubscriptionPlansAsync(context, logger);
+                await SeedPlanFeatureMappingsAsync(context, logger);
                 await SeedMessageProvidersAsync(context, logger);
                 await SeedChannelRoutingConfigsAsync(context, logger);
                 await SeedPricingModelsAsync(context, logger);
@@ -314,6 +316,149 @@ namespace MarketingPlatform.Infrastructure.Data
             }
         }
 
+        private static async Task SeedFeaturesAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding features...");
+
+            try
+            {
+                // Seed Features
+                if (!await context.Features.AnyAsync())
+                {
+                    logger?.LogInformation("Creating features...");
+
+                    var features = new List<Feature>
+                    {
+                        new Feature
+                        {
+                            Name = "SMS Messages",
+                            Description = "Send SMS text messages to your contacts",
+                            IsActive = true,
+                            DisplayOrder = 1,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "MMS Messages",
+                            Description = "Send multimedia messages with images and videos",
+                            IsActive = true,
+                            DisplayOrder = 2,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Email Campaigns",
+                            Description = "Create and send email marketing campaigns",
+                            IsActive = true,
+                            DisplayOrder = 3,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Contact Management",
+                            Description = "Organize and manage your contact database",
+                            IsActive = true,
+                            DisplayOrder = 4,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Basic Analytics",
+                            Description = "View basic campaign performance metrics",
+                            IsActive = true,
+                            DisplayOrder = 5,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Advanced Analytics",
+                            Description = "Detailed insights and custom reports",
+                            IsActive = true,
+                            DisplayOrder = 6,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Automation Workflows",
+                            Description = "Automate your marketing campaigns",
+                            IsActive = true,
+                            DisplayOrder = 7,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Custom Templates",
+                            Description = "Create reusable message templates",
+                            IsActive = true,
+                            DisplayOrder = 8,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "API Access",
+                            Description = "Programmatic access to platform features",
+                            IsActive = true,
+                            DisplayOrder = 9,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Priority Support",
+                            Description = "Fast-tracked customer support",
+                            IsActive = true,
+                            DisplayOrder = 10,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "24/7 Support",
+                            Description = "Round-the-clock customer support",
+                            IsActive = true,
+                            DisplayOrder = 11,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Dedicated Account Manager",
+                            Description = "Personal account management and guidance",
+                            IsActive = true,
+                            DisplayOrder = 12,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "White-label Options",
+                            Description = "Customize the platform with your branding",
+                            IsActive = true,
+                            DisplayOrder = 13,
+                            CreatedAt = DateTime.UtcNow
+                        },
+                        new Feature
+                        {
+                            Name = "Team Collaboration",
+                            Description = "Multiple user accounts and permissions",
+                            IsActive = true,
+                            DisplayOrder = 14,
+                            CreatedAt = DateTime.UtcNow
+                        }
+                    };
+
+                    context.Features.AddRange(features);
+                    await context.SaveChangesAsync();
+                    logger?.LogInformation("Successfully created {Count} features.", features.Count);
+                }
+                else
+                {
+                    logger?.LogInformation("Features already exist.");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Error seeding features.");
+                throw;
+            }
+        }
+
         private static async Task SeedSubscriptionPlansAsync(ApplicationDbContext context, ILogger? logger)
         {
             logger?.LogInformation("Seeding subscription plans...");
@@ -329,50 +474,56 @@ namespace MarketingPlatform.Infrastructure.Data
                 {
                     new SubscriptionPlan
                     {
-                        Name = "Free",
-                        Description = "Perfect for trying out the platform",
-                        PriceMonthly = 0,
-                        PriceYearly = 0,
-                        SMSLimit = 100,
-                        MMSLimit = 10,
-                        EmailLimit = 500,
-                        ContactLimit = 500,
+                        Name = "Starter",
+                        Description = "Perfect for small businesses getting started with marketing automation",
+                        PlanCategory = "For small businesses",
+                        IsMostPopular = false,
+                        PriceMonthly = 29.99m,
+                        PriceYearly = 299.99m, // ~17% discount
+                        SMSLimit = 1000,
+                        MMSLimit = 100,
+                        EmailLimit = 5000,
+                        ContactLimit = 1000,
                         Features = "[\"Basic campaign management\", \"Basic analytics\", \"Email support\"]",
                         IsActive = true,
                         IsVisible = true,
-                        ShowOnLanding = true, // Display on landing page
+                        ShowOnLanding = true,
                         CreatedAt = DateTime.UtcNow
                     },
                     new SubscriptionPlan
                     {
-                        Name = "Pro",
-                        Description = "For growing businesses",
-                        PriceMonthly = 49.99m,
-                        PriceYearly = 499.99m,
-                        SMSLimit = 5000,
-                        MMSLimit = 500,
-                        EmailLimit = 25000,
+                        Name = "Professional",
+                        Description = "Advanced features for growing teams and increased reach",
+                        PlanCategory = "For growing teams",
+                        IsMostPopular = true,
+                        PriceMonthly = 79.99m,
+                        PriceYearly = 799.99m, // ~17% discount
+                        SMSLimit = 10000,
+                        MMSLimit = 1000,
+                        EmailLimit = 50000,
                         ContactLimit = 10000,
                         Features = "[\"Advanced campaign management\", \"Workflows & automation\", \"Advanced analytics\", \"Priority support\", \"Custom templates\"]",
                         IsActive = true,
                         IsVisible = true,
-                        ShowOnLanding = true, // Display on landing page (Most Popular)
+                        ShowOnLanding = true,
                         CreatedAt = DateTime.UtcNow
                     },
                     new SubscriptionPlan
                     {
                         Name = "Enterprise",
-                        Description = "For large organizations",
-                        PriceMonthly = 199.99m,
-                        PriceYearly = 1999.99m,
-                        SMSLimit = 50000,
-                        MMSLimit = 5000,
-                        EmailLimit = 250000,
+                        Description = "Complete solution with unlimited power and dedicated support",
+                        PlanCategory = "For large organizations",
+                        IsMostPopular = false,
+                        PriceMonthly = 249.99m,
+                        PriceYearly = 2499.99m, // ~17% discount
+                        SMSLimit = 100000,
+                        MMSLimit = 10000,
+                        EmailLimit = 500000,
                         ContactLimit = 100000,
                         Features = "[\"Unlimited campaigns\", \"Advanced workflows\", \"Premium analytics\", \"24/7 support\", \"Dedicated account manager\", \"API access\", \"White-label options\"]",
                         IsActive = true,
                         IsVisible = true,
-                        ShowOnLanding = true, // Display on landing page
+                        ShowOnLanding = true,
                         CreatedAt = DateTime.UtcNow
                     }
                     };
@@ -389,6 +540,104 @@ namespace MarketingPlatform.Infrastructure.Data
             catch (Exception ex)
             {
                 logger?.LogError(ex, "Error seeding subscription plans.");
+                throw;
+            }
+        }
+
+        private static async Task SeedPlanFeatureMappingsAsync(ApplicationDbContext context, ILogger? logger)
+        {
+            logger?.LogInformation("Seeding plan-feature mappings...");
+
+            try
+            {
+                // Seed Plan-Feature Mappings
+                if (!await context.PlanFeatureMappings.AnyAsync())
+                {
+                    logger?.LogInformation("Creating plan-feature mappings...");
+
+                    // Get plans and features
+                    var starterPlan = await context.SubscriptionPlans.FirstOrDefaultAsync(p => p.Name == "Starter");
+                    var proPlan = await context.SubscriptionPlans.FirstOrDefaultAsync(p => p.Name == "Professional");
+                    var enterprisePlan = await context.SubscriptionPlans.FirstOrDefaultAsync(p => p.Name == "Enterprise");
+
+                    var smsFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "SMS Messages");
+                    var mmsFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "MMS Messages");
+                    var emailFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Email Campaigns");
+                    var contactsFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Contact Management");
+                    var basicAnalyticsFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Basic Analytics");
+                    var advancedAnalyticsFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Advanced Analytics");
+                    var automationFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Automation Workflows");
+                    var templatesFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Custom Templates");
+                    var apiAccessFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "API Access");
+                    var prioritySupportFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Priority Support");
+                    var support247Feature = await context.Features.FirstOrDefaultAsync(f => f.Name == "24/7 Support");
+                    var accountManagerFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Dedicated Account Manager");
+                    var whiteLabelFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "White-label Options");
+                    var teamCollaborationFeature = await context.Features.FirstOrDefaultAsync(f => f.Name == "Team Collaboration");
+
+                    var mappings = new List<PlanFeatureMapping>();
+
+                    // Starter Plan Features
+                    if (starterPlan != null)
+                    {
+                        if (smsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = starterPlan.Id, FeatureId = smsFeature.Id, IsIncluded = true, FeatureValue = "1,000 messages/month", DisplayOrder = 1, CreatedAt = DateTime.UtcNow });
+                        if (mmsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = starterPlan.Id, FeatureId = mmsFeature.Id, IsIncluded = true, FeatureValue = "100 messages/month", DisplayOrder = 2, CreatedAt = DateTime.UtcNow });
+                        if (emailFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = starterPlan.Id, FeatureId = emailFeature.Id, IsIncluded = true, FeatureValue = "5,000 emails/month", DisplayOrder = 3, CreatedAt = DateTime.UtcNow });
+                        if (contactsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = starterPlan.Id, FeatureId = contactsFeature.Id, IsIncluded = true, FeatureValue = "Up to 1,000 contacts", DisplayOrder = 4, CreatedAt = DateTime.UtcNow });
+                        if (basicAnalyticsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = starterPlan.Id, FeatureId = basicAnalyticsFeature.Id, IsIncluded = true, DisplayOrder = 5, CreatedAt = DateTime.UtcNow });
+                        if (templatesFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = starterPlan.Id, FeatureId = templatesFeature.Id, IsIncluded = true, DisplayOrder = 6, CreatedAt = DateTime.UtcNow });
+                    }
+
+                    // Professional Plan Features
+                    if (proPlan != null)
+                    {
+                        if (smsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = smsFeature.Id, IsIncluded = true, FeatureValue = "10,000 messages/month", DisplayOrder = 1, CreatedAt = DateTime.UtcNow });
+                        if (mmsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = mmsFeature.Id, IsIncluded = true, FeatureValue = "1,000 messages/month", DisplayOrder = 2, CreatedAt = DateTime.UtcNow });
+                        if (emailFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = emailFeature.Id, IsIncluded = true, FeatureValue = "50,000 emails/month", DisplayOrder = 3, CreatedAt = DateTime.UtcNow });
+                        if (contactsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = contactsFeature.Id, IsIncluded = true, FeatureValue = "Up to 10,000 contacts", DisplayOrder = 4, CreatedAt = DateTime.UtcNow });
+                        if (advancedAnalyticsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = advancedAnalyticsFeature.Id, IsIncluded = true, DisplayOrder = 5, CreatedAt = DateTime.UtcNow });
+                        if (automationFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = automationFeature.Id, IsIncluded = true, DisplayOrder = 6, CreatedAt = DateTime.UtcNow });
+                        if (templatesFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = templatesFeature.Id, IsIncluded = true, FeatureValue = "Unlimited", DisplayOrder = 7, CreatedAt = DateTime.UtcNow });
+                        if (prioritySupportFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = prioritySupportFeature.Id, IsIncluded = true, DisplayOrder = 8, CreatedAt = DateTime.UtcNow });
+                        if (teamCollaborationFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = proPlan.Id, FeatureId = teamCollaborationFeature.Id, IsIncluded = true, FeatureValue = "Up to 5 users", DisplayOrder = 9, CreatedAt = DateTime.UtcNow });
+                    }
+
+                    // Enterprise Plan Features
+                    if (enterprisePlan != null)
+                    {
+                        if (smsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = smsFeature.Id, IsIncluded = true, FeatureValue = "100,000 messages/month", DisplayOrder = 1, CreatedAt = DateTime.UtcNow });
+                        if (mmsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = mmsFeature.Id, IsIncluded = true, FeatureValue = "10,000 messages/month", DisplayOrder = 2, CreatedAt = DateTime.UtcNow });
+                        if (emailFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = emailFeature.Id, IsIncluded = true, FeatureValue = "500,000 emails/month", DisplayOrder = 3, CreatedAt = DateTime.UtcNow });
+                        if (contactsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = contactsFeature.Id, IsIncluded = true, FeatureValue = "Up to 100,000 contacts", DisplayOrder = 4, CreatedAt = DateTime.UtcNow });
+                        if (advancedAnalyticsFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = advancedAnalyticsFeature.Id, IsIncluded = true, FeatureValue = "Custom reports", DisplayOrder = 5, CreatedAt = DateTime.UtcNow });
+                        if (automationFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = automationFeature.Id, IsIncluded = true, FeatureValue = "Advanced", DisplayOrder = 6, CreatedAt = DateTime.UtcNow });
+                        if (templatesFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = templatesFeature.Id, IsIncluded = true, FeatureValue = "Unlimited", DisplayOrder = 7, CreatedAt = DateTime.UtcNow });
+                        if (apiAccessFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = apiAccessFeature.Id, IsIncluded = true, DisplayOrder = 8, CreatedAt = DateTime.UtcNow });
+                        if (support247Feature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = support247Feature.Id, IsIncluded = true, DisplayOrder = 9, CreatedAt = DateTime.UtcNow });
+                        if (accountManagerFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = accountManagerFeature.Id, IsIncluded = true, DisplayOrder = 10, CreatedAt = DateTime.UtcNow });
+                        if (whiteLabelFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = whiteLabelFeature.Id, IsIncluded = true, DisplayOrder = 11, CreatedAt = DateTime.UtcNow });
+                        if (teamCollaborationFeature != null) mappings.Add(new PlanFeatureMapping { SubscriptionPlanId = enterprisePlan.Id, FeatureId = teamCollaborationFeature.Id, IsIncluded = true, FeatureValue = "Unlimited users", DisplayOrder = 12, CreatedAt = DateTime.UtcNow });
+                    }
+
+                    if (mappings.Any())
+                    {
+                        context.PlanFeatureMappings.AddRange(mappings);
+                        await context.SaveChangesAsync();
+                        logger?.LogInformation("Successfully created {Count} plan-feature mappings.", mappings.Count);
+                    }
+                    else
+                    {
+                        logger?.LogWarning("No plan-feature mappings created. Plans or features may be missing.");
+                    }
+                }
+                else
+                {
+                    logger?.LogInformation("Plan-feature mappings already exist.");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Error seeding plan-feature mappings.");
                 throw;
             }
         }

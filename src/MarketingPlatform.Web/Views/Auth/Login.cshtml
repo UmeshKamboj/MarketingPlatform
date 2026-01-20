@@ -101,7 +101,11 @@
             recaptchaSiteKey: '@ViewBag.RecaptchaSiteKey',
             useServerSideAuth: true  // Flag to disable client-side interception
         };
-
+        window.appConfig= {
+            apiBaseUrl: '@ViewBag.ApiBaseUrl',
+            recaptchaSiteKey: '@ViewBag.RecaptchaSiteKey',
+            useServerSideAuth: true  // Flag to disable client-side interception
+        };
         // Simple password toggle (no form interception)
         document.addEventListener('DOMContentLoaded', function() {
             const toggleButton = document.getElementById('togglePassword');

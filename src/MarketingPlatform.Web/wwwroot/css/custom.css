@@ -1441,3 +1441,426 @@ body {
     border: none;
     min-height: 500px;
 }
+
+/* ========================================
+   LANDING PAGE ENHANCEMENTS - NEW STYLES
+   ======================================== */
+
+/* Company Logos Section */
+.company-logo-wrapper {
+    padding: 15px;
+    transition: transform 0.3s ease;
+}
+
+.company-logo-wrapper:hover {
+    transform: scale(1.05);
+}
+
+.company-logo {
+    max-height: 50px;
+    width: auto;
+    filter: grayscale(100%);
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.company-logo:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+
+.grayscale-logo {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+.letter-spacing-1 {
+    letter-spacing: 1px;
+}
+
+/* Video Player Styles */
+.demo-video-container {
+    position: relative;
+    background: #000;
+    min-height: 300px;
+}
+
+.demo-video-container video {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.video-play-overlay {
+    pointer-events: auto;
+    z-index: 10;
+    transition: opacity 0.3s ease;
+}
+
+.video-play-overlay.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.btn-play-video {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-play-video:hover {
+    transform: scale(1.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-play-video i {
+    margin-left: 5px;
+}
+
+/* Trust Badges Section */
+.trust-badges-section {
+    background: #fff;
+}
+
+.trust-badge-card {
+    background: #fff;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.trust-badge-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.trust-badge-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+/* Use Cases Section */
+.use-cases-section {
+    background: #f9fafb;
+}
+
+.industry-tabs .nav-link {
+    border: 2px solid transparent;
+    border-radius: 50px;
+    padding: 12px 24px;
+    margin: 0 8px;
+    font-weight: 600;
+    color: #6b7280;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.industry-tabs .nav-link:hover {
+    color: #4f46e5;
+    border-color: #4f46e5;
+    background: #f3f4f6;
+}
+
+.industry-tabs .nav-link.active {
+    color: #fff;
+    background: #4f46e5;
+    border-color: #4f46e5;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+
+.industry-tabs .nav-link i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.use-case-list li {
+    padding-left: 0;
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.use-case-list strong {
+    color: #1f2937;
+}
+
+.use-case-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.use-case-image-wrapper img {
+    transition: transform 0.3s ease;
+}
+
+.use-case-image-wrapper:hover img {
+    transform: scale(1.05);
+}
+
+/* FAQ Section */
+.faq-section {
+    background: #f9fafb;
+}
+
+.faq-section .accordion-item {
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.faq-section .accordion-item:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.faq-section .accordion-button {
+    font-size: 1.1rem;
+    padding: 1.25rem 1.5rem;
+    background: #fff;
+    color: #1f2937;
+    border: none;
+}
+
+.faq-section .accordion-button:not(.collapsed) {
+    background: #f3f4f6;
+    color: #4f46e5;
+    box-shadow: none;
+}
+
+.faq-section .accordion-button:focus {
+    box-shadow: none;
+    border: none;
+}
+
+.faq-section .accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%234f46e5'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.faq-section .accordion-body {
+    padding: 1.5rem;
+    background: #fff;
+    line-height: 1.7;
+}
+
+.faq-section .accordion-body ul {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.faq-section .accordion-body li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+/* Features Comparison Table */
+.features-comparison-section {
+    background: #fff;
+}
+
+.comparison-table {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.comparison-table thead {
+    background: #f9fafb;
+}
+
+.comparison-table th {
+    border: none;
+    vertical-align: middle;
+}
+
+.comparison-table .feature-column {
+    min-width: 250px;
+    background: #fff;
+    position: sticky;
+    left: 0;
+    z-index: 10;
+}
+
+.comparison-table .plan-column {
+    min-width: 200px;
+}
+
+.comparison-table .plan-header {
+    border: none;
+}
+
+.comparison-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.comparison-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.comparison-table .section-header {
+    background: #f3f4f6;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.comparison-table .section-header td {
+    border-top: 2px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.comparison-table .feature-name {
+    font-weight: 500;
+    color: #374151;
+    padding: 1rem 1.25rem;
+}
+
+.comparison-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.comparison-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.comparison-table .bi-check-circle-fill {
+    font-size: 1.5rem;
+}
+
+.comparison-table .bi-dash-circle {
+    font-size: 1.5rem;
+}
+
+.comparison-table tfoot td {
+    border-top: 2px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+/* Mobile responsiveness for comparison table */
+@media (max-width: 991.98px) {
+    .comparison-table {
+        display: none;
+    }
+
+    #mobile-comparison {
+        display: block !important;
+    }
+}
+
+@media (min-width: 992px) {
+    #mobile-comparison {
+        display: none !important;
+    }
+}
+
+/* Table responsive scrolling */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #4f46e5;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #4338ca;
+}
+
+/* AOS Animation Enhancements */
+[data-aos="fade-up"] {
+    transform: translateY(30px);
+    opacity: 0;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+[data-aos="fade-up"].aos-animate {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+[data-aos="fade-left"] {
+    transform: translateX(-30px);
+    opacity: 0;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+[data-aos="fade-left"].aos-animate {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+[data-aos="fade-right"] {
+    transform: translateX(30px);
+    opacity: 0;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+[data-aos="fade-right"].aos-animate {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+[data-aos="zoom-in"] {
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+[data-aos="zoom-in"].aos-animate {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Utility Classes for Landing Page */
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .company-logo {
+        max-height: 35px;
+    }
+
+    .trust-badge-img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .industry-tabs .nav-link {
+        padding: 10px 16px;
+        margin: 4px;
+        font-size: 0.9rem;
+    }
+
+    .btn-play-video {
+        width: 60px;
+        height: 60px;
+    }
+
+    .btn-play-video i {
+        font-size: 1.5rem;
+    }
+}

@@ -4,13 +4,15 @@ namespace MarketingPlatform.Core.Entities
     {
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
+        public string? PlanCategory { get; set; } // e.g., "For small businesses", "For growing teams"
+        public bool IsMostPopular { get; set; } = false;
         public decimal PriceMonthly { get; set; }
         public decimal PriceYearly { get; set; }
         public int SMSLimit { get; set; }
         public int MMSLimit { get; set; }
         public int EmailLimit { get; set; }
         public int ContactLimit { get; set; }
-        public string? Features { get; set; } // JSON
+        public string? Features { get; set; } // JSON - Deprecated, use PlanFeatureMappings instead
         
         // Stripe Integration
         public string? StripeProductId { get; set; }
@@ -28,5 +30,6 @@ namespace MarketingPlatform.Core.Entities
 
         // Navigation properties
         public virtual ICollection<UserSubscription> UserSubscriptions { get; set; } = new List<UserSubscription>();
+        public virtual ICollection<PlanFeatureMapping> PlanFeatureMappings { get; set; } = new List<PlanFeatureMapping>();
     }
 }

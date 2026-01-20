@@ -75,7 +75,7 @@ var app = builder.Build();
 // This middleware generates a unique nonce per request and sets CSP headers
 // Development: Permissive CSP to allow hot reload, browser-link, WebSockets
 // Production: Strict nonce-based CSP for security
-app.UseMiddleware<CspMiddleware>();
+//app.UseMiddleware<CspMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

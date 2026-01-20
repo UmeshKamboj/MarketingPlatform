@@ -4,6 +4,7 @@ using MarketingPlatform.Application.Interfaces;
 using MarketingPlatform.Core.Entities;
 using MarketingPlatform.Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace MarketingPlatform.Application.Services
@@ -56,10 +57,14 @@ namespace MarketingPlatform.Application.Services
 
         public async Task<List<SubscriptionPlanDto>> GetLandingPagePlansAsync()
         {
-            var plans = await _planRepository.FindAsync(p => 
-                p.IsActive && p.IsVisible && p.ShowOnLanding && !p.IsDeleted);
+            var plans = await _planRepository.GetQueryable()
+                .Where(p => p.IsActive && p.IsVisible && p.ShowOnLanding && !p.IsDeleted)
+                .Include(p => p.PlanFeatureMappings)
+                    .ThenInclude(pfm => pfm.Feature)
+                .OrderBy(p => p.PriceMonthly)
+                .ToListAsync();
 
-            return plans.OrderBy(p => p.PriceMonthly).Select(MapToPlanDto).ToList();
+            return plans.Select(MapToPlanDto).ToList();
         }
 
         public async Task<SubscriptionPlanDto> CreatePlanAsync(CreateSubscriptionPlanDto dto)
@@ -283,6 +288,26 @@ namespace MarketingPlatform.Application.Services
         {
             var dto = _mapper.Map<SubscriptionPlanDto>(plan);
             dto.Features = DeserializeJson<Dictionary<string, object>>(plan.Features);
+            dto.PlanCategory = plan.PlanCategory ?? "Standard";
+            dto.IsMostPopular = plan.IsMostPopular;
+
+            if (plan.PlanFeatureMappings != null && plan.PlanFeatureMappings.Any())
+            {
+                dto.PlanFeatures = plan.PlanFeatureMappings
+                    .OrderBy(pfm => pfm.DisplayOrder)
+                    .Select(pfm => new PlanFeatureDto
+                    {
+                        Id = pfm.Id,
+                        FeatureId = pfm.FeatureId,
+                        FeatureName = pfm.Feature?.Name ?? "",
+                        FeatureDescription = pfm.Feature?.Description,
+                        FeatureValue = pfm.FeatureValue,
+                        IsIncluded = pfm.IsIncluded,
+                        DisplayOrder = pfm.DisplayOrder
+                    })
+                    .ToList();
+            }
+
             return dto;
         }
 

@@ -4,7 +4,7 @@
 
 class ApiClient {
     constructor() {
-        this.baseUrl = window.authConfig?.apiBaseUrl || '/api';
+        this.baseUrl = window.authConfig?.apiBaseUrl || window.appConfig?.apiBaseUrl;
     }
 
     /**
