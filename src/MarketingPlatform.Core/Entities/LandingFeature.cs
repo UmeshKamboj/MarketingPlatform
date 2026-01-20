@@ -14,16 +14,6 @@ namespace MarketingPlatform.Core.Entities
         public bool IsActive { get; set; } = true;
         public bool ShowOnLanding { get; set; } = true;
 
-        // Additional details for flip card back
-        public string? StatTitle1 { get; set; }
-        public string? StatValue1 { get; set; }
-        public string? StatTitle2 { get; set; }
-        public string? StatValue2 { get; set; }
-        public string? StatTitle3 { get; set; }
-        public string? StatValue3 { get; set; }
-        public string? CallToActionText { get; set; }
-        public string? CallToActionUrl { get; set; }
-
         // Media for detail page
         public string? HeaderImageUrl { get; set; } // Hero image for detail page
         public string? VideoUrl { get; set; } // Video URL (YouTube, Vimeo, or direct)

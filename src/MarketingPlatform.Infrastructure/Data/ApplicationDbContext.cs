@@ -82,6 +82,9 @@ namespace MarketingPlatform.Infrastructure.Data
         public DbSet<PlanFeatureMapping> PlanFeatureMappings => Set<PlanFeatureMapping>();
         public DbSet<LandingFeature> LandingFeatures => Set<LandingFeature>();
         public DbSet<LandingFaq> LandingFaqs => Set<LandingFaq>();
+        public DbSet<Testimonial> Testimonials => Set<Testimonial>();
+        public DbSet<UseCase> UseCases => Set<UseCase>();
+        public DbSet<TrustedCompany> TrustedCompanies => Set<TrustedCompany>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
