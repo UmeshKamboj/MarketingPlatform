@@ -1,7 +1,10 @@
 /**
  * landing-features.js - Dynamic landing page features with flip cards
  * Loads features from database and displays with interactive flip functionality
+ * Version: 2.0 - Fixed hover flip issue (only buttons trigger flip)
  */
+
+console.log('Landing Features JS v2.0 loaded - Flip on button click only');
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
@@ -200,7 +203,6 @@ function initializeFlipCards() {
         // Check if clicked element is a flip trigger or inside one
         const flipTrigger = e.target.closest('.flip-trigger');
         const flipBackTrigger = e.target.closest('.flip-back-trigger');
-        const flipCardBack = e.target.closest('.flip-card-back');
 
         if (flipTrigger) {
             e.preventDefault();
