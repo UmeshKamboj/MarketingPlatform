@@ -31,8 +31,11 @@ async function loadTrustedCompanies() {
                             <img src="${company.logoUrl}"
                                  alt="${escapeHtml(company.companyName)}"
                                  class="company-logo img-fluid grayscale-logo"
-                                 onerror="this.src='/images/placeholder-logo.png'"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
                                  title="${escapeHtml(company.companyName)}">
+                            <div style="display:none; padding: 20px 10px; border: 1px dashed #ccc; border-radius: 8px; color: #999; font-size: 0.875rem;">
+                                ${escapeHtml(company.companyName)}
+                            </div>
                         </div>
                     </div>
                 `;
