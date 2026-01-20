@@ -161,7 +161,7 @@ function renderPricingPlans(plans) {
                                 <div class="small text-muted mb-2">
                                     or $${plan.priceYearly.toFixed(2)}/year
                                 </div>
-                                <div class="badge bg-success bg-opacity-10 text-success">
+                                <div class="badge bg-success bg-opacity-10">
                                     Save ${calculateYearlySavings(plan.priceMonthly, plan.priceYearly)}% yearly
                                 </div>
                             ` : ''}

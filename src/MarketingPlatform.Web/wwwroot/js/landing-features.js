@@ -227,6 +227,14 @@ function reinitScrollAnimations() {
     featureCards.forEach(el => observer.observe(el));
 
     console.log('Reinitialized scroll animations for', featureCards.length, 'feature cards');
+    setTimeout(() => {
+        featureCards.forEach(item => {
+            if (!item.classList.contains('aos-animate')) {
+                item.classList.add('aos-animate');
+            }
+        });
+        console.log('Forced animation on', featureCards.length, 'Feature cards');
+    }, 100);
 }
 
 /**
