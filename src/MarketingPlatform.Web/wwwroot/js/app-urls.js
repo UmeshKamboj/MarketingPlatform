@@ -510,6 +510,20 @@ const AppUrls = {
             update: (id) => `/api/landingfaqs/${id}`,
             delete: (id) => `/api/landingfaqs/${id}`
         },
+
+        securityBadges: {
+            list: '/api/securitybadges',
+            get: (id) => `/api/securitybadges/${id}`,
+            create: '/api/securitybadges',
+            update: (id) => `/api/securitybadges/${id}`,
+            delete: (id) => `/api/securitybadges/${id}`
+        },
+
+        useCases: {
+            list: '/api/usecases',
+            get: (id) => `/api/usecases/${id}`,
+            byIndustry: (industry) => `/api/usecases/industry/${industry}`
+        },
         
         pricing: {
             // Models
