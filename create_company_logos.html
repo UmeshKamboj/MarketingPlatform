@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Company Logo Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .logo-container {
+            display: inline-block;
+            margin: 10px;
+        }
+        svg {
+            border: 1px solid #ddd;
+            background: white;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Company Logo Generator</h1>
+    <p>Click "Generate All Logos" to create PNG images for all companies.</p>
+    <button onclick="generateAllLogos()">Generate All Logos</button>
+    <div id="logos"></div>
+
+    <script>
+        const companies = [
+            { name: 'Microsoft', color: '#00A4EF' },
+            { name: 'Amazon', color: '#FF9900' },
+            { name: 'Google', color: '#4285F4' },
+            { name: 'IBM', color: '#0F62FE' },
+            { name: 'Salesforce', color: '#00A1E0' },
+            { name: 'Oracle', color: '#F80000' },
+            { name: 'SAP', color: '#0FAAFF' },
+            { name: 'Adobe', color: '#FF0000' },
+            { name: 'Cisco', color: '#049FD9' },
+            { name: 'Intel', color: '#0071C5' },
+            { name: 'Dell', color: '#007DB8' },
+            { name: 'HP', color: '#0096D6' }
+        ];
+
+        function createLogoSVG(company) {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '200');
+            svg.setAttribute('height', '100');
+            svg.setAttribute('viewBox', '0 0 200 100');
+
+            // Background
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('width', '200');
+            rect.setAttribute('height', '100');
+            rect.setAttribute('fill', 'white');
+            svg.appendChild(rect);
+
+            // Company name text
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', '100');
+            text.setAttribute('y', '55');
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('font-family', 'Arial, sans-serif');
+            text.setAttribute('font-size', '24');
+            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('fill', company.color);
+            text.textContent = company.name;
+            svg.appendChild(text);
+
+            return svg;
+        }
+
+        function downloadSVGasPNG(svg, filename) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 200;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const img = new Image();
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+
+                    canvas.toBlob(function(blob) {
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(a.href), 100);
+                        resolve();
+                    });
+                };
+
+                img.src = url;
+            });
+        }
+
+        async function generateAllLogos() {
+            const container = document.getElementById('logos');
+            container.innerHTML = '<p>Generating logos...</p>';
+
+            for (const company of companies) {
+                const svg = createLogoSVG(company);
+
+                const div = document.createElement('div');
+                div.className = 'logo-container';
+                div.appendChild(svg.cloneNode(true));
+
+                const label = document.createElement('p');
+                label.textContent = company.name;
+                label.style.textAlign = 'center';
+                div.appendChild(label);
+
+                container.appendChild(div);
+
+                // Download as PNG
+                await downloadSVGasPNG(svg, company.name.toLowerCase() + '.png');
+                await new Promise(resolve => setTimeout(resolve, 500)); // Delay between downloads
+            }
+
+            container.innerHTML += '<p style="color: green; font-weight: bold;">✓ All logos generated! Check your Downloads folder.</p>';
+            alert('All logos downloaded! Move them to: src/MarketingPlatform.Web/wwwroot/images/logos/');
+        }
+    </script>
+</body>
+</html>

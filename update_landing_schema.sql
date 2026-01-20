@@ -165,18 +165,18 @@ BEGIN
     INSERT INTO [TrustedCompanies]
         ([CompanyName], [LogoUrl], [WebsiteUrl], [DisplayOrder], [IsActive])
     VALUES
-        ('Microsoft', '/images/logos/microsoft.png', 'https://microsoft.com', 1, 1),
-        ('Amazon', '/images/logos/amazon.png', 'https://amazon.com', 2, 1),
-        ('Google', '/images/logos/google.png', 'https://google.com', 3, 1),
-        ('IBM', '/images/logos/ibm.png', 'https://ibm.com', 4, 1),
-        ('Salesforce', '/images/logos/salesforce.png', 'https://salesforce.com', 5, 1),
-        ('Oracle', '/images/logos/oracle.png', 'https://oracle.com', 6, 1),
-        ('SAP', '/images/logos/sap.png', 'https://sap.com', 7, 1),
-        ('Adobe', '/images/logos/adobe.png', 'https://adobe.com', 8, 1),
-        ('Cisco', '/images/logos/cisco.png', 'https://cisco.com', 9, 1),
-        ('Intel', '/images/logos/intel.png', 'https://intel.com', 10, 1),
-        ('Dell', '/images/logos/dell.png', 'https://dell.com', 11, 1),
-        ('HP', '/images/logos/hp.png', 'https://hp.com', 12, 1);
+        ('Microsoft', '/images/logos/microsoft.svg', 'https://microsoft.com', 1, 1),
+        ('Amazon', '/images/logos/amazon.svg', 'https://amazon.com', 2, 1),
+        ('Google', '/images/logos/google.svg', 'https://google.com', 3, 1),
+        ('IBM', '/images/logos/ibm.svg', 'https://ibm.com', 4, 1),
+        ('Salesforce', '/images/logos/salesforce.svg', 'https://salesforce.com', 5, 1),
+        ('Oracle', '/images/logos/oracle.svg', 'https://oracle.com', 6, 1),
+        ('SAP', '/images/logos/sap.svg', 'https://sap.com', 7, 1),
+        ('Adobe', '/images/logos/adobe.svg', 'https://adobe.com', 8, 1),
+        ('Cisco', '/images/logos/cisco.svg', 'https://cisco.com', 9, 1),
+        ('Intel', '/images/logos/intel.svg', 'https://intel.com', 10, 1),
+        ('Dell', '/images/logos/dell.svg', 'https://dell.com', 11, 1),
+        ('HP', '/images/logos/hp.svg', 'https://hp.com', 12, 1);
 
     PRINT '✓ Inserted 12 sample trusted companies';
 END
