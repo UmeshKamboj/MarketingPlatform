@@ -177,9 +177,17 @@ function renderFeatures(features) {
 /**
  * Initialize flip card click handlers using event delegation
  */
+let flipCardsInitialized = false; // Prevent multiple initializations
+
 function initializeFlipCards() {
     const container = document.getElementById('features-cards');
     if (!container) return;
+
+    // Only initialize once to prevent event listener stacking
+    if (flipCardsInitialized) {
+        console.log('Flip cards already initialized, skipping');
+        return;
+    }
 
     // Use event delegation for better reliability with dynamic content
     container.addEventListener('click', function(e) {
@@ -212,16 +220,10 @@ function initializeFlipCards() {
                 console.log('Flipping card back:', featureId);
                 card.classList.remove('flipped');
             }
-        } else if (flipCardBack && !e.target.closest('a, button')) {
-            // Click on card back (but not on links/buttons) flips back
-            const card = flipCardBack.closest('.flip-card');
-            if (card && card.classList.contains('flipped')) {
-                console.log('Flipping card back via card click');
-                card.classList.remove('flipped');
-            }
         }
     });
 
+    flipCardsInitialized = true; // Mark as initialized
     console.log('Flip card interactions initialized with event delegation');
 
     reinitScrollAnimations();

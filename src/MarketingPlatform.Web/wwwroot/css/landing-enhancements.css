@@ -41,13 +41,19 @@
 .flip-card-back {
     transform: rotateY(180deg);
     overflow: hidden;
-    cursor: pointer; /* Indicate card back is clickable */
+    pointer-events: auto; /* Ensure pointer events work */
 }
 
-/* Don't show pointer on buttons and links inside card back */
+/* Buttons and links are clickable */
 .flip-card-back button,
 .flip-card-back a {
     cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+/* Scrollable area should allow scrolling */
+.flip-card-back .overflow-auto {
+    pointer-events: auto;
 }
 
 /* Stats on flip card back - ensure text is visible */
@@ -98,9 +104,7 @@
 }
 
 .feature-icon-bg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    position: absolute; 
     transform: translate(-50%, -50%);
     width: 100px;
     height: 100px;
