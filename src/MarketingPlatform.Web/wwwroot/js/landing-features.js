@@ -183,9 +183,16 @@ function initializeFlipCards() {
 
     // Use event delegation for better reliability with dynamic content
     container.addEventListener('click', function(e) {
+        // Don't interfere with "View Full Details" links
+        if (e.target.closest('a[href^="/features/"]')) {
+            console.log('Allowing navigation to detail page');
+            return; // Let the link work normally
+        }
+
         // Check if clicked element is a flip trigger or inside one
         const flipTrigger = e.target.closest('.flip-trigger');
         const flipBackTrigger = e.target.closest('.flip-back-trigger');
+        const flipCardBack = e.target.closest('.flip-card-back');
 
         if (flipTrigger) {
             e.preventDefault();
@@ -203,6 +210,13 @@ function initializeFlipCards() {
             const card = document.getElementById(`feature-card-${featureId}`);
             if (card) {
                 console.log('Flipping card back:', featureId);
+                card.classList.remove('flipped');
+            }
+        } else if (flipCardBack && !e.target.closest('a, button')) {
+            // Click on card back (but not on links/buttons) flips back
+            const card = flipCardBack.closest('.flip-card');
+            if (card && card.classList.contains('flipped')) {
+                console.log('Flipping card back via card click');
                 card.classList.remove('flipped');
             }
         }

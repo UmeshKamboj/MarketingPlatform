@@ -41,6 +41,13 @@
 .flip-card-back {
     transform: rotateY(180deg);
     overflow: hidden;
+    cursor: pointer; /* Indicate card back is clickable */
+}
+
+/* Don't show pointer on buttons and links inside card back */
+.flip-card-back button,
+.flip-card-back a {
+    cursor: pointer !important;
 }
 
 /* Stats on flip card back - ensure text is visible */
