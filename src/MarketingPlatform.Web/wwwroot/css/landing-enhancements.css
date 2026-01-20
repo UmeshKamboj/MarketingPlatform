@@ -43,6 +43,17 @@
     overflow: hidden;
 }
 
+/* Stats on flip card back - ensure text is visible */
+.flip-card-back .bg-opacity-20 {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.flip-card-back .bg-opacity-20 .fw-bold,
+.flip-card-back .bg-opacity-20 small {
+    color: white !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 /* Better text handling on flip card back */
 .flip-card-back .overflow-auto {
     max-height: 280px;

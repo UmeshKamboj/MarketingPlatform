@@ -77,6 +77,7 @@ function renderFeatures(features) {
     let html = '';
     features.forEach((feature, index) => {
         console.log(`Rendering feature ${index + 1}:`, feature.title);
+        console.log(`  Stats: 1="${feature.statValue1}" 2="${feature.statValue2}" 3="${feature.statValue3}"`);
 
         // Calculate delay for staggered animation
         const delay = (index % 3) * 100 + 100;
@@ -118,29 +119,29 @@ function renderFeatures(features) {
                                     </p>
 
                                     <!-- Stats -->
-                                    ${feature.statTitle1 || feature.statTitle2 || feature.statTitle3 ? `
+                                    ${(feature.statTitle1 || feature.StatTitle1) || (feature.statTitle2 || feature.StatTitle2) || (feature.statTitle3 || feature.StatTitle3) ? `
                                         <div class="row g-2 mb-3">
-                                            ${feature.statTitle1 ? `
+                                            ${(feature.statTitle1 || feature.StatTitle1) ? `
                                                 <div class="col-4">
                                                     <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue1)}</div>
-                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle1)}</small>
+                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue1 || feature.StatValue1)}</div>
+                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle1 || feature.StatTitle1)}</small>
                                                     </div>
                                                 </div>
                                             ` : ''}
-                                            ${feature.statTitle2 ? `
+                                            ${(feature.statTitle2 || feature.StatTitle2) ? `
                                                 <div class="col-4">
                                                     <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue2)}</div>
-                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle2)}</small>
+                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue2 || feature.StatValue2)}</div>
+                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle2 || feature.StatTitle2)}</small>
                                                     </div>
                                                 </div>
                                             ` : ''}
-                                            ${feature.statTitle3 ? `
+                                            ${(feature.statTitle3 || feature.StatTitle3) ? `
                                                 <div class="col-4">
                                                     <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue3)}</div>
-                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle3)}</small>
+                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue3 || feature.StatValue3)}</div>
+                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle3 || feature.StatTitle3)}</small>
                                                     </div>
                                                 </div>
                                             ` : ''}
