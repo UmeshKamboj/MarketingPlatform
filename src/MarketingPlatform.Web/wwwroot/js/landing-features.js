@@ -117,39 +117,9 @@ function renderFeatures(features) {
                                 <!-- Content -->
                                 <div class="flex-grow-1 overflow-auto mb-3">
                                     <h4 class="fw-bold mb-3">${escapeHtml(feature.title)}</h4>
-                                    <p class="mb-3 small" style="line-height: 1.5;">
+                                    <p class="mb-0 small" style="line-height: 1.6;">
                                         ${escapeHtml(feature.detailedDescription)}
                                     </p>
-
-                                    <!-- Stats -->
-                                    ${(feature.statTitle1 || feature.StatTitle1) || (feature.statTitle2 || feature.StatTitle2) || (feature.statTitle3 || feature.StatTitle3) ? `
-                                        <div class="row g-2 mb-3">
-                                            ${(feature.statTitle1 || feature.StatTitle1) ? `
-                                                <div class="col-4">
-                                                    <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue1 || feature.StatValue1)}</div>
-                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle1 || feature.StatTitle1)}</small>
-                                                    </div>
-                                                </div>
-                                            ` : ''}
-                                            ${(feature.statTitle2 || feature.StatTitle2) ? `
-                                                <div class="col-4">
-                                                    <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue2 || feature.StatValue2)}</div>
-                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle2 || feature.StatTitle2)}</small>
-                                                    </div>
-                                                </div>
-                                            ` : ''}
-                                            ${(feature.statTitle3 || feature.StatTitle3) ? `
-                                                <div class="col-4">
-                                                    <div class="bg-white bg-opacity-20 rounded p-2 text-center">
-                                                        <div class="fw-bold mb-0">${escapeHtml(feature.statValue3 || feature.StatValue3)}</div>
-                                                        <small class="opacity-90" style="font-size: 0.7rem;">${escapeHtml(feature.statTitle3 || feature.StatTitle3)}</small>
-                                                    </div>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    ` : ''}
                                 </div>
 
                                 <!-- View Details Button at Bottom -->
@@ -211,7 +181,10 @@ function initializeFlipCards() {
             const card = document.getElementById(`feature-card-${featureId}`);
             if (card) {
                 console.log('Flipping card forward:', featureId);
+                card.classList.add('flipping');
                 card.classList.add('flipped');
+                // Remove flipping class after transition
+                setTimeout(() => card.classList.remove('flipping'), 600);
             }
         } else if (flipBackTrigger) {
             e.preventDefault();
@@ -220,7 +193,10 @@ function initializeFlipCards() {
             const card = document.getElementById(`feature-card-${featureId}`);
             if (card) {
                 console.log('Flipping card back:', featureId);
+                card.classList.add('flipping');
                 card.classList.remove('flipped');
+                // Remove flipping class after transition
+                setTimeout(() => card.classList.remove('flipping'), 600);
             }
         }
     });

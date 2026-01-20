@@ -14,12 +14,28 @@
     position: relative;
     width: 100%;
     min-height: 400px;
-    transition: transform 0.6s ease-in-out;
     transform-style: preserve-3d;
-    transform: rotateY(0deg);
+    transform: rotateY(0deg) !important;
+    will-change: auto;
+}
+
+/* Only add transition when flipping */
+.flip-card.flipping {
+    transition: transform 0.6s ease-in-out;
 }
 
 .flip-card.flipped {
+    transform: rotateY(180deg) !important;
+}
+
+/* Explicitly prevent any hover transformations */
+.flip-card:hover,
+.flip-card-container:hover .flip-card {
+    transform: rotateY(0deg) !important;
+}
+
+.flip-card.flipped:hover,
+.flip-card-container:hover .flip-card.flipped {
     transform: rotateY(180deg) !important;
 }
 
